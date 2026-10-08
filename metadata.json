@@ -1,0 +1,6 @@
+{
+  "name": "AURELIS — Spaced Repetition & Revision Platform",
+  "description": "Remember what matters. A premium personal revision and spaced-repetition platform designed for students preparing for demanding academic examinations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

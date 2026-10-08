@@ -1,0 +1,17 @@
+{
+  "name": "AURELIS — Spaced Repetition",
+  "short_name": "AURELIS",
+  "description": "Remember what matters. Spaced repetition for rigorous examination prep.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0b0e",
+  "theme_color": "#0a0b0e",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
