@@ -222,10 +222,6 @@ export const LandingPage: React.FC = () => {
               q: 'What if I miss a scheduled revision day?',
               a: 'Items become marked as Overdue and are surfaced at the very top of your queue so you can quickly catch up without losing your recall momentum.',
             },
-            {
-              q: 'Does AURELIS require an internet connection?',
-              a: 'No. The entire core application is built with a local-first architecture. All records persist on your device.',
-            },
           ].map(({ q, a }, idx) => (
             <div
               key={idx}
