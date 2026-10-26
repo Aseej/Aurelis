@@ -47,6 +47,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   targetDailyTopics: 3,
   revisionIntervals: DEFAULT_REVISION_INTERVALS,
   theme: 'dark',
+  language: 'en',
   notificationsEnabled: true,
   notificationTime: '07:30',
   onboarded: true, // Default to true so user immediately sees rich interactive dashboard, but can replay onboarding anytime

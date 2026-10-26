@@ -12,6 +12,7 @@ import {
   Search,
   X,
 } from 'lucide-react';
+import { useI18n } from '../../i18n';
 
 const CATEGORY_LABELS: Record<MistakeCategory, string> = {
   forgot_concept: 'Forgot Concept',
@@ -26,6 +27,7 @@ const CATEGORY_LABELS: Record<MistakeCategory, string> = {
 
 export const ErrorLogView: React.FC = () => {
   const { state, addErrorLog, toggleErrorResolved, deleteErrorLog } = useApp();
+  const { t } = useI18n();
 
   const todayStr = getTodayDateString();
 
@@ -121,10 +123,10 @@ export const ErrorLogView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
-            Error Notebook & Mistakes
+            {t('errors.title', 'Error Notebook & Mistakes')}
           </h1>
           <p className="text-xs text-[#858A93] dark:text-[#777F8C] mt-0.5">
-            Analyze exam pitfalls and record conceptual corrections to eliminate repeat errors
+            {t('errors.subtitle', 'Systematically record mistakes, formula confusions, and misconceptions')}
           </p>
         </div>
 
@@ -133,7 +135,7 @@ export const ErrorLogView: React.FC = () => {
           className="btn-gold-primary flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-xs transition-all active:scale-95"
         >
           <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
-          <span>Record New Mistake</span>
+          <span>{t('errors.addError', 'Record New Mistake')}</span>
         </button>
       </div>
 

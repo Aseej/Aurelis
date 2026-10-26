@@ -22,6 +22,8 @@ import { GlobalSearchModal } from './components/search/GlobalSearchModal';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { OnboardingModal } from './components/onboarding/OnboardingModal';
 
+import { I18nProvider } from './i18n';
+
 const AppContent: React.FC = () => {
   const { activeView, state, updateSettings } = useApp();
 
@@ -81,10 +83,25 @@ const AppContent: React.FC = () => {
   );
 };
 
+const AppWithI18n: React.FC = () => {
+  const { state, updateSettings } = useApp();
+  const currentLanguage = state.settings.language || 'en';
+
+  const handleLanguageChange = (code: string) => {
+    updateSettings({ language: code });
+  };
+
+  return (
+    <I18nProvider currentLanguage={currentLanguage} onLanguageChange={handleLanguageChange}>
+      <AppContent />
+    </I18nProvider>
+  );
+};
+
 export default function App() {
   return (
     <AppProvider>
-      <AppContent />
+      <AppWithI18n />
     </AppProvider>
   );
 }

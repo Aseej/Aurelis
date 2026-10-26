@@ -101,6 +101,7 @@ export interface UserSettings {
   targetDailyTopics: number;
   revisionIntervals: number[]; // Default: [0, 2, 4, 6, 13, 20, 27]
   theme: 'dark' | 'light';
+  language?: string; // Language code, e.g. 'en', 'ne', 'hi', etc.
   notificationsEnabled: boolean;
   notificationTime: string;
   onboarded: boolean;

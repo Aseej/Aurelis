@@ -9,9 +9,11 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
+import { useI18n } from '../../i18n';
 
 export const WeeklyTestsView: React.FC = () => {
   const { state, weeklyTestsDue, addWeeklyTest, deleteWeeklyTest } = useApp();
+  const { t, formatDate } = useI18n();
 
   const todayStr = getTodayDateString();
 
@@ -88,10 +90,10 @@ export const WeeklyTestsView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
-            Weekly Tests & Diagnostics
+            {t('tests.title', 'Weekly Tests & Assessment')}
           </h1>
           <p className="text-xs text-[#858A93] dark:text-[#777F8C] mt-0.5">
-            Assess 7-day retention milestones and record examination scores
+            {t('tests.subtitle', 'Track performance on comprehensive tests and verify spaced recall retention')}
           </p>
         </div>
 
@@ -103,7 +105,7 @@ export const WeeklyTestsView: React.FC = () => {
               className="btn-glass-secondary flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold text-[#8C6221] dark:text-[#FFE6AD] border border-[#E6C27A]/30 transition-all"
             >
               <Sparkles className="h-3.5 w-3.5 text-[#E6C27A]" />
-              <span>{isAiGenerating ? 'Synthesizing Test...' : 'Generate 5-Q Practice Test'}</span>
+              <span>{isAiGenerating ? t('common.loading', 'Synthesizing Test...') : 'Generate 5-Q Practice Test'}</span>
             </button>
           )}
 
@@ -112,7 +114,7 @@ export const WeeklyTestsView: React.FC = () => {
             className="btn-gold-primary flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-xs transition-all active:scale-95"
           >
             <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>Log Test Score</span>
+            <span>{t('tests.addTest', 'Log Test Score')}</span>
           </button>
         </div>
       </div>

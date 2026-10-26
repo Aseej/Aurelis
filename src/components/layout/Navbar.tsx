@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { Search, Plus, Moon, Sun, Flame, Sparkles } from 'lucide-react';
+import { useI18n } from '../../i18n';
+import { Search, Plus, Moon, Sun, Flame } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const {
@@ -14,6 +15,8 @@ export const Navbar: React.FC = () => {
     streakInfo,
     purgeDemoData,
   } = useApp();
+
+  const { t } = useI18n();
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-black/[0.06] bg-[#F4F1EA]/80 backdrop-blur-xl dark:border-white/[0.09] dark:bg-[#090B10]/80 transition-colors">
@@ -36,7 +39,7 @@ export const Navbar: React.FC = () => {
                 AURELIS
               </span>
               <span className="hidden sm:block text-[9px] uppercase tracking-widest text-[#858A93] dark:text-[#777F8C] -mt-0.5">
-                Remember what matters
+                {t('app.brandTagline', 'Remember what matters')}
               </span>
             </div>
           </button>
@@ -49,7 +52,7 @@ export const Navbar: React.FC = () => {
             >
               <span aria-hidden="true">·</span>
               <span className="text-[#A97B32] dark:text-[#E6C27A]/90 hover:underline">
-                Reset Demo Data
+                {t('nav.resetDemo', 'Reset Demo Data')}
               </span>
             </button>
           )}
@@ -68,7 +71,7 @@ export const Navbar: React.FC = () => {
                 : ''
             }`}
           >
-            Today's Focus
+            {t('nav.dashboard', "Today's Focus")}
           </button>
           <button
             onClick={() => setActiveView('review')}
@@ -78,7 +81,7 @@ export const Navbar: React.FC = () => {
                 : ''
             }`}
           >
-            Revision Queue
+            {t('nav.review', 'Revision Queue')}
           </button>
           <button
             onClick={() => setActiveView('calendar')}
@@ -88,7 +91,7 @@ export const Navbar: React.FC = () => {
                 : ''
             }`}
           >
-            Calendar
+            {t('nav.calendar', 'Calendar')}
           </button>
           <button
             onClick={() => setActiveView('subjects')}
@@ -98,7 +101,7 @@ export const Navbar: React.FC = () => {
                 : ''
             }`}
           >
-            Subjects
+            {t('nav.subjects', 'Subjects')}
           </button>
           <button
             onClick={() => setActiveView('tests')}
@@ -108,7 +111,7 @@ export const Navbar: React.FC = () => {
                 : ''
             }`}
           >
-            Weekly Tests
+            {t('nav.tests', 'Weekly Tests')}
           </button>
           <button
             onClick={() => setActiveView('errors')}
@@ -118,7 +121,7 @@ export const Navbar: React.FC = () => {
                 : ''
             }`}
           >
-            Error Log
+            {t('nav.errors', 'Error Log')}
           </button>
           <button
             onClick={() => setActiveView('analytics')}
@@ -128,7 +131,7 @@ export const Navbar: React.FC = () => {
                 : ''
             }`}
           >
-            Analytics
+            {t('nav.analytics', 'Analytics')}
           </button>
         </nav>
 
@@ -148,11 +151,11 @@ export const Navbar: React.FC = () => {
           <button
             onClick={() => setIsSearchOpen(true)}
             className="flex h-8 items-center gap-2 rounded-lg border border-black/[0.08] bg-white/60 px-2.5 text-xs text-[#686D77] transition-all hover:bg-white hover:text-[#20232A] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-[#A7ABB5] dark:hover:bg-white/[0.08] dark:hover:text-[#F6F3EC]"
-            title="Search topics, notes & mistakes (⌘K)"
-            aria-label="Quick Search"
+            title={t('nav.searchPlaceholder', 'Search topics, notes & mistakes (⌘K)')}
+            aria-label={t('nav.search', 'Search')}
           >
             <Search className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Search</span>
+            <span className="hidden sm:inline">{t('nav.search', 'Search')}</span>
             <kbd className="hidden sm:inline-block rounded border border-black/[0.1] bg-white/80 px-1 text-[10px] font-mono text-[#858A93] dark:border-white/[0.1] dark:bg-white/[0.06] dark:text-[#777F8C]">
               ⌘K
             </kbd>
@@ -171,10 +174,11 @@ export const Navbar: React.FC = () => {
             className="btn-gold-primary flex h-8 items-center gap-1.5 rounded-lg px-3 text-xs tracking-tight"
           >
             <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span className="whitespace-nowrap font-semibold">Add Topic</span>
+            <span className="whitespace-nowrap font-semibold">{t('nav.addTopic', 'Add Topic')}</span>
           </button>
         </div>
       </div>
     </header>
   );
 };
+

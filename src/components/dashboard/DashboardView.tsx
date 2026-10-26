@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useI18n } from '../../i18n';
 import {
   getTodayDateString,
   getDueReasonExplanation,
@@ -33,15 +34,17 @@ export const DashboardView: React.FC = () => {
     purgeDemoData,
   } = useApp();
 
+  const { t, formatDate } = useI18n();
+
   const todayStr = getTodayDateString();
 
   // Dynamic greeting based on time of day
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
-  }, []);
+    if (hour < 12) return t('dashboard.greetingMorning', 'Good morning');
+    if (hour < 17) return t('dashboard.greetingAfternoon', 'Good afternoon');
+    return t('dashboard.greetingEvening', 'Good evening');
+  }, [t]);
 
   // Today's topics logged (studied today)
   const newTopicsToday = useMemo(() => {
@@ -74,7 +77,7 @@ export const DashboardView: React.FC = () => {
             onClick={() => purgeDemoData()}
             className="self-start sm:self-auto rounded-xl border border-[#E6C27A]/40 bg-white/70 dark:bg-black/40 px-3.5 py-1.5 font-semibold text-[#8C6221] dark:text-[#FFE6AD] hover:bg-[#E6C27A]/20 transition-all shadow-xs shrink-0"
           >
-            Reset All Demo Data
+            {t('nav.resetDemo', 'Reset All Demo Data')}
           </button>
         </section>
       )}
@@ -87,7 +90,7 @@ export const DashboardView: React.FC = () => {
               {greeting}, {state.settings.studentName || 'Aakash Panjiyar'}
             </h1>
             <p className="text-xs text-[#858A93] dark:text-[#777F8C] font-mono mt-0.5">
-              {new Date().toLocaleDateString('en-US', {
+              {formatDate(new Date(), {
                 weekday: 'long',
                 month: 'long',
                 day: 'numeric',
@@ -102,7 +105,7 @@ export const DashboardView: React.FC = () => {
               className="btn-glass-secondary inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-medium shadow-xs transition-all"
             >
               <Plus className="h-3.5 w-3.5 text-[#A97B32] dark:text-[#E6C27A]" />
-              <span>Record New Topic</span>
+              <span>{t('dashboard.addNewTopic', 'Record New Topic')}</span>
             </button>
           </div>
         </div>
@@ -120,10 +123,10 @@ export const DashboardView: React.FC = () => {
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-wider text-[#A97B32] dark:text-[#E6C27A] flex items-center gap-1.5">
               <Sparkles className="h-3.5 w-3.5" />
-              <span>Today's Study Plan</span>
+              <span>{t('dashboard.todayRecallSchedule', "Today's Study Plan")}</span>
             </div>
             <p className="text-xs text-[#858A93] dark:text-[#777F8C] mt-0.5">
-              Spaced repetition agenda computed for maximum long-term retention
+              {t('queue.subtitle', 'Spaced repetition agenda computed for maximum long-term retention')}
             </p>
           </div>
 
@@ -132,7 +135,7 @@ export const DashboardView: React.FC = () => {
               onClick={() => setActiveView('review')}
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#A97B32] dark:text-[#FFE6AD] hover:underline self-start sm:self-auto"
             >
-              <span>View Full Queue</span>
+              <span>{t('queue.allDue', 'View Full Queue')}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           )}
@@ -146,10 +149,10 @@ export const DashboardView: React.FC = () => {
               <span className="font-mono text-3xl sm:text-4xl font-semibold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
                 {String(todayReviewsDue.length).padStart(2, '0')}
               </span>
-              <span className="text-xs font-medium text-[#858A93] dark:text-[#777F8C]">Due</span>
+              <span className="text-xs font-medium text-[#858A93] dark:text-[#777F8C]">{t('common.due', 'Due')}</span>
             </div>
             <div className="text-xs text-[#686D77] dark:text-[#A7ABB5]">
-              Scheduled Revisions
+              {t('calendar.reviewsOnDate', 'Scheduled Revisions')}
             </div>
           </div>
 
@@ -159,10 +162,10 @@ export const DashboardView: React.FC = () => {
               <span className="font-mono text-3xl sm:text-4xl font-semibold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
                 {String(newTopicsToday.length).padStart(2, '0')}
               </span>
-              <span className="text-xs font-medium text-[#858A93] dark:text-[#777F8C]">Logged</span>
+              <span className="text-xs font-medium text-[#858A93] dark:text-[#777F8C]">{t('common.today', 'Logged')}</span>
             </div>
             <div className="text-xs text-[#686D77] dark:text-[#A7ABB5]">
-              New Topics Today
+              {t('common.topics', 'New Topics Today')}
             </div>
           </div>
 
@@ -172,10 +175,10 @@ export const DashboardView: React.FC = () => {
               <span className="font-mono text-3xl sm:text-4xl font-semibold tabular-nums text-[#A97B32] dark:text-[#E6C27A]">
                 {String(weeklyTestsDue.length).padStart(2, '0')}
               </span>
-              <span className="text-xs font-medium text-[#858A93] dark:text-[#777F8C]">Milestone</span>
+              <span className="text-xs font-medium text-[#858A93] dark:text-[#777F8C]">{t('nav.tests', 'Milestone')}</span>
             </div>
             <div className="text-xs text-[#686D77] dark:text-[#A7ABB5]">
-              Day 7 Tests Due
+              {t('stage.test', 'Day 7 Tests Due')}
             </div>
           </div>
 
@@ -189,10 +192,10 @@ export const DashboardView: React.FC = () => {
               >
                 {String(overdueReviews.length).padStart(2, '0')}
               </span>
-              <span className="text-xs font-medium text-[#858A93] dark:text-[#777F8C]">Overdue</span>
+              <span className="text-xs font-medium text-[#858A93] dark:text-[#777F8C]">{t('common.overdue', 'Overdue')}</span>
             </div>
             <div className="text-xs text-[#686D77] dark:text-[#A7ABB5]">
-              Need Immediate Attention
+              {t('dashboard.attentionNeeded', 'Need Immediate Attention')}
             </div>
           </div>
         </div>
@@ -206,7 +209,7 @@ export const DashboardView: React.FC = () => {
               <div className="flex items-center gap-2 text-xs text-[#686D77] dark:text-[#A7ABB5]">
                 <span className="h-2 w-2 rounded-full bg-[#E6C27A]" />
                 <span className="font-semibold uppercase tracking-wider text-[11px] text-[#A97B32] dark:text-[#E6C27A]">
-                  Next Recommended Review
+                  {t('common.recommended', 'Next Recommended Review')}
                 </span>
                 <span aria-hidden="true">·</span>
                 <span className="font-mono text-[#858A93] dark:text-[#777F8C]">
@@ -233,7 +236,7 @@ export const DashboardView: React.FC = () => {
                 className="btn-gold-primary flex h-11 items-center gap-2.5 rounded-xl px-5 text-xs font-semibold shadow-md active:scale-95 transition-all"
               >
                 <Play className="h-4 w-4 fill-current" />
-                <span className="tracking-wide">Start Review</span>
+                <span className="tracking-wide">{t('dashboard.startSession', 'Start Review')}</span>
               </button>
             </div>
           </div>

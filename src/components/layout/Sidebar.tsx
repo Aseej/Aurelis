@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useI18n } from '../../i18n';
 import {
   LayoutDashboard,
   Repeat,
@@ -23,20 +24,22 @@ export const Sidebar: React.FC = () => {
     setIsSettingsOpen,
   } = useApp();
 
+  const { t, isRTL } = useI18n();
+
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const dueCount = todayReviewsDue.length;
   const testCount = weeklyTestsDue.length;
 
   const navItems = [
-    { id: 'dashboard', label: "Today's Focus", icon: LayoutDashboard, badge: dueCount > 0 ? dueCount : null },
-    { id: 'review', label: 'Revision Queue', icon: Repeat, badge: dueCount > 0 ? dueCount : null },
-    { id: 'calendar', label: 'Calendar', icon: Calendar },
-    { id: 'subjects', label: 'Subjects', icon: BookOpen },
-    { id: 'tests', label: 'Weekly Tests', icon: FileCheck2, badge: testCount > 0 ? testCount : null },
-    { id: 'errors', label: 'Error Notebook', icon: AlertCircle },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'landing', label: 'Public Overview', icon: Globe },
+    { id: 'dashboard', label: t('nav.dashboard', "Today's Focus"), icon: LayoutDashboard, badge: dueCount > 0 ? dueCount : null },
+    { id: 'review', label: t('nav.review', 'Revision Queue'), icon: Repeat, badge: dueCount > 0 ? dueCount : null },
+    { id: 'calendar', label: t('nav.calendar', 'Calendar'), icon: Calendar },
+    { id: 'subjects', label: t('nav.subjects', 'Subjects'), icon: BookOpen },
+    { id: 'tests', label: t('nav.tests', 'Weekly Tests'), icon: FileCheck2, badge: testCount > 0 ? testCount : null },
+    { id: 'errors', label: t('nav.errors', 'Error Notebook'), icon: AlertCircle },
+    { id: 'analytics', label: t('nav.analytics', 'Analytics'), icon: BarChart3 },
+    { id: 'landing', label: t('nav.landing', 'Public Overview'), icon: Globe },
   ];
 
   return (
@@ -53,7 +56,7 @@ export const Sidebar: React.FC = () => {
               A
             </span>
             <span className="font-serif text-xs font-semibold tracking-wider text-[#20232A] dark:text-[#F6F3EC]">
-              NAVIGATION
+              {t('nav.menu', 'NAVIGATION')}
             </span>
           </div>
         )}
@@ -65,7 +68,11 @@ export const Sidebar: React.FC = () => {
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          {isCollapsed ? (
+            isRTL ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />
+          ) : (
+            isRTL ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />
+          )}
         </button>
       </div>
 
@@ -112,11 +119,11 @@ export const Sidebar: React.FC = () => {
           className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-xs text-[#686D77] hover:bg-black/[0.04] hover:text-[#20232A] dark:text-[#A7ABB5] dark:hover:bg-white/[0.04] dark:hover:text-[#F6F3EC] transition-all ${
             isCollapsed ? 'justify-center px-0' : ''
           }`}
-          title="Settings & Data Management"
+          title={t('nav.settings', 'Settings & Backup')}
         >
           <Settings className="h-4 w-4 shrink-0 text-[#858A93] dark:text-[#777F8C]" />
           {!isCollapsed && (
-            <span className="truncate">Settings & Backup</span>
+            <span className="truncate">{t('nav.settings', 'Settings & Backup')}</span>
           )}
         </button>
       </div>

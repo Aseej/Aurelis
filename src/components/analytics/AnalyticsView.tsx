@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useI18n } from '../../i18n';
 import {
   TrendingUp,
   Award,
@@ -13,6 +14,7 @@ import {
 
 export const AnalyticsView: React.FC = () => {
   const { state, setActiveView, setIsAddTopicOpen } = useApp();
+  const { t, formatNumber } = useI18n();
 
   const totalTopics = state.topics.length;
 
@@ -22,13 +24,13 @@ export const AnalyticsView: React.FC = () => {
     let completedReviews = 0;
     let totalMinutesStudied = 0;
 
-    state.topics.forEach((t) => {
-      t.schedule.forEach((s) => {
+    state.topics.forEach((topic) => {
+      topic.schedule.forEach((s) => {
         if (s.stepIndex === 0) return; // step 0 is Learn
         totalScheduledReviews++;
         if (s.status === 'completed') {
           completedReviews++;
-          totalMinutesStudied += t.estimatedDurationMinutes || 20;
+          totalMinutesStudied += topic.estimatedDurationMinutes || 20;
         }
       });
     });
@@ -43,25 +45,25 @@ export const AnalyticsView: React.FC = () => {
     const testAverage =
       testCount > 0
         ? Math.round(
-            state.weeklyTests.reduce((acc, t) => acc + t.percentage, 0) / testCount
+            state.weeklyTests.reduce((acc, test) => acc + test.percentage, 0) / testCount
           )
         : null;
 
     // Mastery levels distribution
     const masteryDist = {
-      mastered: state.topics.filter((t) => t.mastery === 'mastered').length,
-      strong: state.topics.filter((t) => t.mastery === 'strong').length,
-      developing: state.topics.filter((t) => t.mastery === 'developing').length,
-      learning: state.topics.filter((t) => t.mastery === 'learning').length,
-      new: state.topics.filter((t) => t.mastery === 'new').length,
+      mastered: state.topics.filter((topic) => topic.mastery === 'mastered').length,
+      strong: state.topics.filter((topic) => topic.mastery === 'strong').length,
+      developing: state.topics.filter((topic) => topic.mastery === 'developing').length,
+      learning: state.topics.filter((topic) => topic.mastery === 'learning').length,
+      new: state.topics.filter((topic) => topic.mastery === 'new').length,
     };
 
     // Subject breakdown
     const subjectBreakdown = state.subjects.map((s) => {
-      const topics = state.topics.filter((t) => t.subjectId === s.id);
+      const topics = state.topics.filter((topic) => topic.subjectId === s.id);
       const avg =
         topics.length > 0
-          ? Math.round(topics.reduce((acc, t) => acc + t.masteryScore, 0) / topics.length)
+          ? Math.round(topics.reduce((acc, topic) => acc + topic.masteryScore, 0) / topics.length)
           : 0;
       return {
         subject: s,
@@ -101,7 +103,7 @@ export const AnalyticsView: React.FC = () => {
           onClick={() => setIsAddTopicOpen(true)}
           className="btn-gold-primary inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold"
         >
-          Add Your First Topic
+          {t('common.addTopic')}
         </button>
       </div>
     );
@@ -112,10 +114,10 @@ export const AnalyticsView: React.FC = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
-          Performance & Mastery Analytics
+          {t('analytics.title')}
         </h1>
         <p className="text-xs text-[#858A93] dark:text-[#777F8C] mt-0.5">
-          Auditable metrics computed from your spaced repetition schedule and diagnostic test logs
+          {t('analytics.subtitle')}
         </p>
       </div>
 
@@ -124,13 +126,13 @@ export const AnalyticsView: React.FC = () => {
         {/* 1. Topics Learned */}
         <div className="rounded-3xl glass-premium p-5 transition-all">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-            Curriculum Topics
+            {t('nav.topics')}
           </div>
           <div className="mt-2.5 flex items-baseline gap-2">
             <span className="font-mono text-3xl font-bold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
-              {totalTopics}
+              {formatNumber(totalTopics)}
             </span>
-            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">logged</span>
+            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">{t('dashboard.stats.topicsLearned')}</span>
           </div>
           <p className="mt-1 text-[11px] text-[#858A93] dark:text-[#777F8C]">
             Across {state.subjects.length} academic subjects

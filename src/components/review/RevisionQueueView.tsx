@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useI18n } from '../../i18n';
 import {
   getTodayDateString,
   getDueReasonExplanation,
@@ -8,6 +9,7 @@ import { Play, Check, Clock, AlertTriangle, Filter, Search, Sparkles } from 'luc
 
 export const RevisionQueueView: React.FC = () => {
   const { state, startReviewSession, todayReviewsDue, overdueReviews } = useApp();
+  const { t } = useI18n();
 
   const todayStr = getTodayDateString();
 
@@ -62,15 +64,23 @@ export const RevisionQueueView: React.FC = () => {
     return map;
   }, [state.subjects]);
 
+  const statusLabels: Record<string, string> = {
+    due: t('queue.dueToday', 'Due Today'),
+    overdue: t('queue.overdue', 'Overdue'),
+    upcoming: t('queue.upcoming', 'Upcoming'),
+    completed: t('queue.completed', 'Completed'),
+    all: t('common.all', 'All'),
+  };
+
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
-          Spaced Repetition Queue
+          {t('queue.title', 'Spaced Repetition Queue')}
         </h1>
         <p className="text-xs text-[#858A93] dark:text-[#777F8C] mt-0.5">
-          Scan and complete scheduled active-recall repetitions across all subjects
+          {t('queue.subtitle', 'Automated 7-stage recall engine based on the Ebbinghaus forgetting curve')}
         </p>
       </div>
 
@@ -80,7 +90,7 @@ export const RevisionQueueView: React.FC = () => {
           <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#858A93] dark:text-[#777F8C]" />
           <input
             type="text"
-            placeholder="Search queue by topic or chapter..."
+            placeholder={t('subjects.searchTopics', 'Search queue by topic or chapter...')}
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             className="w-full rounded-xl border border-black/[0.08] bg-white/70 pl-8.5 pr-3 py-1.5 text-xs text-[#20232A] focus:outline-none focus:border-[#E6C27A] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-[#F6F3EC] dark:focus:border-[#E6C27A]"
@@ -93,7 +103,7 @@ export const RevisionQueueView: React.FC = () => {
           onChange={(e) => setSelectedSubject(e.target.value)}
           className="rounded-xl border border-black/[0.08] bg-white/70 px-3 py-1.5 text-[#20232A] focus:outline-none focus:border-[#E6C27A] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-[#F6F3EC]"
         >
-          <option value="all">All Subjects</option>
+          <option value="all">{t('subjects.filterBySubject', 'All Subjects')}</option>
           {state.subjects.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
@@ -107,13 +117,13 @@ export const RevisionQueueView: React.FC = () => {
             <button
               key={st}
               onClick={() => setSelectedStatus(st)}
-              className={`rounded-lg px-2.5 py-1 text-[11px] font-medium capitalize transition-all ${
+              className={`rounded-lg px-2.5 py-1 text-[11px] font-medium transition-all ${
                 selectedStatus === st
                   ? 'bg-white text-[#20232A] shadow-xs dark:bg-white/[0.12] dark:text-[#FFE6AD] font-semibold'
                   : 'text-[#686D77] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]'
               }`}
             >
-              {st}
+              {statusLabels[st] || st}
             </button>
           ))}
         </div>
@@ -123,7 +133,7 @@ export const RevisionQueueView: React.FC = () => {
       <div className="space-y-3">
         {allQueueItems.length === 0 ? (
           <div className="rounded-2xl glass-subtle border border-dashed border-black/[0.1] dark:border-white/[0.1] p-12 text-center text-xs text-[#858A93] dark:text-[#777F8C]">
-            No revision items match your active filter.
+            {t('queue.emptyQueue', 'No revision items match your active filter.')}
           </div>
         ) : (
           allQueueItems.map(({ topic, item }) => {
@@ -159,12 +169,12 @@ export const RevisionQueueView: React.FC = () => {
                       <span className="truncate">{topic.chapterName}</span>
                       <span aria-hidden="true">·</span>
                       <span className="font-mono text-[#858A93] dark:text-[#777F8C]">
-                        {item.stageName} (Step {item.stepIndex + 1}/7)
+                        {item.stageName} ({t('queue.stageBadge', 'Step')} {item.stepIndex + 1}/7)
                       </span>
                       {isOverdue && (
                         <>
                           <span aria-hidden="true">·</span>
-                          <span className="text-[#F87171] font-semibold">Overdue</span>
+                          <span className="text-[#F87171] font-semibold">{t('common.overdue', 'Overdue')}</span>
                         </>
                       )}
                     </div>
@@ -185,11 +195,13 @@ export const RevisionQueueView: React.FC = () => {
                         className="btn-gold-primary flex h-9 items-center gap-2 rounded-xl px-4 text-xs font-semibold shadow-xs transition-all active:scale-95"
                       >
                         <Play className="h-3.5 w-3.5 fill-current" />
-                        <span>Start Review</span>
+                        <span>{t('dashboard.startSession', 'Start Review')}</span>
                       </button>
                     ) : (
                       <div className="text-right text-xs">
-                        <span className="text-emerald-600 dark:text-emerald-400 font-medium">Completed</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                          {t('common.completed', 'Completed')}
+                        </span>
                         <div className="text-[10px] text-[#858A93] dark:text-[#777F8C] font-mono">
                           Recall: {item.confidenceRating || 'Logged'}
                         </div>

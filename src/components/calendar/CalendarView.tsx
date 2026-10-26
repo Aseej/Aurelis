@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useI18n } from '../../i18n';
 import {
   parseDateString,
   formatDate,
@@ -22,6 +23,8 @@ export const CalendarView: React.FC = () => {
     startReviewSession,
     setIsAddTopicOpen,
   } = useApp();
+
+  const { t, language, formatDate: i18nFormatDate, isRTL } = useI18n();
 
   const todayStr = getTodayDateString();
   const initialDateObj = parseDateString(selectedCalendarDate || todayStr);
@@ -167,10 +170,24 @@ export const CalendarView: React.FC = () => {
     return items;
   }, [state.topics, selectedCalendarDate, todayStr]);
 
-  const monthName = new Date(currentYear, currentMonth, 1).toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  });
+  const monthName = useMemo(() => {
+    return i18nFormatDate(new Date(currentYear, currentMonth, 1), {
+      month: 'long',
+      year: 'numeric',
+    });
+  }, [i18nFormatDate, currentYear, currentMonth]);
+
+  // Dynamic localized weekday headers (Sun -> Sat)
+  const weekdayHeaders = useMemo(() => {
+    return [0, 1, 2, 3, 4, 5, 6].map((dayOffset) => {
+      const d = new Date(2026, 0, 4 + dayOffset); // 2026-01-04 was Sunday
+      try {
+        return new Intl.DateTimeFormat(language, { weekday: 'short' }).format(d);
+      } catch (err) {
+        return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayOffset];
+      }
+    });
+  }, [language]);
 
   return (
     <div className="space-y-6 pb-12">
@@ -178,10 +195,10 @@ export const CalendarView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
-            Revision Calendar
+            {t('calendar.title', 'Revision Calendar')}
           </h1>
           <p className="text-xs text-[#858A93] dark:text-[#777F8C] mt-0.5">
-            Plan and inspect your spaced repetition schedule across days and weeks
+            {t('calendar.subtitle', 'Plan and inspect your spaced repetition schedule across days and weeks')}
           </p>
         </div>
 
@@ -190,7 +207,7 @@ export const CalendarView: React.FC = () => {
             onClick={jumpToToday}
             className="btn-glass-secondary rounded-xl px-3 py-1.5 text-xs font-medium transition-all"
           >
-            Today
+            {t('common.today', 'Today')}
           </button>
 
           <div className="flex items-center rounded-xl glass-subtle border border-black/[0.08] dark:border-white/[0.08] p-0.5">
@@ -199,7 +216,7 @@ export const CalendarView: React.FC = () => {
               className="p-1.5 text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC] rounded-lg transition-colors"
               aria-label="Previous Month"
             >
-              <ChevronLeft className="h-4 w-4" />
+              {isRTL ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
             </button>
             <span className="px-3 text-xs font-semibold text-[#20232A] dark:text-[#F6F3EC] min-w-[130px] text-center">
               {monthName}
@@ -209,7 +226,7 @@ export const CalendarView: React.FC = () => {
               className="p-1.5 text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC] rounded-lg transition-colors"
               aria-label="Next Month"
             >
-              <ChevronRight className="h-4 w-4" />
+              {isRTL ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
             </button>
           </div>
         </div>
@@ -221,13 +238,9 @@ export const CalendarView: React.FC = () => {
         <div className="lg:col-span-2 rounded-3xl glass-premium p-4 sm:p-6 transition-all">
           {/* Day of Week Headers */}
           <div className="grid grid-cols-7 mb-3 text-center text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-            <span>Sun</span>
-            <span>Mon</span>
-            <span>Tue</span>
-            <span>Wed</span>
-            <span>Thu</span>
-            <span>Fri</span>
-            <span>Sat</span>
+            {weekdayHeaders.map((dayName, idx) => (
+              <span key={idx}>{dayName}</span>
+            ))}
           </div>
 
           {/* Days Grid */}

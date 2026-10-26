@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useI18n } from '../../i18n';
 import { Topic } from '../../types';
 import { formatDisplayDate } from '../../utils/scheduler';
 import { getMasteryBadgeClass } from '../../utils/mastery';
@@ -18,6 +19,8 @@ export const SubjectsView: React.FC = () => {
     setIsAddTopicOpen,
     startReviewSession,
   } = useApp();
+
+  const { t, isRTL } = useI18n();
 
   const [activeTopicForModal, setActiveTopicForModal] = useState<Topic | null>(null);
 
@@ -93,8 +96,8 @@ export const SubjectsView: React.FC = () => {
               onClick={() => setSelectedSubjectId(null)}
               className="inline-flex items-center gap-1.5 text-xs text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC] transition-colors"
             >
-              <ArrowLeft className="h-4 w-4" />
-              <span>All Subjects</span>
+              <ArrowLeft className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
+              <span>{t('subjects.filterBySubject', 'All Subjects')}</span>
             </button>
 
             <button
@@ -102,7 +105,7 @@ export const SubjectsView: React.FC = () => {
               className="btn-gold-primary flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-xs"
             >
               <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
-              <span>Add Topic to {selectedStats.subject.name}</span>
+              <span>{t('subjects.addTopic', 'Add Topic')}</span>
             </button>
           </div>
 
@@ -259,10 +262,10 @@ export const SubjectsView: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
-                Subjects & Mastery
+                {t('subjects.title', 'Subjects & Mastery')}
               </h1>
               <p className="text-xs text-[#858A93] dark:text-[#777F8C] mt-0.5">
-                Track retention and spaced repetition coverage across your academic disciplines
+                {t('subjects.subtitle', 'Track retention and spaced repetition coverage across your academic disciplines')}
               </p>
             </div>
 
@@ -271,7 +274,7 @@ export const SubjectsView: React.FC = () => {
               className="btn-gold-primary flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-xs"
             >
               <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
-              <span>Record Topic</span>
+              <span>{t('subjects.addTopic', 'Record Topic')}</span>
             </button>
           </div>
 

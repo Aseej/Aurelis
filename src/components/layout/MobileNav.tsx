@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useI18n } from '../../i18n';
 import {
   Home,
   Repeat,
@@ -16,6 +17,7 @@ import {
 
 export const MobileNav: React.FC = () => {
   const { activeView, setActiveView, todayReviewsDue, setIsSettingsOpen } = useApp();
+  const { t } = useI18n();
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
   const dueCount = todayReviewsDue.length;
@@ -34,12 +36,12 @@ export const MobileNav: React.FC = () => {
           >
             <div className="flex items-center justify-between mb-3 px-1">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-                Additional Study Views
+                {t('nav.additionalViews', 'Additional Study Views')}
               </span>
               <button
                 onClick={() => setIsMoreMenuOpen(false)}
                 className="h-6 w-6 flex items-center justify-center rounded-full text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]"
-                aria-label="Close menu"
+                aria-label={t('common.close', 'Close')}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -58,7 +60,7 @@ export const MobileNav: React.FC = () => {
                 }`}
               >
                 <FileText className="h-4 w-4 shrink-0 text-[#E6C27A]" />
-                <span>Weekly Tests</span>
+                <span>{t('nav.tests', 'Weekly Tests')}</span>
               </button>
 
               <button
@@ -73,7 +75,7 @@ export const MobileNav: React.FC = () => {
                 }`}
               >
                 <AlertCircle className="h-4 w-4 shrink-0 text-[#F87171]" />
-                <span>Error Notebook</span>
+                <span>{t('nav.errors', 'Error Notebook')}</span>
               </button>
 
               <button
@@ -88,7 +90,7 @@ export const MobileNav: React.FC = () => {
                 }`}
               >
                 <BarChart3 className="h-4 w-4 shrink-0 text-[#60A5FA]" />
-                <span>Analytics</span>
+                <span>{t('nav.analytics', 'Analytics')}</span>
               </button>
 
               <button
@@ -103,7 +105,7 @@ export const MobileNav: React.FC = () => {
                 }`}
               >
                 <Globe className="h-4 w-4 shrink-0 text-[#34D399]" />
-                <span>Public Overview</span>
+                <span>{t('nav.landing', 'Public Overview')}</span>
               </button>
 
               <button
@@ -114,7 +116,7 @@ export const MobileNav: React.FC = () => {
                 className="col-span-2 flex items-center gap-2.5 rounded-xl p-3 text-left text-[#20232A] dark:text-[#F6F3EC] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] mt-1"
               >
                 <SettingsIcon className="h-4 w-4 shrink-0 text-[#858A93] dark:text-[#777F8C]" />
-                <span className="font-medium">Settings & Data Backup</span>
+                <span className="font-medium">{t('nav.settings', 'Settings & Data Backup')}</span>
               </button>
             </div>
           </div>
@@ -141,7 +143,7 @@ export const MobileNav: React.FC = () => {
               }`}
             >
               <Home className="h-4.5 w-4.5" />
-              <span className="mt-1 text-[10px] tracking-tight">Home</span>
+              <span className="mt-1 text-[10px] tracking-tight">{t('nav.dashboard', 'Home')}</span>
               {activeView === 'dashboard' && (
                 <span className="absolute bottom-1 h-0.5 w-3 rounded-full bg-[#E6C27A]" />
               )}
@@ -167,7 +169,7 @@ export const MobileNav: React.FC = () => {
                   </span>
                 )}
               </div>
-              <span className="mt-1 text-[10px] tracking-tight">Review</span>
+              <span className="mt-1 text-[10px] tracking-tight">{t('nav.review', 'Review')}</span>
               {activeView === 'review' && (
                 <span className="absolute bottom-1 h-0.5 w-3 rounded-full bg-[#E6C27A]" />
               )}
@@ -186,7 +188,7 @@ export const MobileNav: React.FC = () => {
               }`}
             >
               <Calendar className="h-4.5 w-4.5" />
-              <span className="mt-1 text-[10px] tracking-tight">Calendar</span>
+              <span className="mt-1 text-[10px] tracking-tight">{t('nav.calendar', 'Calendar')}</span>
               {activeView === 'calendar' && (
                 <span className="absolute bottom-1 h-0.5 w-3 rounded-full bg-[#E6C27A]" />
               )}
@@ -205,7 +207,7 @@ export const MobileNav: React.FC = () => {
               }`}
             >
               <BookOpen className="h-4.5 w-4.5" />
-              <span className="mt-1 text-[10px] tracking-tight">Subjects</span>
+              <span className="mt-1 text-[10px] tracking-tight">{t('nav.subjects', 'Subjects')}</span>
               {activeView === 'subjects' && (
                 <span className="absolute bottom-1 h-0.5 w-3 rounded-full bg-[#E6C27A]" />
               )}
@@ -221,7 +223,7 @@ export const MobileNav: React.FC = () => {
               }`}
             >
               <MoreHorizontal className="h-4.5 w-4.5" />
-              <span className="mt-1 text-[10px] tracking-tight">More</span>
+              <span className="mt-1 text-[10px] tracking-tight">{t('nav.menu', 'More')}</span>
               {['tests', 'errors', 'analytics'].includes(activeView) && (
                 <span className="absolute bottom-1 h-0.5 w-3 rounded-full bg-[#E6C27A]" />
               )}
@@ -232,3 +234,4 @@ export const MobileNav: React.FC = () => {
     </>
   );
 };
+
