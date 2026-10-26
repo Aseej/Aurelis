@@ -26,19 +26,33 @@ const AppContent: React.FC = () => {
   const { activeView, state, updateSettings } = useApp();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafaf9] dark:bg-[#0a0b0e] text-neutral-900 dark:text-neutral-100 selection:bg-amber-400/20 selection:text-amber-300">
+    <div className="relative min-h-screen flex flex-col bg-[#F4F1EA] dark:bg-[#090B10] text-[#20232A] dark:text-[#F6F3EC] selection:bg-[#E6C27A]/25 selection:text-[#B88A43] dark:selection:text-[#FFE6AD] overflow-x-hidden">
+      {/* Cinematic Ambient Atmosphere Layers */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+        {/* Subtle warm champagne-gold ambient glow top-right */}
+        <div className="absolute -top-[120px] right-[5%] h-[550px] w-[550px] rounded-full bg-gradient-to-br from-[#E6C27A]/8 via-[#B88A43]/4 to-transparent blur-[120px] dark:from-[#E6C27A]/12 dark:via-[#B88A43]/6" />
+        {/* Subtle cool obsidian-indigo ambient glow mid-left */}
+        <div className="absolute top-[35%] -left-[100px] h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-[#60A5FA]/4 to-transparent blur-[140px] dark:from-[#3B82F6]/6" />
+        {/* Faint gold highlight focal glow bottom-right */}
+        <div className="absolute -bottom-[80px] right-[15%] h-[420px] w-[420px] rounded-full bg-gradient-to-t from-[#B88A43]/5 to-transparent blur-[110px] dark:from-[#B88A43]/8" />
+      </div>
+
       {/* Top Bar following Top Bar Contract */}
-      <Navbar />
+      <div className="relative z-30">
+        <Navbar />
+      </div>
 
       {activeView === 'landing' ? (
-        <LandingPage />
+        <div className="relative z-10">
+          <LandingPage />
+        </div>
       ) : (
-        <div className="flex-1 flex overflow-hidden">
+        <div className="relative z-10 flex-1 flex overflow-hidden">
           {/* Desktop Collapsible Sidebar */}
           <Sidebar />
 
           {/* Primary Content Viewport */}
-          <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl w-full mx-auto pb-24 lg:pb-12">
+          <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl w-full mx-auto pb-28 lg:pb-14">
             {activeView === 'dashboard' && <DashboardView />}
             {activeView === 'review' && <RevisionQueueView />}
             {activeView === 'calendar' && <CalendarView />}
@@ -50,7 +64,7 @@ const AppContent: React.FC = () => {
         </div>
       )}
 
-      {/* Mobile Navigation Tab Bar (hidden in landing view) */}
+      {/* Floating Bottom Navigation Dock (hidden in landing view) */}
       {activeView !== 'landing' && <MobileNav />}
 
       {/* Global Modals - single consistent tree with keys */}

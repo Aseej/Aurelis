@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { Flame, Check, ArrowRight, Award, Zap } from 'lucide-react';
+import { Flame, Check, ArrowRight, Zap } from 'lucide-react';
 
 export const StreakCard: React.FC = () => {
   const { streakInfo, todayReviewsDue, startReviewSession, recordDailyCheckin } = useApp();
@@ -21,26 +21,27 @@ export const StreakCard: React.FC = () => {
   return (
     <section
       aria-label="Daily Study Streak & Consistency Tracker"
-      className="rounded-xl border border-neutral-200/90 bg-white p-4 sm:p-5 shadow-xs dark:border-neutral-800/90 dark:bg-[#111216] transition-all"
+      className="rounded-2xl glass-premium p-4 sm:p-5 transition-all"
     >
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         {/* Left Column: Streak Numerical Counter & Status */}
         <div className="flex items-start sm:items-center gap-3.5">
-          <div className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-amber-400/10 text-amber-500 ring-1 ring-amber-400/25 dark:bg-amber-400/10 dark:text-amber-400">
-            <Flame className="h-5 w-5 sm:h-6 sm:w-6 fill-amber-400/20 text-amber-500 dark:text-amber-400" />
+          <div className="relative flex h-12 w-12 sm:h-13 sm:w-13 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#E6C27A]/20 to-[#B88A43]/10 text-[#A97B32] dark:text-[#E6C27A] border border-[#E6C27A]/30 shadow-xs">
+            <Flame className="h-6 w-6 fill-[#E6C27A]/30 text-[#B88A43] dark:text-[#E6C27A]" />
+            <div className="absolute inset-x-0 top-0 h-[1px] bg-white/20 rounded-t-2xl" />
           </div>
 
           <div className="space-y-0.5 min-w-0">
             <div className="flex items-baseline gap-2">
-              <span className="font-mono text-2xl sm:text-3xl font-bold tabular-nums text-neutral-900 dark:text-neutral-50">
+              <span className="font-mono text-2xl sm:text-3xl font-bold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
                 {String(currentStreak).padStart(2, '0')}
               </span>
-              <span className="text-xs font-semibold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#686D77] dark:text-[#A7ABB5]">
                 {currentStreak === 1 ? 'Day Streak' : 'Days Streak'}
               </span>
 
               {longestStreak > 0 && (
-                <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-neutral-400 font-mono">
+                <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-[#858A93] dark:text-[#777F8C] font-mono">
                   <span aria-hidden="true">·</span>
                   <span>Best: {longestStreak} {longestStreak === 1 ? 'day' : 'days'}</span>
                 </span>
@@ -48,12 +49,12 @@ export const StreakCard: React.FC = () => {
             </div>
 
             {/* Unboxed Status Metadata line */}
-            <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-              <span className={studiedToday ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-amber-600 dark:text-amber-400 font-medium'}>
+            <div className="flex flex-wrap items-center gap-2 text-xs text-[#686D77] dark:text-[#A7ABB5]">
+              <span className={studiedToday ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-[#A97B32] dark:text-[#E6C27A] font-medium'}>
                 {statusMessage}
               </span>
               {longestStreak > 0 && (
-                <span className="sm:hidden text-neutral-400 font-mono">
+                <span className="sm:hidden text-[#858A93] dark:text-[#777F8C] font-mono">
                   · Best: {longestStreak}d
                 </span>
               )}
@@ -62,11 +63,11 @@ export const StreakCard: React.FC = () => {
         </div>
 
         {/* Center / Right Column: Progress Visuals */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4 lg:gap-6 border-t sm:border-t-0 pt-3 sm:pt-0 border-neutral-100 dark:border-neutral-850">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 lg:gap-6 border-t sm:border-t-0 pt-3 sm:pt-0 border-black/[0.06] dark:border-white/[0.08]">
           {/* Progress Visual 1: 7-Day Rolling Consistency Track */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-neutral-500 dark:text-neutral-400">
-              <span className="font-medium text-neutral-700 dark:text-neutral-300">
+            <div className="flex items-center justify-between text-[11px] text-[#858A93] dark:text-[#777F8C]">
+              <span className="font-medium text-[#20232A] dark:text-[#F6F3EC]">
                 7-Day Consistency Track
               </span>
               <span className="font-mono tabular-nums">
@@ -86,12 +87,12 @@ export const StreakCard: React.FC = () => {
                     className="flex flex-col items-center gap-1"
                   >
                     <div
-                      className={`flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-xs font-mono transition-all ${
+                      className={`flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl text-xs font-mono transition-all ${
                         isDone
-                          ? 'bg-amber-400/20 text-amber-700 border border-amber-400/50 dark:bg-amber-400/15 dark:text-amber-300 dark:border-amber-400/35 font-bold shadow-xs'
+                          ? 'bg-[#E6C27A]/25 text-[#8C6221] border border-[#E6C27A]/50 dark:bg-[#E6C27A]/20 dark:text-[#FFE6AD] dark:border-[#E6C27A]/40 font-bold shadow-xs'
                           : isToday
-                          ? 'border border-dashed border-amber-400/70 bg-amber-400/5 text-amber-600 dark:text-amber-400 dark:border-amber-400/60 font-semibold'
-                          : 'border border-neutral-200 bg-neutral-50/60 text-neutral-400 dark:border-neutral-800 dark:bg-neutral-900/40 dark:text-neutral-500'
+                          ? 'border border-dashed border-[#E6C27A] bg-[#E6C27A]/10 text-[#A97B32] dark:text-[#E6C27A] font-semibold'
+                          : 'border border-black/[0.08] bg-black/[0.02] text-[#858A93] dark:border-white/[0.08] dark:bg-white/[0.02] dark:text-[#777F8C]'
                       }`}
                     >
                       {isDone ? (
@@ -101,10 +102,10 @@ export const StreakCard: React.FC = () => {
                       )}
                     </div>
                     <span
-                      className={`text-[10px] uppercase font-mono ${
+                      className={`text-[9px] uppercase font-mono ${
                         isToday
-                          ? 'font-bold text-amber-600 dark:text-amber-400'
-                          : 'text-neutral-400 dark:text-neutral-500'
+                          ? 'font-bold text-[#A97B32] dark:text-[#E6C27A]'
+                          : 'text-[#858A93] dark:text-[#777F8C]'
                       }`}
                     >
                       {day.dayOfWeekAbbr}
@@ -116,20 +117,20 @@ export const StreakCard: React.FC = () => {
           </div>
 
           {/* Progress Visual 2: Milestone Meter & Fast Action */}
-          <div className="space-y-1.5 sm:min-w-[190px] border-t sm:border-t-0 sm:border-l border-neutral-100 sm:border-neutral-200/60 sm:pl-5 pt-3 sm:pt-0 dark:border-neutral-800/60">
+          <div className="space-y-1.5 sm:min-w-[190px] border-t sm:border-t-0 sm:border-l border-black/[0.06] sm:pl-5 pt-3 sm:pt-0 dark:border-white/[0.08]">
             <div className="flex items-center justify-between text-[11px]">
-              <span className="text-neutral-600 dark:text-neutral-300 font-medium truncate max-w-[130px]">
+              <span className="text-[#686D77] dark:text-[#A7ABB5] font-medium truncate max-w-[130px]">
                 {milestoneTitle}
               </span>
-              <span className="font-mono text-neutral-400 tabular-nums">
+              <span className="font-mono text-[#858A93] dark:text-[#777F8C] tabular-nums">
                 {currentStreak}/{nextMilestone}d
               </span>
             </div>
 
             {/* Sleek Milestone Progress Bar */}
-            <div className="h-1.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
+            <div className="h-1.5 w-full rounded-full bg-black/[0.08] dark:bg-white/[0.08] overflow-hidden">
               <div
-                className="h-full rounded-full bg-amber-400 transition-all duration-500 ease-out"
+                className="h-full rounded-full bg-gradient-to-r from-[#B88A43] via-[#E6C27A] to-[#FFE6AD] transition-all duration-500 ease-out"
                 style={{ width: `${milestoneProgressPercentage}%` }}
               />
             </div>
@@ -140,7 +141,7 @@ export const StreakCard: React.FC = () => {
                 todayReviewsDue.length > 0 ? (
                   <button
                     onClick={() => startReviewSession(todayReviewsDue[0].topic.id, todayReviewsDue[0].item.stepIndex)}
-                    className="inline-flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400 hover:underline"
+                    className="inline-flex items-center gap-1 font-semibold text-[#A97B32] dark:text-[#E6C27A] hover:underline"
                   >
                     <span>Revise now to lock in streak</span>
                     <ArrowRight className="h-3 w-3" />
@@ -148,7 +149,7 @@ export const StreakCard: React.FC = () => {
                 ) : (
                   <button
                     onClick={recordDailyCheckin}
-                    className="inline-flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400 hover:underline"
+                    className="inline-flex items-center gap-1 font-semibold text-[#A97B32] dark:text-[#E6C27A] hover:underline"
                   >
                     <Zap className="h-3 w-3" />
                     <span>Check in for today</span>

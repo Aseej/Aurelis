@@ -1,42 +1,36 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import {
-  Sparkles,
   ArrowRight,
-  Brain,
-  Calendar,
   CheckCircle2,
-  FileCheck2,
-  Shield,
-  HelpCircle,
-  Zap,
+  Sparkles,
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
   const { setActiveView } = useApp();
 
   return (
-    <div className="min-h-screen bg-[#fafaf9] text-neutral-900 dark:bg-[#0a0b0e] dark:text-neutral-100 transition-colors">
+    <div className="min-h-screen bg-[#F4F1EA] text-[#20232A] dark:bg-[#090B10] dark:text-[#F6F3EC] transition-colors pb-12">
       {/* 1. Hero Section */}
-      <section className="relative overflow-hidden px-4 pt-20 pb-16 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center space-y-6">
-        <div className="inline-flex items-center gap-2 rounded-full border border-neutral-300/80 bg-white/70 px-3 py-1 text-xs text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-          <span>Engineered for Class 11/12 & Academic Entrance Aspirants</span>
+      <section className="relative overflow-hidden px-4 pt-16 pb-16 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center space-y-6">
+        <div className="inline-flex items-center gap-2 rounded-full glass-subtle px-4 py-1.5 text-xs text-[#686D77] dark:text-[#A7ABB5]">
+          <span className="h-2 w-2 rounded-full bg-[#E6C27A]" />
+          <span>Engineered for Demanding Academic Examinations</span>
         </div>
 
-        <h1 className="font-serif text-4xl sm:text-6xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50 max-w-3xl mx-auto leading-tight">
+        <h1 className="font-serif text-4xl sm:text-6xl font-bold tracking-tight text-[#20232A] dark:text-[#F6F3EC] max-w-3xl mx-auto leading-tight">
           Remember what matters.
         </h1>
 
-        <p className="text-base sm:text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto leading-relaxed">
-          Your personal revision system for learning today and remembering tomorrow.
+        <p className="text-base sm:text-lg text-[#686D77] dark:text-[#A7ABB5] max-w-2xl mx-auto leading-relaxed">
+          Your personal revision system for studying today and remembering tomorrow.
           Never manually calculate what you need to revise again.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
           <button
             onClick={() => setActiveView('dashboard')}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-neutral-950 px-6 py-3 text-sm font-semibold text-amber-300 shadow-md transition-all hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-950 dark:hover:bg-neutral-200"
+            className="w-full sm:w-auto btn-gold-primary inline-flex items-center justify-center gap-2 rounded-xl px-7 py-3 text-sm font-semibold shadow-md"
           >
             <span>Enter AURELIS Dashboard</span>
             <ArrowRight className="h-4 w-4" />
@@ -44,7 +38,7 @@ export const LandingPage: React.FC = () => {
 
           <a
             href="#how-it-works"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-6 py-3 text-sm font-medium text-neutral-800 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200"
+            className="w-full sm:w-auto btn-glass-secondary inline-flex items-center justify-center gap-2 rounded-xl px-7 py-3 text-sm font-medium"
           >
             <span>See How It Works</span>
           </a>
@@ -52,27 +46,27 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* 2. The Problem Statement */}
-      <section className="px-4 py-16 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-neutral-200/80 dark:border-neutral-800/80">
-        <div className="rounded-2xl border border-neutral-200/90 bg-white p-6 sm:p-10 shadow-xs dark:border-neutral-800/90 dark:bg-[#111216] space-y-4">
-          <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-            The Fundamental Problem
+      <section className="px-4 py-14 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-black/[0.06] dark:border-white/[0.08]">
+        <div className="rounded-3xl glass-premium p-6 sm:p-10 space-y-4">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#A97B32] dark:text-[#E6C27A]">
+            The Fundamental Study Dilemma
           </span>
-          <blockquote className="font-serif text-xl sm:text-2xl text-neutral-900 dark:text-neutral-100 italic">
+          <blockquote className="font-serif text-xl sm:text-2xl text-[#20232A] dark:text-[#F6F3EC] italic">
             «"I studied many things, but I don't know what I should revise today."»
           </blockquote>
-          <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#686D77] dark:text-[#A7ABB5] leading-relaxed">
             Human memory decays rapidly along Ebbinghaus's forgetting curve. Students spend enormous mental energy trying to maintain spreadsheets, sticky notes, or guessing what to review, only to forget critical formulas weeks later. AURELIS removes the calculation burden entirely.
           </p>
         </div>
       </section>
 
       {/* 3. How AURELIS Works (Workflow) */}
-      <section id="how-it-works" className="px-4 py-16 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-10">
+      <section id="how-it-works" className="px-4 py-14 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-8">
         <div className="text-center space-y-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
             Frictionless Daily Habit
           </span>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 dark:text-neutral-50">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
             How AURELIS Works
           </h2>
         </div>
@@ -102,15 +96,15 @@ export const LandingPage: React.FC = () => {
           ].map((item) => (
             <div
               key={item.step}
-              className="rounded-xl border border-neutral-200/90 bg-white p-5 dark:border-neutral-800/90 dark:bg-[#111216] space-y-2"
+              className="rounded-3xl glass-subtle p-5 space-y-2 transition-all hover:border-[#E6C27A]/30"
             >
-              <div className="font-mono text-xs font-semibold text-amber-600 dark:text-amber-400">
+              <div className="font-mono text-xs font-semibold text-[#A97B32] dark:text-[#E6C27A]">
                 {item.step}
               </div>
-              <h3 className="text-sm font-bold text-neutral-900 dark:text-neutral-100">
+              <h3 className="text-sm font-bold text-[#20232A] dark:text-[#F6F3EC]">
                 {item.title}
               </h3>
-              <p className="text-xs text-neutral-500 leading-relaxed">
+              <p className="text-xs text-[#858A93] dark:text-[#777F8C] leading-relaxed">
                 {item.desc}
               </p>
             </div>
@@ -119,17 +113,17 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* 4. Spaced Repetition Timeline */}
-      <section className="px-4 py-16 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-neutral-200/80 dark:border-neutral-800/80 space-y-6">
+      <section className="px-4 py-14 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-black/[0.06] dark:border-white/[0.08] space-y-6">
         <div className="text-center space-y-1">
-          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
             Calendar-Deterministic Intervals
           </span>
-          <h2 className="text-2xl font-bold text-neutral-950 dark:text-neutral-50">
+          <h2 className="text-2xl font-bold text-[#20232A] dark:text-[#F6F3EC]">
             The Evidence-Based 7-Step Schedule
           </h2>
         </div>
 
-        <div className="rounded-xl border border-neutral-200/90 bg-white p-6 dark:border-neutral-800/90 dark:bg-[#111216] divide-y divide-neutral-100 dark:divide-neutral-800/60 text-xs">
+        <div className="rounded-3xl glass-premium p-6 divide-y divide-black/[0.06] dark:divide-white/[0.08] text-xs">
           {[
             { day: 'Day 1', label: 'Learn', role: 'Initial neural encoding of core theorems.' },
             { day: 'Day 3', label: 'Revision 1', role: 'Interrupt the steepest 48-hour forgetting drop.' },
@@ -139,69 +133,69 @@ export const LandingPage: React.FC = () => {
             { day: 'Day 21', label: 'Review 2', role: 'Consolidate into long-term declarative storage.' },
             { day: 'Day 28', label: 'Review 3', role: 'Permanent cognitive anchor.' },
           ].map((row) => (
-            <div key={row.day} className="py-2.5 flex items-center justify-between">
+            <div key={row.day} className="py-3 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="font-mono font-semibold text-neutral-900 dark:text-neutral-100 w-16">
+                <span className="font-mono font-semibold text-[#20232A] dark:text-[#F6F3EC] w-16">
                   {row.day}
                 </span>
-                <span className="font-medium text-amber-600 dark:text-amber-400">
+                <span className="font-semibold text-[#A97B32] dark:text-[#E6C27A]">
                   {row.label}
                 </span>
               </div>
-              <span className="text-neutral-500 text-right">{row.role}</span>
+              <span className="text-[#858A93] dark:text-[#777F8C] text-right">{row.role}</span>
             </div>
           ))}
         </div>
       </section>
 
       {/* 5. Core Architectural Pillars */}
-      <section className="px-4 py-16 sm:px-6 lg:px-8 max-w-5xl mx-auto border-t border-neutral-200/80 dark:border-neutral-800/80 space-y-8">
+      <section className="px-4 py-14 sm:px-6 lg:px-8 max-w-5xl mx-auto border-t border-black/[0.06] dark:border-white/[0.08] space-y-8">
         <div className="text-center space-y-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
             Built for Academic Mastery
           </span>
-          <h2 className="text-2xl sm:text-3xl font-bold text-neutral-950 dark:text-neutral-50">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#20232A] dark:text-[#F6F3EC]">
             Four Pillars of Long-Term Retention
           </h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="rounded-2xl border border-neutral-200/90 bg-white p-6 dark:border-neutral-800/90 dark:bg-[#111216] space-y-2">
-            <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-amber-500 shrink-0" />
+          <div className="rounded-3xl glass-subtle p-6 space-y-2">
+            <h3 className="text-base font-bold text-[#20232A] dark:text-[#F6F3EC] flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-[#E6C27A] shrink-0" />
               <span>Autonomous Spaced Scheduling</span>
             </h3>
-            <p className="text-xs text-neutral-500 leading-relaxed">
-              Record what you study in seconds. AURELIS builds an independent 7-step spaced repetition schedule for every topic, handling month rollovers and leap years automatically.
+            <p className="text-xs text-[#858A93] dark:text-[#777F8C] leading-relaxed">
+              Record what you study in seconds. AURELIS builds an independent 7-step spaced repetition schedule for every topic, handling calendar month rollovers and leap years automatically.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-neutral-200/90 bg-white p-6 dark:border-neutral-800/90 dark:bg-[#111216] space-y-2">
-            <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-amber-500 shrink-0" />
+          <div className="rounded-3xl glass-subtle p-6 space-y-2">
+            <h3 className="text-base font-bold text-[#20232A] dark:text-[#F6F3EC] flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-[#E6C27A] shrink-0" />
               <span>Distraction-Free Active Recall</span>
             </h3>
-            <p className="text-xs text-neutral-500 leading-relaxed">
+            <p className="text-xs text-[#858A93] dark:text-[#777F8C] leading-relaxed">
               Prompts active memory retrieval before revealing study notes. Rate recall confidence to adaptively guide review intervals.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-neutral-200/90 bg-white p-6 dark:border-neutral-800/90 dark:bg-[#111216] space-y-2">
-            <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-amber-500 shrink-0" />
+          <div className="rounded-3xl glass-subtle p-6 space-y-2">
+            <h3 className="text-base font-bold text-[#20232A] dark:text-[#F6F3EC] flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-[#E6C27A] shrink-0" />
               <span>Day 7 Diagnostic Milestones</span>
             </h3>
-            <p className="text-xs text-neutral-500 leading-relaxed">
+            <p className="text-xs text-[#858A93] dark:text-[#777F8C] leading-relaxed">
               Topics reaching their 7-day milestone are automatically grouped for timed testing to validate recall retention under real examination conditions.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-neutral-200/90 bg-white p-6 dark:border-neutral-800/90 dark:bg-[#111216] space-y-2">
-            <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-amber-500 shrink-0" />
+          <div className="rounded-3xl glass-subtle p-6 space-y-2">
+            <h3 className="text-base font-bold text-[#20232A] dark:text-[#F6F3EC] flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-[#E6C27A] shrink-0" />
               <span>Error Notebook & Mistake Analysis</span>
             </h3>
-            <p className="text-xs text-neutral-500 leading-relaxed">
+            <p className="text-xs text-[#858A93] dark:text-[#777F8C] leading-relaxed">
               Deconstruct problem slips into clear categories (formula errors, calculation slips, conceptual misunderstandings) to prevent repeat mistakes.
             </p>
           </div>
@@ -209,12 +203,12 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* 6. FAQ Section */}
-      <section className="px-4 py-16 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-neutral-200/80 dark:border-neutral-800/80 space-y-6">
-        <h2 className="text-2xl font-bold text-center text-neutral-950 dark:text-neutral-50">
+      <section className="px-4 py-14 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-black/[0.06] dark:border-white/[0.08] space-y-6">
+        <h2 className="text-2xl font-bold text-center text-[#20232A] dark:text-[#F6F3EC]">
           Frequently Asked Questions
         </h2>
 
-        <div className="space-y-4 text-xs">
+        <div className="space-y-3.5 text-xs">
           {[
             {
               q: 'Can I study multiple topics or chapters on the same day?',
@@ -235,26 +229,26 @@ export const LandingPage: React.FC = () => {
           ].map(({ q, a }, idx) => (
             <div
               key={idx}
-              className="rounded-xl border border-neutral-200/90 bg-white p-4 dark:border-neutral-800/90 dark:bg-[#111216] space-y-1.5"
+              className="rounded-2xl glass-subtle p-4 space-y-1.5"
             >
-              <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">{q}</h3>
-              <p className="text-neutral-500 dark:text-neutral-400 leading-relaxed">{a}</p>
+              <h3 className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">{q}</h3>
+              <p className="text-[#858A93] dark:text-[#777F8C] leading-relaxed">{a}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* 7. Final Launch CTA */}
-      <section className="px-4 py-20 text-center space-y-4 border-t border-neutral-200/80 dark:border-neutral-800/80 bg-neutral-100/50 dark:bg-[#0c0d11]">
-        <h2 className="font-serif text-3xl font-bold text-neutral-950 dark:text-neutral-50">
+      <section className="px-4 py-16 text-center space-y-4 border-t border-black/[0.06] dark:border-white/[0.08]">
+        <h2 className="font-serif text-3xl font-bold text-[#20232A] dark:text-[#F6F3EC]">
           Begin your revision system today.
         </h2>
-        <p className="text-xs text-neutral-500 max-w-md mx-auto">
+        <p className="text-xs text-[#858A93] dark:text-[#777F8C] max-w-md mx-auto">
           Start recording your chapters and lock in long-term mastery.
         </p>
         <button
           onClick={() => setActiveView('dashboard')}
-          className="inline-flex items-center gap-2 rounded-xl bg-neutral-950 px-6 py-3 text-xs font-semibold text-amber-300 shadow-md hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-950"
+          className="btn-gold-primary inline-flex items-center gap-2 rounded-xl px-7 py-3 text-xs font-semibold shadow-md"
         >
           <span>Launch AURELIS App</span>
           <ArrowRight className="h-4 w-4" />

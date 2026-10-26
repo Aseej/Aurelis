@@ -4,14 +4,10 @@ import { DEFAULT_REVISION_INTERVALS } from '../../utils/scheduler';
 import {
   X,
   User,
-  BookOpen,
   Calendar,
-  Sun,
-  Moon,
   Download,
   Upload,
   Trash2,
-  RefreshCw,
   Shield,
   Check,
 } from 'lucide-react';
@@ -22,8 +18,6 @@ export const SettingsModal: React.FC = () => {
     setIsSettingsOpen,
     state,
     updateSettings,
-    theme,
-    toggleTheme,
     exportData,
     importData,
     loadDemoData,
@@ -115,30 +109,30 @@ export const SettingsModal: React.FC = () => {
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 sm:p-6 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto"
     >
-      <div className="relative w-full max-w-2xl rounded-2xl border border-neutral-200/90 bg-white shadow-2xl dark:border-neutral-800/90 dark:bg-[#0e0f14] overflow-hidden my-auto max-h-[92vh] flex flex-col">
+      <div className="relative w-full max-w-2xl rounded-3xl glass-premium shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col border border-white/20 dark:border-white/10">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-neutral-200/80 px-6 py-4 dark:border-neutral-800/80">
+        <div className="flex items-center justify-between border-b border-black/[0.06] px-6 py-4 dark:border-white/[0.08]">
           <div>
-            <h2 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
+            <h2 className="text-base font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
               Settings & Preferences
             </h2>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">
-              Customize revision intervals, daily targets, and manage personal data
+            <p className="text-xs text-[#858A93] dark:text-[#777F8C]">
+              Customize revision rhythm, personal targets, and local data backups
             </p>
           </div>
           <button
             onClick={() => setIsSettingsOpen(false)}
-            className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
-            aria-label="Close"
+            className="rounded-xl p-1.5 text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC] transition-colors"
+            aria-label="Close settings"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex border-b border-neutral-200/60 px-6 dark:border-neutral-800/60 text-xs">
+        <div className="flex border-b border-black/[0.06] px-6 dark:border-white/[0.08] text-xs">
           {[
             { id: 'profile', label: 'Profile & Targets' },
             { id: 'schedule', label: 'Revision Rhythm' },
@@ -148,10 +142,10 @@ export const SettingsModal: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`py-3 px-3 font-medium transition-colors border-b-2 -mb-px ${
+              className={`py-3 px-3.5 font-medium transition-all border-b-2 -mb-px ${
                 activeTab === tab.id
-                  ? 'border-amber-500 text-neutral-900 dark:text-neutral-100 font-semibold'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200'
+                  ? 'border-[#A97B32] text-[#20232A] dark:border-[#E6C27A] dark:text-[#FFE6AD] font-semibold'
+                  : 'border-transparent text-[#686D77] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]'
               }`}
             >
               {tab.label}
@@ -162,7 +156,7 @@ export const SettingsModal: React.FC = () => {
         {/* Tab Content */}
         <div className="flex-1 overflow-y-auto p-6 text-xs space-y-6">
           {isSavedNotice && (
-            <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-2.5 text-xs text-emerald-500 flex items-center gap-2">
+            <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-3 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-2 font-medium">
               <Check className="h-4 w-4" />
               <span>Preferences saved.</span>
             </div>
@@ -172,38 +166,38 @@ export const SettingsModal: React.FC = () => {
           {activeTab === 'profile' && (
             <form onSubmit={handleSaveProfile} className="space-y-4">
               <div>
-                <label className="font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                   Student Name
                 </label>
                 <input
                   type="text"
                   value={studentName}
                   onChange={(e) => setStudentName(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-xs text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                  className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                 />
               </div>
 
               <div>
-                <label className="font-semibold text-neutral-700 dark:text-neutral-300">
-                  Target Examination / Curriculum
+                <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
+                  Target Examination / Academic Curriculum
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Class 12 Boards & JEE / NEET / SAT"
+                  placeholder="e.g. Class 12 Boards & Competitive Entrance"
                   value={targetExam}
                   onChange={(e) => setTargetExam(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-xs text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                  className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                 />
               </div>
 
               <div>
-                <label className="font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                   Daily New Topics Target
                 </label>
                 <select
                   value={targetDailyTopics}
                   onChange={(e) => setTargetDailyTopics(Number(e.target.value))}
-                  className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-xs text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                  className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                 >
                   <option value={1}>1 topic / day</option>
                   <option value={2}>2 topics / day</option>
@@ -217,9 +211,9 @@ export const SettingsModal: React.FC = () => {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="rounded-lg bg-neutral-900 px-4 py-2 font-semibold text-amber-300 dark:bg-neutral-100 dark:text-neutral-900"
+                  className="btn-gold-primary rounded-xl px-5 py-2.5 font-semibold text-xs shadow-xs"
                 >
-                  Save Profile
+                  Save Profile Settings
                 </button>
               </div>
             </form>
@@ -229,11 +223,11 @@ export const SettingsModal: React.FC = () => {
           {activeTab === 'schedule' && (
             <form onSubmit={handleSaveIntervals} className="space-y-4">
               <div className="space-y-1">
-                <label className="font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                   Spaced Repetition Schedule (Day Offsets)
                 </label>
-                <p className="text-neutral-500 dark:text-neutral-400 text-[11px]">
-                  Default algorithm uses Day 1 (0), Day 3 (+2), Day 5 (+4), Day 7 (+6), Day 14 (+13), Day 21 (+20), Day 28 (+27).
+                <p className="text-[#858A93] dark:text-[#777F8C] text-[11px]">
+                  Default spaced intervals: Day 1 (0), Day 3 (+2), Day 5 (+4), Day 7 (+6), Day 14 (+13), Day 21 (+20), Day 28 (+27).
                 </p>
               </div>
 
@@ -241,29 +235,29 @@ export const SettingsModal: React.FC = () => {
                 type="text"
                 value={intervalsStr}
                 onChange={(e) => setIntervalsStr(e.target.value)}
-                className="w-full rounded-lg border border-neutral-300 p-2.5 font-mono text-xs text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                className="w-full rounded-xl border border-black/[0.08] bg-white/70 p-2.5 font-mono text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
               />
 
-              <div className="rounded-lg border border-neutral-200/60 bg-neutral-50 p-3 dark:border-neutral-800/60 dark:bg-neutral-900/40 text-[11px] text-neutral-500">
-                <span className="font-semibold text-neutral-700 dark:text-neutral-300">
-                  Active Configuration:
+              <div className="rounded-2xl glass-subtle p-3.5 text-[11px] text-[#686D77] dark:text-[#A7ABB5]">
+                <span className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
+                  Active Configuration Rhythm:
                 </span>
                 <div className="mt-1 font-mono">
                   Day 1 (Learn) → Day 3 (Rev 1) → Day 5 (Rev 2) → Day 7 (Test) → Day 14 (Rev) → Day 21 (Rev) → Day 28 (Rev)
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIntervalsStr(DEFAULT_REVISION_INTERVALS.join(', '))}
-                  className="rounded-lg border border-neutral-300 px-3 py-1.5 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300"
+                  className="btn-glass-secondary rounded-xl px-3.5 py-2 font-medium"
                 >
                   Reset to Default
                 </button>
                 <button
                   type="submit"
-                  className="rounded-lg bg-neutral-900 px-4 py-1.5 font-semibold text-amber-300 dark:bg-neutral-100 dark:text-neutral-900"
+                  className="btn-gold-primary rounded-xl px-4 py-2 font-semibold shadow-xs"
                 >
                   Update Rhythm
                 </button>
@@ -273,26 +267,26 @@ export const SettingsModal: React.FC = () => {
 
           {/* 3. Data & Backup Tab */}
           {activeTab === 'data' && (
-            <div className="space-y-5">
+            <div className="space-y-4">
               {importStatus && (
-                <div className="rounded-lg bg-neutral-100 p-2.5 dark:bg-neutral-800 font-mono text-[11px]">
+                <div className="rounded-2xl glass-subtle p-3 font-mono text-[11px] text-[#20232A] dark:text-[#F6F3EC]">
                   {importStatus}
                 </div>
               )}
 
               {/* Export */}
-              <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-4 dark:border-neutral-800">
+              <div className="flex items-center justify-between rounded-2xl glass-subtle p-4">
                 <div>
-                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100">
+                  <h4 className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                     Export Learning Records
                   </h4>
-                  <p className="text-[11px] text-neutral-500">
-                    Download complete snapshot of subjects, topics, schedules, and test scores as JSON.
+                  <p className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
+                    Download a complete JSON snapshot of topics, review histories, and error logs.
                   </p>
                 </div>
                 <button
                   onClick={exportData}
-                  className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                  className="btn-glass-secondary flex items-center gap-1.5 rounded-xl px-3.5 py-2 font-medium"
                 >
                   <Download className="h-3.5 w-3.5" />
                   <span>Export JSON</span>
@@ -300,16 +294,16 @@ export const SettingsModal: React.FC = () => {
               </div>
 
               {/* Import */}
-              <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-4 dark:border-neutral-800">
+              <div className="flex items-center justify-between rounded-2xl glass-subtle p-4">
                 <div>
-                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100">
+                  <h4 className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                     Import Backup
                   </h4>
-                  <p className="text-[11px] text-neutral-500">
-                    Restore previously exported learning data from a JSON backup file.
+                  <p className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
+                    Restore previously exported study records from a valid JSON backup file.
                   </p>
                 </div>
-                <label className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800">
+                <label className="btn-glass-secondary flex cursor-pointer items-center gap-1.5 rounded-xl px-3.5 py-2 font-medium">
                   <Upload className="h-3.5 w-3.5" />
                   <span>Select File</span>
                   <input
@@ -322,28 +316,28 @@ export const SettingsModal: React.FC = () => {
               </div>
 
               {/* Demo Data Management */}
-              <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-4 dark:border-neutral-800">
+              <div className="flex items-center justify-between rounded-2xl glass-subtle p-4">
                 <div>
-                  <h4 className="font-semibold text-neutral-900 dark:text-neutral-100">
+                  <h4 className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                     Demo Preview Data
                   </h4>
-                  <p className="text-[11px] text-neutral-500">
+                  <p className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
                     {state.isDemoData
-                      ? 'Currently viewing Class 11/12 demo dataset. Purge to start your real notebook.'
-                      : 'Load realistic Class 11/12 physics, chemistry, and math demo records.'}
+                      ? 'Currently viewing sample academic dataset. Purge to begin your personal revision notebook.'
+                      : 'Load realistic sample physics, chemistry, and math syllabus records.'}
                   </p>
                 </div>
                 {state.isDemoData ? (
                   <button
                     onClick={purgeDemoData}
-                    className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 font-medium text-amber-800 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-300"
+                    className="rounded-xl border border-[#E6C27A]/40 bg-[#E6C27A]/15 px-3.5 py-2 font-semibold text-[#8C6221] dark:text-[#FFE6AD] hover:bg-[#E6C27A]/25 transition-colors"
                   >
                     Clear Demo Data
                   </button>
                 ) : (
                   <button
                     onClick={loadDemoData}
-                    className="rounded-lg border border-neutral-300 px-3 py-1.5 font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200"
+                    className="btn-glass-secondary rounded-xl px-3.5 py-2 font-medium"
                   >
                     Load Demo Data
                   </button>
@@ -351,18 +345,18 @@ export const SettingsModal: React.FC = () => {
               </div>
 
               {/* Destructive Clear */}
-              <div className="flex items-center justify-between rounded-xl border border-rose-200/60 p-4 dark:border-rose-950/50">
+              <div className="flex items-center justify-between rounded-2xl glass-subtle border border-[#F87171]/20 p-4">
                 <div>
-                  <h4 className="font-semibold text-rose-600 dark:text-rose-400">
+                  <h4 className="font-semibold text-[#F87171]">
                     Purge All Learning Records
                   </h4>
-                  <p className="text-[11px] text-neutral-500">
-                    Permanently delete all subjects, topics, and mistake logs on this browser.
+                  <p className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
+                    Permanently delete all subjects, topics, and mistake logs in this browser session.
                   </p>
                 </div>
                 <button
                   onClick={handleReset}
-                  className="flex items-center gap-1.5 rounded-lg border border-rose-300 bg-rose-50 px-3 py-1.5 font-medium text-rose-700 hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950/20 dark:text-rose-400"
+                  className="flex items-center gap-1.5 rounded-xl border border-[#F87171]/40 bg-[#F87171]/10 px-3.5 py-2 font-semibold text-[#F87171] hover:bg-[#F87171]/20 transition-colors"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                   <span>Delete All</span>
@@ -373,10 +367,10 @@ export const SettingsModal: React.FC = () => {
 
           {/* 4. Privacy Tab */}
           {activeTab === 'privacy' && (
-            <div className="space-y-3 leading-relaxed text-neutral-600 dark:text-neutral-300 text-xs">
-              <div className="flex items-center gap-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                <Shield className="h-4 w-4 text-amber-500" />
-                <span>You Own Your Academic Learning Data</span>
+            <div className="space-y-3 leading-relaxed text-[#686D77] dark:text-[#A7ABB5] text-xs">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#20232A] dark:text-[#F6F3EC]">
+                <Shield className="h-4 w-4 text-[#E6C27A]" />
+                <span>Local-First Academic Learning System</span>
               </div>
               <p>
                 AURELIS is built with a local-first philosophy. Your recorded chapters, formulas, recall scores, and error logs are stored on your device and are never sold or shared with third parties.

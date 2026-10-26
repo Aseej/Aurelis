@@ -11,15 +11,13 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
-  HelpCircle,
+  Globe,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
   const {
     activeView,
     setActiveView,
-    state,
     todayReviewsDue,
     weeklyTestsDue,
     setIsSettingsOpen,
@@ -38,29 +36,30 @@ export const Sidebar: React.FC = () => {
     { id: 'tests', label: 'Weekly Tests', icon: FileCheck2, badge: testCount > 0 ? testCount : null },
     { id: 'errors', label: 'Error Notebook', icon: AlertCircle },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    { id: 'landing', label: 'Public Overview', icon: Globe },
   ];
 
   return (
     <aside
-      className={`hidden lg:flex flex-col border-r border-neutral-200/80 bg-[#fafafa] dark:border-neutral-800/80 dark:bg-[#0c0d11] transition-all duration-200 ease-in-out shrink-0 select-none ${
+      className={`hidden lg:flex flex-col border-r border-black/[0.06] bg-[#EBE7DE]/50 backdrop-blur-xl dark:border-white/[0.08] dark:bg-[#0E1118]/70 transition-all duration-200 ease-in-out shrink-0 select-none z-20 ${
         isCollapsed ? 'w-16' : 'w-60'
       }`}
     >
       {/* Sidebar Header */}
-      <div className="flex h-14 items-center justify-between px-4 border-b border-neutral-200/60 dark:border-neutral-800/60">
+      <div className="flex h-14 items-center justify-between px-4 border-b border-black/[0.06] dark:border-white/[0.08]">
         {!isCollapsed && (
           <div className="flex items-center gap-2.5">
-            <span className="flex h-6 w-6 items-center justify-center rounded bg-neutral-900 text-[11px] font-semibold text-amber-300 ring-1 ring-amber-400/30 dark:bg-neutral-800">
+            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-[#1E2430] to-[#0E1118] text-[11px] font-serif font-semibold text-[#E6C27A] border border-white/10 dark:border-[#E6C27A]/30">
               A
             </span>
-            <span className="font-serif text-sm font-semibold tracking-wide text-neutral-900 dark:text-neutral-100">
-              AURELIS
+            <span className="font-serif text-xs font-semibold tracking-wider text-[#20232A] dark:text-[#F6F3EC]">
+              NAVIGATION
             </span>
           </div>
         )}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`flex h-7 w-7 items-center justify-center rounded-md text-neutral-400 hover:bg-neutral-200/60 hover:text-neutral-700 dark:hover:bg-neutral-800/70 dark:hover:text-neutral-200 ${
+          className={`flex h-7 w-7 items-center justify-center rounded-md text-[#858A93] hover:bg-black/[0.04] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:bg-white/[0.06] dark:hover:text-[#F6F3EC] ${
             isCollapsed ? 'mx-auto' : ''
           }`}
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -71,7 +70,7 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Navigation Items */}
-      <div className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
+      <div className="flex-1 overflow-y-auto px-2.5 py-4 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeView === item.id;
@@ -79,23 +78,25 @@ export const Sidebar: React.FC = () => {
             <button
               key={item.id}
               onClick={() => setActiveView(item.id as any)}
-              className={`group flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-xs font-medium transition-all ${
+              className={`group flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-all ${
                 isActive
-                  ? 'bg-neutral-900 text-white shadow-xs dark:bg-neutral-800/90 dark:text-amber-200'
-                  : 'text-neutral-600 hover:bg-neutral-200/50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-850 dark:hover:text-neutral-200'
+                  ? 'bg-black/[0.07] text-[#20232A] shadow-xs border border-black/[0.08] dark:bg-white/[0.08] dark:text-[#FFE6AD] dark:border-white/[0.12]'
+                  : 'text-[#686D77] hover:bg-black/[0.04] hover:text-[#20232A] dark:text-[#A7ABB5] dark:hover:bg-white/[0.04] dark:hover:text-[#F6F3EC]'
               } ${isCollapsed ? 'justify-center px-0' : ''}`}
               title={isCollapsed ? item.label : undefined}
             >
               <Icon
                 className={`h-4 w-4 shrink-0 transition-colors ${
-                  isActive ? 'text-amber-400' : 'text-neutral-500 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200'
+                  isActive
+                    ? 'text-[#A97B32] dark:text-[#E6C27A]'
+                    : 'text-[#858A93] group-hover:text-[#20232A] dark:text-[#777F8C] dark:group-hover:text-[#F6F3EC]'
                 }`}
               />
               {!isCollapsed && (
                 <span className="flex-1 text-left truncate">{item.label}</span>
               )}
               {!isCollapsed && item.badge !== null && item.badge !== undefined && (
-                <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-amber-400/20 px-1 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+                <span className="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#E6C27A]/20 px-1 text-[10px] font-mono font-semibold text-[#8C6221] dark:text-[#FFE6AD]">
                   {item.badge}
                 </span>
               )}
@@ -104,40 +105,20 @@ export const Sidebar: React.FC = () => {
         })}
       </div>
 
-      {/* Student Profile Card & Settings at bottom */}
-      <div className="border-t border-neutral-200/60 p-2.5 dark:border-neutral-800/60 space-y-1">
-        <button
-          onClick={() => setActiveView('landing')}
-          className={`flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-xs text-neutral-600 transition-colors hover:bg-neutral-200/50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-850 dark:hover:text-neutral-200 ${
-            isCollapsed ? 'justify-center px-0' : ''
-          }`}
-          title="Product Vision & Landing"
-        >
-          <Sparkles className="h-4 w-4 shrink-0 text-amber-500/80" />
-          {!isCollapsed && <span className="truncate">Public Overview</span>}
-        </button>
-
+      {/* Sidebar Footer with Settings */}
+      <div className="p-3 border-t border-black/[0.06] dark:border-white/[0.08]">
         <button
           onClick={() => setIsSettingsOpen(true)}
-          className={`flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-xs text-neutral-600 transition-colors hover:bg-neutral-200/50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-850 dark:hover:text-neutral-200 ${
+          className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-xs text-[#686D77] hover:bg-black/[0.04] hover:text-[#20232A] dark:text-[#A7ABB5] dark:hover:bg-white/[0.04] dark:hover:text-[#F6F3EC] transition-all ${
             isCollapsed ? 'justify-center px-0' : ''
           }`}
-          title="Settings & Data Preferences"
+          title="Settings & Data Management"
         >
-          <Settings className="h-4 w-4 shrink-0 text-neutral-500" />
-          {!isCollapsed && <span className="truncate">Settings & Backup</span>}
+          <Settings className="h-4 w-4 shrink-0 text-[#858A93] dark:text-[#777F8C]" />
+          {!isCollapsed && (
+            <span className="truncate">Settings & Backup</span>
+          )}
         </button>
-
-        {!isCollapsed && (
-          <div className="mt-2 rounded-lg bg-neutral-100/70 p-2.5 dark:bg-neutral-900/60">
-            <div className="text-[11px] font-medium text-neutral-900 dark:text-neutral-200 truncate">
-              {state.settings.studentName || 'Aakash Panjiyar'}
-            </div>
-            <div className="text-[10px] text-neutral-500 dark:text-neutral-400 truncate">
-              {state.settings.targetExam || 'Preparation Mode'}
-            </div>
-          </div>
-        )}
       </div>
     </aside>
   );

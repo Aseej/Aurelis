@@ -65,11 +65,11 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 sm:p-6 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto"
     >
-      <div className="relative w-full max-w-2xl rounded-2xl border border-neutral-200/90 bg-white shadow-2xl dark:border-neutral-800/90 dark:bg-[#0e0f14] overflow-hidden my-auto max-h-[92vh] flex flex-col">
+      <div className="relative w-full max-w-2xl rounded-3xl glass-premium shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col border border-white/20 dark:border-white/10">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-neutral-200/80 px-6 py-4 dark:border-neutral-800/80">
+        <div className="flex items-center justify-between border-b border-black/[0.06] px-6 py-4 dark:border-white/[0.08]">
           <div className="flex items-center gap-2 text-xs font-mono">
             <span
               className="font-semibold uppercase tracking-wider text-[11px]"
@@ -78,14 +78,14 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
               {subject.name}
             </span>
             <span aria-hidden="true">·</span>
-            <span className="text-neutral-500">{topic.chapterName}</span>
+            <span className="text-[#858A93] dark:text-[#777F8C]">{topic.chapterName}</span>
           </div>
 
           <div className="flex items-center gap-2">
             {!isEditing ? (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-1 rounded-lg border border-neutral-300 px-2.5 py-1 text-xs text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                className="btn-glass-secondary flex items-center gap-1 rounded-xl px-2.5 py-1 text-xs"
               >
                 <Edit2 className="h-3 w-3" />
                 <span>Edit</span>
@@ -93,16 +93,16 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
             ) : (
               <button
                 onClick={handleSave}
-                className="flex items-center gap-1 rounded-lg bg-neutral-900 px-3 py-1 text-xs font-semibold text-white dark:bg-neutral-100 dark:text-neutral-900"
+                className="btn-gold-primary flex items-center gap-1 rounded-xl px-3 py-1 text-xs font-semibold"
               >
-                <Check className="h-3 w-3" />
+                <Check className="h-3 w-3 stroke-[2.5]" />
                 <span>Save</span>
               </button>
             )}
 
             <button
               onClick={handleDelete}
-              className="rounded-lg p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30"
+              className="rounded-xl p-1.5 text-[#F87171] hover:bg-[#F87171]/10 transition-colors"
               title="Delete Topic"
               aria-label="Delete Topic"
             >
@@ -111,7 +111,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
 
             <button
               onClick={onClose}
-              className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
+              className="rounded-xl p-1.5 text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC] transition-colors"
               aria-label="Close"
             >
               <X className="h-4 w-4" />
@@ -120,71 +120,71 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 text-xs">
           {isEditing ? (
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="text-xs font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                   Topic Title
                 </label>
                 <input
                   type="text"
                   value={editedTitle}
                   onChange={(e) => setEditedTitle(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-xs text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                  className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="text-xs font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                   Chapter
                 </label>
                 <input
                   type="text"
                   value={editedChapter}
                   onChange={(e) => setEditedChapter(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-xs text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                  className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  <label className="text-xs font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                     Studied Date
                   </label>
                   <input
                     type="date"
                     value={editedStudiedDate}
                     onChange={(e) => setEditedStudiedDate(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-xs text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                    className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                   />
-                  <p className="mt-1 text-[10px] text-neutral-400">
-                    Recalculates future uncompleted review dates safely.
+                  <p className="mt-1 text-[10px] text-[#858A93] dark:text-[#777F8C]">
+                    Safely shifts future uncompleted repetitions.
                   </p>
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  <label className="text-xs font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                     Est. Duration (min)
                   </label>
                   <input
                     type="number"
                     value={editedDuration}
                     onChange={(e) => setEditedDuration(Number(e.target.value))}
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-xs text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                    className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="text-xs font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                   Notes
                 </label>
                 <textarea
                   rows={5}
                   value={editedNotes}
                   onChange={(e) => setEditedNotes(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-neutral-300 p-3 text-xs text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 font-mono"
+                  className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 p-3 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC] font-mono"
                 />
               </div>
             </div>
@@ -193,15 +193,15 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
               {/* Display Header */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
+                  <h3 className="text-xl font-bold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
                     {topic.title}
                   </h3>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${badgeClass}`}>
+                  <span className={`text-xs font-mono px-2 py-0.5 rounded-md border ${badgeClass}`}>
                     {topic.mastery.toUpperCase()} ({topic.masteryScore}%)
                   </span>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 text-xs text-neutral-500 dark:text-neutral-400">
+                <div className="flex flex-wrap items-center gap-3 text-xs text-[#858A93] dark:text-[#777F8C]">
                   <span>Studied: {formatDisplayDate(topic.studiedDate, false)}</span>
                   <span aria-hidden="true">·</span>
                   <span>Est. Review: ~{topic.estimatedDurationMinutes} min</span>
@@ -211,8 +211,8 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
               </div>
 
               {/* Revision Schedule History & Progression */}
-              <div className="rounded-xl border border-neutral-200/90 bg-neutral-50/60 p-4 dark:border-neutral-800/90 dark:bg-neutral-900/40 space-y-3">
-                <div className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+              <div className="rounded-2xl glass-subtle p-4 space-y-3">
+                <div className="text-xs font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
                   Spaced Repetition Milestones (7-Step Curve)
                 </div>
 
@@ -224,17 +224,17 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
                     return (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between rounded-lg border border-neutral-200/60 bg-white p-2.5 text-xs dark:border-neutral-800/60 dark:bg-[#121318]"
+                        className="flex items-center justify-between rounded-xl glass-subtle p-3 text-xs"
                       >
                         <div className="flex items-center gap-3">
-                          <span className="font-mono text-neutral-400 text-[11px] w-5">
+                          <span className="font-mono text-[#858A93] dark:text-[#777F8C] text-[11px] w-5">
                             #{idx + 1}
                           </span>
                           <div>
-                            <div className="font-medium text-neutral-900 dark:text-neutral-100">
+                            <div className="font-medium text-[#20232A] dark:text-[#F6F3EC]">
                               {item.stageName}
                             </div>
-                            <div className="text-[11px] text-neutral-500">
+                            <div className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
                               Scheduled: {formatDisplayDate(item.scheduledDate, false)}
                               {item.completedDate && ` · Completed: ${formatDisplayDate(item.completedDate, false)}`}
                             </div>
@@ -243,7 +243,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
 
                         <div className="flex items-center gap-2">
                           {isDone ? (
-                            <span className="text-emerald-500 font-medium text-[11px]">
+                            <span className="text-emerald-600 dark:text-emerald-400 font-medium text-[11px]">
                               Completed {item.confidenceRating && `(${item.confidenceRating})`}
                             </span>
                           ) : isOverdue ? (
@@ -252,13 +252,13 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
                                 startReviewSession(topic.id, item.stepIndex);
                                 onClose();
                               }}
-                              className="rounded bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 text-[11px] font-semibold text-rose-500 hover:bg-rose-500/20"
+                              className="rounded-lg bg-[#F87171]/15 border border-[#F87171]/30 px-2.5 py-1 text-[11px] font-semibold text-[#F87171] hover:bg-[#F87171]/25"
                             >
                               Overdue · Revise
                             </button>
                           ) : (
-                            <span className="text-neutral-400 text-[11px]">
-                              Pending
+                            <span className="text-[#858A93] dark:text-[#777F8C] text-[11px]">
+                              Scheduled
                             </span>
                           )}
                         </div>
@@ -270,11 +270,11 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
 
               {/* Notes */}
               <div className="space-y-2">
-                <div className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+                <div className="text-xs font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
                   Concept Notes & Formulas
                 </div>
-                <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-4 text-xs text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-200 whitespace-pre-wrap font-sans leading-relaxed">
-                  {topic.notes || 'No notes saved.'}
+                <div className="rounded-2xl glass-subtle p-4 text-xs text-[#20232A] dark:text-[#F6F3EC] whitespace-pre-wrap font-sans leading-relaxed">
+                  {topic.notes || 'No reference notes saved.'}
                 </div>
               </div>
             </>

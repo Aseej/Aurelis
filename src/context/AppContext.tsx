@@ -124,15 +124,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(null);
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<string>(getTodayDateString());
 
-  // Synchronize HTML theme class
+  // Synchronize HTML theme class and colorScheme
   useEffect(() => {
     const root = document.documentElement;
     if (theme === 'dark') {
       root.classList.add('dark');
       root.classList.remove('light');
+      root.style.colorScheme = 'dark';
     } else {
       root.classList.remove('dark');
       root.classList.add('light');
+      root.style.colorScheme = 'light';
+    }
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', theme === 'dark' ? '#090B10' : '#F4F1EA');
     }
   }, [theme]);
 

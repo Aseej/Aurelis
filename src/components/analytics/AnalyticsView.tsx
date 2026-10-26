@@ -89,17 +89,17 @@ export const AnalyticsView: React.FC = () => {
 
   if (totalTopics === 0) {
     return (
-      <div className="py-16 text-center space-y-4">
-        <Target className="mx-auto h-12 w-12 text-neutral-300 dark:text-neutral-700" />
-        <h2 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+      <div className="py-20 text-center space-y-4">
+        <Target className="mx-auto h-12 w-12 text-[#858A93] dark:text-[#777F8C]" />
+        <h2 className="text-base font-semibold text-[#20232A] dark:text-[#F6F3EC]">
           Your analytics will appear as you build your revision history.
         </h2>
-        <p className="text-xs text-neutral-500 max-w-sm mx-auto">
-          Log chapters and complete spaced reviews to unlock retention insights and exam readiness diagnostics.
+        <p className="text-xs text-[#858A93] dark:text-[#777F8C] max-w-sm mx-auto">
+          Record topics and complete active spaced reviews to unlock retention insights and exam readiness diagnostics.
         </p>
         <button
           onClick={() => setIsAddTopicOpen(true)}
-          className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-semibold text-amber-300 dark:bg-neutral-100 dark:text-neutral-900"
+          className="btn-gold-primary inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold"
         >
           Add Your First Topic
         </button>
@@ -111,76 +111,76 @@ export const AnalyticsView: React.FC = () => {
     <div className="space-y-6 pb-12">
       {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
           Performance & Mastery Analytics
         </h1>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">
-          Transparent metrics derived from your completed spaced repetitions and diagnostic tests
+        <p className="text-xs text-[#858A93] dark:text-[#777F8C] mt-0.5">
+          Auditable metrics computed from your spaced repetition schedule and diagnostic test logs
         </p>
       </div>
 
       {/* Top 4 KPI Metrics (Tabular numerals, no pills) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* 1. Topics Learned */}
-        <div className="rounded-xl border border-neutral-200/90 bg-white p-4 shadow-xs dark:border-neutral-800/90 dark:bg-[#111216]">
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
-            Topics in Curriculum
+        <div className="rounded-3xl glass-premium p-5 transition-all">
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
+            Curriculum Topics
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="font-mono text-3xl font-bold tabular-nums text-neutral-900 dark:text-neutral-50">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="font-mono text-3xl font-bold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
               {totalTopics}
             </span>
-            <span className="text-xs text-neutral-500">logged</span>
+            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">logged</span>
           </div>
-          <p className="mt-1 text-[11px] text-neutral-400">
+          <p className="mt-1 text-[11px] text-[#858A93] dark:text-[#777F8C]">
             Across {state.subjects.length} academic subjects
           </p>
         </div>
 
         {/* 2. Repetition Completion Rate */}
-        <div className="rounded-xl border border-neutral-200/90 bg-white p-4 shadow-xs dark:border-neutral-800/90 dark:bg-[#111216]">
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+        <div className="rounded-3xl glass-premium p-5 transition-all">
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
             Review Adherence
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="font-mono text-3xl font-bold tabular-nums text-amber-600 dark:text-amber-400">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="font-mono text-3xl font-bold tabular-nums text-[#A97B32] dark:text-[#E6C27A]">
               {metrics.completionRate}%
             </span>
-            <span className="text-xs text-neutral-500">adherence</span>
+            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">adherence</span>
           </div>
-          <p className="mt-1 text-[11px] text-neutral-400">
+          <p className="mt-1 text-[11px] text-[#858A93] dark:text-[#777F8C]">
             {metrics.completedReviews} of {metrics.totalScheduledReviews} reviews completed
           </p>
         </div>
 
         {/* 3. Study Time */}
-        <div className="rounded-xl border border-neutral-200/90 bg-white p-4 shadow-xs dark:border-neutral-800/90 dark:bg-[#111216]">
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+        <div className="rounded-3xl glass-premium p-5 transition-all">
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
             Active Recall Time
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="font-mono text-3xl font-bold tabular-nums text-neutral-900 dark:text-neutral-50">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="font-mono text-3xl font-bold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
               {metrics.totalHours}
             </span>
-            <span className="text-xs text-neutral-500">hours</span>
+            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">hours</span>
           </div>
-          <p className="mt-1 text-[11px] text-neutral-400">
-            Dedicated spaced repetition training
+          <p className="mt-1 text-[11px] text-[#858A93] dark:text-[#777F8C]">
+            Spaced repetition retrieval
           </p>
         </div>
 
         {/* 4. Diagnostic Average */}
-        <div className="rounded-xl border border-neutral-200/90 bg-white p-4 shadow-xs dark:border-neutral-800/90 dark:bg-[#111216]">
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+        <div className="rounded-3xl glass-premium p-5 transition-all">
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
             Diagnostic Test Avg
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="font-mono text-3xl font-bold tabular-nums text-neutral-900 dark:text-neutral-50">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="font-mono text-3xl font-bold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
               {metrics.testAverage !== null ? `${metrics.testAverage}%` : 'N/A'}
             </span>
-            <span className="text-xs text-neutral-500">score</span>
+            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">score</span>
           </div>
-          <p className="mt-1 text-[11px] text-neutral-400">
+          <p className="mt-1 text-[11px] text-[#858A93] dark:text-[#777F8C]">
             {state.weeklyTests.length} tests logged
           </p>
         </div>
@@ -189,34 +189,34 @@ export const AnalyticsView: React.FC = () => {
       {/* Mastery Model Distribution & Subject Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Mastery Breakdown */}
-        <div className="rounded-xl border border-neutral-200/90 bg-white p-5 dark:border-neutral-800/90 dark:bg-[#111216] space-y-4">
+        <div className="rounded-3xl glass-subtle p-5 sm:p-6 space-y-4 transition-all">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-neutral-400">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
               Mastery Stage Distribution
             </h3>
-            <span className="text-xs text-neutral-500 font-mono">
+            <span className="text-xs text-[#858A93] dark:text-[#777F8C] font-mono">
               {metrics.masteryDist.mastered} Mastered
             </span>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             {[
-              { label: 'Mastered (>= 90%)', count: metrics.masteryDist.mastered, color: 'bg-amber-400' },
+              { label: 'Mastered (>= 90%)', count: metrics.masteryDist.mastered, color: 'bg-[#E6C27A]' },
               { label: 'Strong (70 - 89%)', count: metrics.masteryDist.strong, color: 'bg-emerald-400' },
-              { label: 'Developing (40 - 69%)', count: metrics.masteryDist.developing, color: 'bg-sky-400' },
+              { label: 'Developing (40 - 69%)', count: metrics.masteryDist.developing, color: 'bg-[#60A5FA]' },
               { label: 'Learning (15 - 39%)', count: metrics.masteryDist.learning, color: 'bg-orange-400' },
-              { label: 'New (< 15%)', count: metrics.masteryDist.new, color: 'bg-neutral-400' },
+              { label: 'New (< 15%)', count: metrics.masteryDist.new, color: 'bg-[#858A93]' },
             ].map((row) => {
               const pct = totalTopics > 0 ? Math.round((row.count / totalTopics) * 100) : 0;
               return (
-                <div key={row.label} className="space-y-1 text-xs">
-                  <div className="flex justify-between text-neutral-700 dark:text-neutral-300">
+                <div key={row.label} className="space-y-1.5 text-xs">
+                  <div className="flex justify-between text-[#20232A] dark:text-[#F6F3EC]">
                     <span>{row.label}</span>
-                    <span className="font-mono text-neutral-400 tabular-nums">
+                    <span className="font-mono text-[#858A93] dark:text-[#777F8C] tabular-nums">
                       {row.count} ({pct}%)
                     </span>
                   </div>
-                  <div className="h-1.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
+                  <div className="h-1.5 w-full rounded-full bg-black/[0.08] dark:bg-white/[0.08] overflow-hidden">
                     <div
                       className={`h-full rounded-full ${row.color}`}
                       style={{ width: `${pct}%` }}
@@ -227,29 +227,29 @@ export const AnalyticsView: React.FC = () => {
             })}
           </div>
 
-          <p className="text-[11px] text-neutral-400 border-t border-neutral-100 pt-3 dark:border-neutral-800">
-            Calculated transparently: 50% from interval completions, 35% from recall ratings, and 15% from error log stability.
+          <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] border-t border-black/[0.06] pt-3 dark:border-white/[0.08]">
+            Multi-factor model: 50% interval completions, 35% recall ratings, and 15% error notebook stability.
           </p>
         </div>
 
         {/* Subject Progress */}
-        <div className="rounded-xl border border-neutral-200/90 bg-white p-5 dark:border-neutral-800/90 dark:bg-[#111216] space-y-4">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-neutral-400">
+        <div className="rounded-3xl glass-subtle p-5 sm:p-6 space-y-4 transition-all">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
             Subject Relative Performance
           </h3>
 
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             {metrics.subjectBreakdown.map(({ subject, topicCount, avgMastery }) => (
-              <div key={subject.id} className="space-y-1 text-xs">
+              <div key={subject.id} className="space-y-1.5 text-xs">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                  <span className="font-medium text-[#20232A] dark:text-[#F6F3EC]">
                     {subject.name} ({topicCount} topics)
                   </span>
                   <span className="font-mono font-semibold tabular-nums" style={{ color: subject.color }}>
                     {avgMastery}%
                   </span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
+                <div className="h-1.5 w-full rounded-full bg-black/[0.08] dark:bg-white/[0.08] overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all"
                     style={{ width: `${avgMastery}%`, backgroundColor: subject.color }}
@@ -262,32 +262,32 @@ export const AnalyticsView: React.FC = () => {
       </div>
 
       {/* Weakest Topics List */}
-      <div className="rounded-xl border border-neutral-200/90 bg-white p-5 dark:border-neutral-800/90 dark:bg-[#111216] space-y-3">
+      <div className="rounded-3xl glass-subtle p-5 sm:p-6 space-y-3 transition-all">
         <div className="flex items-center gap-2">
-          <AlertTriangle className="h-4 w-4 text-amber-500" />
-          <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-            Lowest Retention Topics (Prioritize in Revision)
+          <AlertTriangle className="h-4 w-4 text-[#E6C27A]" />
+          <h3 className="text-sm font-semibold text-[#20232A] dark:text-[#F6F3EC]">
+            Lowest Retention Topics (Prioritize in Upcoming Revisions)
           </h3>
         </div>
 
-        <div className="divide-y divide-neutral-200/60 dark:divide-neutral-800/60 text-xs">
+        <div className="divide-y divide-black/[0.06] dark:divide-white/[0.08] text-xs">
           {metrics.weakTopics.map((topic) => {
             const subj = state.subjects.find((s) => s.id === topic.subjectId);
             return (
               <div
                 key={topic.id}
-                className="flex items-center justify-between py-2.5 first:pt-1 last:pb-1"
+                className="flex items-center justify-between py-3 first:pt-1 last:pb-1"
               >
                 <div>
-                  <div className="font-medium text-neutral-900 dark:text-neutral-100">
+                  <div className="font-medium text-[#20232A] dark:text-[#F6F3EC]">
                     {topic.title}
                   </div>
-                  <div className="text-[11px] text-neutral-400">
+                  <div className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
                     {subj?.name} · {topic.chapterName}
                   </div>
                 </div>
 
-                <div className="text-right font-mono text-amber-600 dark:text-amber-400 font-semibold tabular-nums">
+                <div className="text-right font-mono text-[#A97B32] dark:text-[#E6C27A] font-semibold tabular-nums">
                   {topic.masteryScore}%
                 </div>
               </div>

@@ -1,18 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Topic, Subject } from '../../types';
+import { Topic } from '../../types';
 import { formatDisplayDate } from '../../utils/scheduler';
 import { getMasteryBadgeClass } from '../../utils/mastery';
 import { TopicDetailModal } from '../topics/TopicDetailModal';
 import {
-  BookOpen,
-  ChevronRight,
-  Layers,
   ArrowLeft,
   Play,
   Plus,
-  AlertTriangle,
-  CheckCircle,
 } from 'lucide-react';
 
 export const SubjectsView: React.FC = () => {
@@ -96,7 +91,7 @@ export const SubjectsView: React.FC = () => {
           <div className="flex items-center justify-between">
             <button
               onClick={() => setSelectedSubjectId(null)}
-              className="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100"
+              className="inline-flex items-center gap-1.5 text-xs text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC] transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>All Subjects</span>
@@ -104,63 +99,63 @@ export const SubjectsView: React.FC = () => {
 
             <button
               onClick={() => setIsAddTopicOpen(true)}
-              className="flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-amber-300 dark:bg-neutral-100 dark:text-neutral-900"
+              className="btn-gold-primary flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-xs"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
               <span>Add Topic to {selectedStats.subject.name}</span>
             </button>
           </div>
 
           {/* Subject Master Card */}
-          <div className="rounded-xl border border-neutral-200/90 bg-white p-5 sm:p-6 shadow-xs dark:border-neutral-800/90 dark:bg-[#111216]">
+          <div className="rounded-3xl glass-hero p-5 sm:p-7 space-y-5 transition-all">
             <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
               <div>
                 <span
                   className="text-xs font-semibold uppercase tracking-wider"
                   style={{ color: selectedStats.subject.color }}
                 >
-                  Subject Mastery Overview
+                  Subject Curriculum Overview
                 </span>
-                <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
+                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
                   {selectedStats.subject.name}
                 </h1>
-                <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                  {selectedStats.subject.description || 'Core examination curriculum syllabus'}
+                <p className="mt-1 text-xs text-[#858A93] dark:text-[#777F8C]">
+                  {selectedStats.subject.description || 'Core academic examination syllabus and spaced repetitions'}
                 </p>
               </div>
 
               {/* Big Mastery Figure */}
               <div className="flex items-baseline gap-2">
-                <span className="font-mono text-3xl sm:text-4xl font-bold tabular-nums text-neutral-900 dark:text-neutral-50">
+                <span className="font-mono text-3xl sm:text-4xl font-bold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
                   {selectedStats.avgScore}%
                 </span>
-                <span className="text-xs text-neutral-500">Mastery</span>
+                <span className="text-xs text-[#858A93] dark:text-[#777F8C]">Mastery</span>
               </div>
             </div>
 
             {/* Metrics Breakdown */}
-            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-neutral-200/60 pt-4 dark:border-neutral-800/60 text-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-black/[0.06] pt-4 dark:border-white/[0.08] text-xs">
               <div>
-                <span className="text-neutral-400">Total Topics</span>
-                <div className="font-mono text-lg font-semibold text-neutral-900 dark:text-neutral-100 tabular-nums">
+                <span className="text-[#858A93] dark:text-[#777F8C]">Total Topics</span>
+                <div className="font-mono text-lg font-semibold text-[#20232A] dark:text-[#F6F3EC] tabular-nums">
                   {selectedStats.total}
                 </div>
               </div>
               <div>
-                <span className="text-neutral-400">Mastered</span>
-                <div className="font-mono text-lg font-semibold text-emerald-500 tabular-nums">
+                <span className="text-[#858A93] dark:text-[#777F8C]">Mastered</span>
+                <div className="font-mono text-lg font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
                   {selectedStats.mastered}
                 </div>
               </div>
               <div>
-                <span className="text-neutral-400">In Progress</span>
-                <div className="font-mono text-lg font-semibold text-sky-500 tabular-nums">
+                <span className="text-[#858A93] dark:text-[#777F8C]">In Progress</span>
+                <div className="font-mono text-lg font-semibold text-[#60A5FA] tabular-nums">
                   {selectedStats.inProgress}
                 </div>
               </div>
               <div>
-                <span className="text-neutral-400">Needs Attention</span>
-                <div className="font-mono text-lg font-semibold text-amber-500 tabular-nums">
+                <span className="text-[#858A93] dark:text-[#777F8C]">Needs Attention</span>
+                <div className="font-mono text-lg font-semibold text-[#A97B32] dark:text-[#E6C27A] tabular-nums">
                   {selectedStats.needsAttention}
                 </div>
               </div>
@@ -169,12 +164,12 @@ export const SubjectsView: React.FC = () => {
 
           {/* Chapters & Topics List */}
           <div className="space-y-4">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-400">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
               Chapters & Topics ({chaptersInSelected.length} Chapters)
             </h2>
 
             {chaptersInSelected.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-neutral-300 p-8 text-center text-xs text-neutral-400 dark:border-neutral-800">
+              <div className="rounded-2xl glass-subtle border border-dashed border-black/[0.1] dark:border-white/[0.1] p-8 text-center text-xs text-[#858A93] dark:text-[#777F8C]">
                 No topics logged in {selectedStats.subject.name} yet.
               </div>
             ) : (
@@ -182,18 +177,18 @@ export const SubjectsView: React.FC = () => {
                 {chaptersInSelected.map(({ chapterName, topics }) => (
                   <div
                     key={chapterName}
-                    className="rounded-xl border border-neutral-200/90 bg-white p-4 dark:border-neutral-800/90 dark:bg-[#111216] space-y-3"
+                    className="rounded-3xl glass-subtle p-5 space-y-3.5 transition-all"
                   >
-                    <div className="flex items-center justify-between border-b border-neutral-200/60 pb-2 dark:border-neutral-800/60">
-                      <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
+                    <div className="flex items-center justify-between border-b border-black/[0.06] pb-2.5 dark:border-white/[0.08]">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-[#20232A] dark:text-[#F6F3EC]">
                         {chapterName}
                       </h3>
-                      <span className="text-[11px] text-neutral-400 font-mono">
+                      <span className="text-[11px] text-[#858A93] dark:text-[#777F8C] font-mono">
                         {topics.length} topic{topics.length === 1 ? '' : 's'}
                       </span>
                     </div>
 
-                    <div className="divide-y divide-neutral-200/60 dark:divide-neutral-800/60">
+                    <div className="divide-y divide-black/[0.06] dark:divide-white/[0.08]">
                       {topics.map((t) => {
                         const badgeClass = getMasteryBadgeClass(t.mastery);
                         const nextReview = t.schedule.find(
@@ -213,15 +208,15 @@ export const SubjectsView: React.FC = () => {
                               className="cursor-pointer space-y-1 flex-1 min-w-0"
                             >
                               <div className="flex items-center gap-2">
-                                <span className="font-semibold text-neutral-900 group-hover:text-amber-600 dark:text-neutral-100 dark:group-hover:text-amber-400 truncate">
+                                <span className="font-semibold text-[#20232A] group-hover:text-[#A97B32] dark:text-[#F6F3EC] dark:group-hover:text-[#E6C27A] truncate">
                                   {t.title}
                                 </span>
-                                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${badgeClass}`}>
+                                <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md border ${badgeClass}`}>
                                   {t.mastery.toUpperCase()}
                                 </span>
                               </div>
 
-                              <div className="flex items-center gap-3 text-[11px] text-neutral-400 font-mono">
+                              <div className="flex items-center gap-3 text-[11px] text-[#858A93] dark:text-[#777F8C] font-mono">
                                 <span>Studied: {formatDisplayDate(t.studiedDate, false)}</span>
                                 <span aria-hidden="true">·</span>
                                 <span>
@@ -242,9 +237,9 @@ export const SubjectsView: React.FC = () => {
                             <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                               <button
                                 onClick={() => startReviewSession(t.id)}
-                                className="flex items-center gap-1 rounded-md border border-neutral-300 px-2 py-1 text-[11px] font-semibold text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                                className="btn-glass-secondary flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[11px] font-semibold transition-all"
                               >
-                                <Play className="h-3 w-3 fill-current text-amber-500" />
+                                <Play className="h-3 w-3 fill-current text-[#A97B32] dark:text-[#E6C27A]" />
                                 <span>Revise</span>
                               </button>
                             </div>
@@ -263,19 +258,19 @@ export const SubjectsView: React.FC = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
+              <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
                 Subjects & Mastery
               </h1>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              <p className="text-xs text-[#858A93] dark:text-[#777F8C] mt-0.5">
                 Track retention and spaced repetition coverage across your academic disciplines
               </p>
             </div>
 
             <button
               onClick={() => setIsAddTopicOpen(true)}
-              className="flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-amber-300 dark:bg-neutral-100 dark:text-neutral-900"
+              className="btn-gold-primary flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-xs"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
               <span>Record Topic</span>
             </button>
           </div>
@@ -293,7 +288,7 @@ export const SubjectsView: React.FC = () => {
                 <div
                   key={subject.id}
                   onClick={() => setSelectedSubjectId(subject.id)}
-                  className="group cursor-pointer rounded-xl border border-neutral-200/90 bg-white p-5 transition-all hover:border-neutral-400 dark:border-neutral-800/90 dark:bg-[#111216] dark:hover:border-neutral-700 space-y-4"
+                  className="group cursor-pointer rounded-3xl glass-premium p-5 transition-all hover:border-[#E6C27A]/40 space-y-4"
                 >
                   <div className="flex items-start justify-between">
                     <div>
@@ -303,46 +298,46 @@ export const SubjectsView: React.FC = () => {
                       >
                         {subject.name}
                       </span>
-                      <h3 className="text-lg font-bold text-neutral-900 group-hover:text-amber-600 dark:text-neutral-100 dark:group-hover:text-amber-400">
+                      <h3 className="text-lg font-bold text-[#20232A] group-hover:text-[#A97B32] dark:text-[#F6F3EC] dark:group-hover:text-[#E6C27A]">
                         {subject.name}
                       </h3>
-                      <p className="text-xs text-neutral-400 line-clamp-1">
+                      <p className="text-xs text-[#858A93] dark:text-[#777F8C] line-clamp-1">
                         {subject.description || 'Core Curriculum'}
                       </p>
                     </div>
 
                     <div className="text-right">
-                      <div className="font-mono text-2xl font-bold tabular-nums text-neutral-900 dark:text-neutral-100">
+                      <div className="font-mono text-2xl font-bold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
                         {avgScore}%
                       </div>
-                      <div className="text-[11px] text-neutral-400">Mastery</div>
+                      <div className="text-[11px] text-[#858A93] dark:text-[#777F8C]">Mastery</div>
                     </div>
                   </div>
 
-                  {/* Progress bar */}
-                  <div className="h-1.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
+                  {/* Sleek champagne gold progress bar */}
+                  <div className="h-1.5 w-full rounded-full bg-black/[0.08] dark:bg-white/[0.08] overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-amber-400 transition-all duration-500"
+                      className="h-full rounded-full bg-gradient-to-r from-[#B88A43] to-[#E6C27A] transition-all duration-500"
                       style={{ width: `${avgScore}%` }}
                     />
                   </div>
 
                   {/* Stat Counters */}
-                  <div className="grid grid-cols-3 border-t border-neutral-100 pt-3 dark:border-neutral-800/60 text-xs text-neutral-500">
+                  <div className="grid grid-cols-3 border-t border-black/[0.06] pt-3 dark:border-white/[0.08] text-xs text-[#686D77] dark:text-[#A7ABB5]">
                     <div>
-                      <span className="font-mono font-semibold text-neutral-900 dark:text-neutral-100 tabular-nums">
+                      <span className="font-mono font-semibold text-[#20232A] dark:text-[#F6F3EC] tabular-nums">
                         {total}
                       </span>{' '}
                       Topics
                     </div>
                     <div>
-                      <span className="font-mono font-semibold text-emerald-500 tabular-nums">
+                      <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
                         {mastered}
                       </span>{' '}
                       Mastered
                     </div>
                     <div>
-                      <span className="font-mono font-semibold text-amber-500 tabular-nums">
+                      <span className="font-mono font-semibold text-[#A97B32] dark:text-[#E6C27A] tabular-nums">
                         {needsAttention}
                       </span>{' '}
                       Attention

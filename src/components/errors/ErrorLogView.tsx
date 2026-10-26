@@ -6,13 +6,11 @@ import { fetchAIErrorDiagnosis } from '../../services/geminiService';
 import {
   AlertCircle,
   Plus,
-  CheckCircle2,
+  Check,
   Trash2,
   Sparkles,
   Search,
-  Filter,
-  Check,
-  RotateCcw,
+  X,
 } from 'lucide-react';
 
 const CATEGORY_LABELS: Record<MistakeCategory, string> = {
@@ -122,33 +120,33 @@ export const ErrorLogView: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
             Error Notebook & Mistakes
           </h1>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">
-            Deconstruct exam mistakes to prevent repeated cognitive missteps
+          <p className="text-xs text-[#858A93] dark:text-[#777F8C] mt-0.5">
+            Analyze exam pitfalls and record conceptual corrections to eliminate repeat errors
           </p>
         </div>
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-semibold text-amber-300 shadow-xs hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900"
+          className="btn-gold-primary flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold shadow-xs transition-all active:scale-95"
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
           <span>Record New Mistake</span>
         </button>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 rounded-xl border border-neutral-200/90 bg-white p-3 dark:border-neutral-800/90 dark:bg-[#111216] text-xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 rounded-2xl glass-subtle p-3 text-xs">
         <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-neutral-400" />
+          <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#858A93] dark:text-[#777F8C]" />
           <input
             type="text"
             placeholder="Search problems, mistake reasons, or correct methods..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-neutral-200 pl-8 pr-3 py-1.5 text-xs text-neutral-900 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+            className="w-full rounded-xl border border-black/[0.08] bg-white/70 pl-8.5 pr-3 py-1.5 text-xs text-[#20232A] focus:outline-none focus:border-[#E6C27A] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-[#F6F3EC] dark:focus:border-[#E6C27A]"
           />
         </div>
 
@@ -156,7 +154,7 @@ export const ErrorLogView: React.FC = () => {
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="rounded-lg border border-neutral-200 bg-white px-2.5 py-1.5 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+          className="rounded-xl border border-black/[0.08] bg-white/70 px-3 py-1.5 text-[#20232A] focus:outline-none focus:border-[#E6C27A] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-[#F6F3EC]"
         >
           <option value="all">All Categories</option>
           {Object.entries(CATEGORY_LABELS).map(([k, label]) => (
@@ -170,7 +168,7 @@ export const ErrorLogView: React.FC = () => {
         <select
           value={selectedSubject}
           onChange={(e) => setSelectedSubject(e.target.value)}
-          className="rounded-lg border border-neutral-200 bg-white px-2.5 py-1.5 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+          className="rounded-xl border border-black/[0.08] bg-white/70 px-3 py-1.5 text-[#20232A] focus:outline-none focus:border-[#E6C27A] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-[#F6F3EC]"
         >
           <option value="all">All Subjects</option>
           {state.subjects.map((s) => (
@@ -181,15 +179,15 @@ export const ErrorLogView: React.FC = () => {
         </select>
 
         {/* Status Filter */}
-        <div className="flex rounded-lg border border-neutral-200 p-0.5 dark:border-neutral-700">
+        <div className="flex rounded-xl border border-black/[0.08] bg-black/[0.03] p-0.5 dark:border-white/[0.08] dark:bg-white/[0.03]">
           {(['all', 'unresolved', 'resolved'] as const).map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`rounded px-2 py-1 text-[11px] font-medium capitalize transition-colors ${
+              className={`rounded-lg px-2.5 py-1 text-[11px] font-medium capitalize transition-all ${
                 statusFilter === st
-                  ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
-                  : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400'
+                  ? 'bg-white text-[#20232A] shadow-xs dark:bg-white/[0.12] dark:text-[#FFE6AD] font-semibold'
+                  : 'text-[#686D77] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]'
               }`}
             >
               {st}
@@ -199,9 +197,9 @@ export const ErrorLogView: React.FC = () => {
       </div>
 
       {/* Mistake Entries List */}
-      <div className="space-y-3">
+      <div className="space-y-3.5">
         {filteredErrors.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-neutral-300 p-8 text-center text-xs text-neutral-400 dark:border-neutral-800">
+          <div className="rounded-2xl glass-subtle border border-dashed border-black/[0.1] dark:border-white/[0.1] p-10 text-center text-xs text-[#858A93] dark:text-[#777F8C]">
             Clean slate. No mistakes match your active filter.
           </div>
         ) : (
@@ -213,29 +211,29 @@ export const ErrorLogView: React.FC = () => {
             return (
               <div
                 key={err.id}
-                className={`rounded-xl border bg-white p-4 transition-all dark:bg-[#111216] space-y-3 ${
+                className={`rounded-3xl p-5 transition-all space-y-3.5 ${
                   err.resolved
-                    ? 'border-neutral-200/60 opacity-75 dark:border-neutral-800/60'
-                    : 'border-neutral-200/90 dark:border-neutral-800/90 hover:border-neutral-400 dark:hover:border-neutral-700'
+                    ? 'glass-subtle opacity-75'
+                    : 'glass-premium hover:border-[#E6C27A]/40'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="space-y-1 flex-1">
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-400">
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-[#858A93] dark:text-[#777F8C]">
                       <span className="font-semibold uppercase text-[11px]" style={{ color: subj?.color }}>
                         {subj?.name}
                       </span>
                       <span aria-hidden="true">·</span>
-                      <span>{err.chapterName}</span>
+                      <span className="truncate">{err.chapterName}</span>
                       <span aria-hidden="true">·</span>
-                      <span className="font-mono text-amber-600 dark:text-amber-400 font-medium">
+                      <span className="font-mono text-[#A97B32] dark:text-[#E6C27A] font-medium">
                         {CATEGORY_LABELS[err.mistakeCategory]}
                       </span>
                       <span aria-hidden="true">·</span>
                       <span className="font-mono">{formatDisplayDate(err.date, false)}</span>
                     </div>
 
-                    <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                    <h3 className="text-base font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                       {err.questionOrProblem}
                     </h3>
                   </div>
@@ -243,19 +241,19 @@ export const ErrorLogView: React.FC = () => {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => toggleErrorResolved(err.id)}
-                      className={`flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
+                      className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[11px] font-semibold transition-all ${
                         err.resolved
-                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                          : 'border border-neutral-200 text-neutral-600 hover:border-neutral-400 dark:border-neutral-700 dark:text-neutral-300'
+                          ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                          : 'btn-glass-secondary'
                       }`}
                     >
-                      <Check className="h-3 w-3" />
+                      <Check className="h-3 w-3 stroke-[2.5]" />
                       <span>{err.resolved ? 'Resolved' : 'Mark Resolved'}</span>
                     </button>
 
                     <button
                       onClick={() => deleteErrorLog(err.id)}
-                      className="p-1 text-neutral-400 hover:text-rose-500"
+                      className="p-1.5 text-[#858A93] hover:text-[#F87171] rounded-lg transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -265,20 +263,20 @@ export const ErrorLogView: React.FC = () => {
 
                 {/* What went wrong vs Correct Method */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                  <div className="rounded-lg border border-rose-200/60 bg-rose-50/30 p-2.5 dark:border-rose-950/40 dark:bg-rose-950/10 space-y-1">
-                    <div className="font-semibold text-rose-600 dark:text-rose-400 text-[11px]">
+                  <div className="rounded-2xl glass-subtle border border-[#F87171]/25 p-3.5 space-y-1">
+                    <div className="font-semibold text-[#F87171] text-[11px] uppercase tracking-wide">
                       Mistake / Trap:
                     </div>
-                    <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed font-mono">
+                    <p className="text-[#20232A] dark:text-[#F6F3EC] leading-relaxed font-mono">
                       {err.mistakeDescription}
                     </p>
                   </div>
 
-                  <div className="rounded-lg border border-emerald-200/60 bg-emerald-50/30 p-2.5 dark:border-emerald-950/40 dark:bg-emerald-950/10 space-y-1">
-                    <div className="font-semibold text-emerald-600 dark:text-emerald-400 text-[11px]">
+                  <div className="rounded-2xl glass-subtle border border-[#34D399]/25 p-3.5 space-y-1">
+                    <div className="font-semibold text-emerald-600 dark:text-emerald-400 text-[11px] uppercase tracking-wide">
                       Correct Method / Rule:
                     </div>
-                    <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed font-mono">
+                    <p className="text-[#20232A] dark:text-[#F6F3EC] leading-relaxed font-mono">
                       {err.correctMethod}
                     </p>
                   </div>
@@ -289,9 +287,9 @@ export const ErrorLogView: React.FC = () => {
                   <button
                     onClick={() => handleDiagnose(err)}
                     disabled={isDiagnosingThis}
-                    className="inline-flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 hover:underline"
+                    className="inline-flex items-center gap-1.5 text-xs text-[#A97B32] dark:text-[#FFE6AD] font-medium hover:underline"
                   >
-                    <Sparkles className="h-3.5 w-3.5" />
+                    <Sparkles className="h-3.5 w-3.5 text-[#E6C27A]" />
                     <span>
                       {isDiagnosingThis ? 'Diagnosing root cause...' : 'AI Cognitive Misconception Diagnosis'}
                     </span>
@@ -299,8 +297,8 @@ export const ErrorLogView: React.FC = () => {
                 </div>
 
                 {hasDiagnosis && (
-                  <div className="rounded-lg border border-amber-300/40 bg-amber-50/60 p-3 text-xs text-neutral-800 dark:border-amber-500/20 dark:bg-amber-950/20 dark:text-neutral-200 space-y-1 font-mono">
-                    <span className="font-semibold text-amber-700 dark:text-amber-400">
+                  <div className="rounded-2xl glass-subtle border border-[#E6C27A]/30 p-3.5 text-xs text-[#20232A] dark:text-[#F6F3EC] space-y-1 font-mono">
+                    <span className="font-semibold text-[#A97B32] dark:text-[#E6C27A]">
                       Cognitive Diagnosis:
                     </span>
                     <p>{diagnosisText}</p>
@@ -317,23 +315,31 @@ export const ErrorLogView: React.FC = () => {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 overflow-y-auto"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto"
         >
-          <div className="relative w-full max-w-lg rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl dark:border-neutral-800 dark:bg-[#0e0f14] space-y-4 max-h-[92vh] overflow-y-auto">
-            <h2 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-              Log Exam or Practice Problem Mistake
-            </h2>
+          <div className="relative w-full max-w-lg rounded-3xl glass-premium p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto border border-white/20 dark:border-white/10">
+            <div className="flex items-center justify-between border-b border-black/[0.06] pb-3 dark:border-white/[0.08]">
+              <h2 className="text-base font-semibold text-[#20232A] dark:text-[#F6F3EC]">
+                Log Exam or Practice Problem Mistake
+              </h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
 
             <form onSubmit={handleSaveError} className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-semibold text-neutral-700 dark:text-neutral-300">
+                  <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                     Subject
                   </label>
                   <select
                     value={subjectId}
                     onChange={(e) => setSubjectId(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-2 py-2 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                    className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                   >
                     {state.subjects.map((s) => (
                       <option key={s.id} value={s.id}>
@@ -344,13 +350,13 @@ export const ErrorLogView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="font-semibold text-neutral-700 dark:text-neutral-300">
+                  <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                     Link to Topic (Optional)
                   </label>
                   <select
                     value={topicId}
                     onChange={(e) => setTopicId(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-neutral-300 px-2 py-2 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                    className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                   >
                     <option value="">No specific topic</option>
                     {topicsForModal.map((t) => (
@@ -363,7 +369,7 @@ export const ErrorLogView: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                   Question or Problem Statement
                 </label>
                 <textarea
@@ -372,18 +378,18 @@ export const ErrorLogView: React.FC = () => {
                   placeholder="e.g. Find angular acceleration when rod is released from horizontal..."
                   value={problemText}
                   onChange={(e) => setProblemText(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-neutral-300 p-2.5 text-xs text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                  className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 p-2.5 text-xs text-[#20232A] placeholder-[#858A93] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC] dark:placeholder-[#777F8C]"
                 />
               </div>
 
               <div>
-                <label className="font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                   Mistake Classification
                 </label>
                 <select
                   value={mistakeCategory}
                   onChange={(e) => setMistakeCategory(e.target.value as MistakeCategory)}
-                  className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-xs dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+                  className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                 >
                   {Object.entries(CATEGORY_LABELS).map(([k, label]) => (
                     <option key={k} value={k}>
@@ -394,7 +400,7 @@ export const ErrorLogView: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                   What did you do wrong?
                 </label>
                 <textarea
@@ -403,12 +409,12 @@ export const ErrorLogView: React.FC = () => {
                   placeholder="e.g. Forgot to account for center of mass torque, calculated torque about center rather than pivot..."
                   value={mistakeDescription}
                   onChange={(e) => setMistakeDescription(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-neutral-300 p-2.5 text-xs text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 font-mono"
+                  className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 p-2.5 text-xs text-[#20232A] placeholder-[#858A93] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC] dark:placeholder-[#777F8C] font-mono"
                 />
               </div>
 
               <div>
-                <label className="font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
                   Correct Method & Rule to Remember
                 </label>
                 <textarea
@@ -416,21 +422,21 @@ export const ErrorLogView: React.FC = () => {
                   placeholder="e.g. Torque about pivot is Mg * (L/2). Moment of inertia about end is ML^2 / 3. Angular acceleration = 3g / 2L."
                   value={correctMethod}
                   onChange={(e) => setCorrectMethod(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-neutral-300 p-2.5 text-xs text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 font-mono"
+                  className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 p-2.5 text-xs text-[#20232A] placeholder-[#858A93] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC] dark:placeholder-[#777F8C] font-mono"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-black/[0.06] dark:border-white/[0.08]">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-lg px-3 py-1.5 text-xs text-neutral-600 hover:text-neutral-900 dark:text-neutral-400"
+                  className="rounded-xl px-3 py-2 text-xs text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-lg bg-neutral-900 px-4 py-1.5 text-xs font-semibold text-amber-300 dark:bg-neutral-100 dark:text-neutral-900"
+                  className="btn-gold-primary rounded-xl px-4 py-2 text-xs font-semibold shadow-xs"
                 >
                   Save Mistake
                 </button>

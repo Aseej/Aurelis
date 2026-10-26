@@ -2,10 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   getTodayDateString,
-  formatDisplayDate,
   getDueReasonExplanation,
 } from '../../utils/scheduler';
-import { Play, Check, Clock, AlertTriangle, Filter, Search, RotateCcw } from 'lucide-react';
+import { Play, Check, Clock, AlertTriangle, Filter, Search, Sparkles } from 'lucide-react';
 
 export const RevisionQueueView: React.FC = () => {
   const { state, startReviewSession, todayReviewsDue, overdueReviews } = useApp();
@@ -67,24 +66,24 @@ export const RevisionQueueView: React.FC = () => {
     <div className="space-y-6 pb-12">
       {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
           Spaced Repetition Queue
         </h1>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">
-          Complete spaced repetitions across all subjects and chapters
+        <p className="text-xs text-[#858A93] dark:text-[#777F8C] mt-0.5">
+          Scan and complete scheduled active-recall repetitions across all subjects
         </p>
       </div>
 
-      {/* Filter and Status Selector */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 rounded-xl border border-neutral-200/90 bg-white p-3 dark:border-neutral-800/90 dark:bg-[#111216] text-xs">
+      {/* Filter and Status Selector Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 rounded-2xl glass-subtle p-3 text-xs">
         <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-neutral-400" />
+          <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#858A93] dark:text-[#777F8C]" />
           <input
             type="text"
-            placeholder="Filter queue by topic or chapter..."
+            placeholder="Search queue by topic or chapter..."
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            className="w-full rounded-lg border border-neutral-200 pl-8 pr-3 py-1.5 text-xs text-neutral-900 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+            className="w-full rounded-xl border border-black/[0.08] bg-white/70 pl-8.5 pr-3 py-1.5 text-xs text-[#20232A] focus:outline-none focus:border-[#E6C27A] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-[#F6F3EC] dark:focus:border-[#E6C27A]"
           />
         </div>
 
@@ -92,7 +91,7 @@ export const RevisionQueueView: React.FC = () => {
         <select
           value={selectedSubject}
           onChange={(e) => setSelectedSubject(e.target.value)}
-          className="rounded-lg border border-neutral-200 bg-white px-2.5 py-1.5 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+          className="rounded-xl border border-black/[0.08] bg-white/70 px-3 py-1.5 text-[#20232A] focus:outline-none focus:border-[#E6C27A] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-[#F6F3EC]"
         >
           <option value="all">All Subjects</option>
           {state.subjects.map((s) => (
@@ -103,15 +102,15 @@ export const RevisionQueueView: React.FC = () => {
         </select>
 
         {/* Status Segmented Control */}
-        <div className="flex rounded-lg border border-neutral-200 p-0.5 dark:border-neutral-700">
+        <div className="flex rounded-xl border border-black/[0.08] bg-black/[0.03] p-0.5 dark:border-white/[0.08] dark:bg-white/[0.03]">
           {(['due', 'overdue', 'upcoming', 'completed', 'all'] as const).map((st) => (
             <button
               key={st}
               onClick={() => setSelectedStatus(st)}
-              className={`rounded px-2.5 py-1 text-[11px] font-medium capitalize transition-colors ${
+              className={`rounded-lg px-2.5 py-1 text-[11px] font-medium capitalize transition-all ${
                 selectedStatus === st
-                  ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900'
-                  : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400'
+                  ? 'bg-white text-[#20232A] shadow-xs dark:bg-white/[0.12] dark:text-[#FFE6AD] font-semibold'
+                  : 'text-[#686D77] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]'
               }`}
             >
               {st}
@@ -123,7 +122,7 @@ export const RevisionQueueView: React.FC = () => {
       {/* Queue Items */}
       <div className="space-y-3">
         {allQueueItems.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-neutral-300 p-12 text-center text-xs text-neutral-400 dark:border-neutral-800">
+          <div className="rounded-2xl glass-subtle border border-dashed border-black/[0.1] dark:border-white/[0.1] p-12 text-center text-xs text-[#858A93] dark:text-[#777F8C]">
             No revision items match your active filter.
           </div>
         ) : (
@@ -139,17 +138,17 @@ export const RevisionQueueView: React.FC = () => {
             return (
               <div
                 key={item.id}
-                className={`rounded-xl border bg-white p-4 transition-all dark:bg-[#111216] ${
+                className={`rounded-2xl p-4 transition-all ${
                   isOverdue
-                    ? 'border-rose-300 dark:border-rose-900/50'
+                    ? 'glass-premium border border-[#F87171]/40'
                     : isCompleted
-                    ? 'border-neutral-200/60 opacity-80 dark:border-neutral-800/60'
-                    : 'border-neutral-200/90 dark:border-neutral-800/90 hover:border-neutral-400 dark:hover:border-neutral-700'
+                    ? 'glass-subtle opacity-75'
+                    : 'glass-subtle hover:border-[#E6C27A]/40'
                 }`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="space-y-1.5 flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-[#686D77] dark:text-[#A7ABB5]">
                       <span
                         className="font-semibold uppercase tracking-wider text-[11px]"
                         style={{ color: subject.color }}
@@ -159,22 +158,22 @@ export const RevisionQueueView: React.FC = () => {
                       <span aria-hidden="true">·</span>
                       <span className="truncate">{topic.chapterName}</span>
                       <span aria-hidden="true">·</span>
-                      <span className="font-mono">
+                      <span className="font-mono text-[#858A93] dark:text-[#777F8C]">
                         {item.stageName} (Step {item.stepIndex + 1}/7)
                       </span>
                       {isOverdue && (
                         <>
                           <span aria-hidden="true">·</span>
-                          <span className="text-rose-500 font-semibold">Overdue</span>
+                          <span className="text-[#F87171] font-semibold">Overdue</span>
                         </>
                       )}
                     </div>
 
-                    <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100 truncate">
+                    <h3 className="text-base font-semibold text-[#20232A] dark:text-[#F6F3EC] truncate">
                       {topic.title}
                     </h3>
 
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                    <p className="text-xs text-[#858A93] dark:text-[#777F8C]">
                       {reason}
                     </p>
                   </div>
@@ -183,15 +182,15 @@ export const RevisionQueueView: React.FC = () => {
                     {!isCompleted ? (
                       <button
                         onClick={() => startReviewSession(topic.id, item.stepIndex)}
-                        className="flex h-9 items-center gap-2 rounded-lg bg-neutral-900 px-3.5 text-xs font-semibold text-amber-300 shadow-sm transition-all hover:bg-neutral-800 dark:bg-neutral-100 dark:text-neutral-900"
+                        className="btn-gold-primary flex h-9 items-center gap-2 rounded-xl px-4 text-xs font-semibold shadow-xs transition-all active:scale-95"
                       >
                         <Play className="h-3.5 w-3.5 fill-current" />
                         <span>Start Review</span>
                       </button>
                     ) : (
                       <div className="text-right text-xs">
-                        <span className="text-emerald-500 font-medium">Completed</span>
-                        <div className="text-[10px] text-neutral-400">
+                        <span className="text-emerald-600 dark:text-emerald-400 font-medium">Completed</span>
+                        <div className="text-[10px] text-[#858A93] dark:text-[#777F8C] font-mono">
                           Recall: {item.confidenceRating || 'Logged'}
                         </div>
                       </div>
