@@ -105,7 +105,7 @@ export const WeeklyTestsView: React.FC = () => {
               className="btn-glass-secondary flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold text-[#8C6221] dark:text-[#FFE6AD] border border-[#E6C27A]/30 transition-all"
             >
               <Sparkles className="h-3.5 w-3.5 text-[#E6C27A]" />
-              <span>{isAiGenerating ? t('common.loading', 'Synthesizing Test...') : 'Generate 5-Q Practice Test'}</span>
+              <span>{isAiGenerating ? t('common.loading', 'Synthesizing Test...') : t('tests.generateTest', 'Generate 5-Q Practice Test')}</span>
             </button>
           )}
 
@@ -124,12 +124,12 @@ export const WeeklyTestsView: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="text-xs font-semibold uppercase tracking-wider text-[#A97B32] dark:text-[#E6C27A]">
-              Milestone Queue (Day 7 Retention)
+              {t('tests.pendingMilestones', 'Milestone Queue (Day 7 Retention)')}
             </div>
             <h2 className="text-lg font-bold text-[#20232A] dark:text-[#F6F3EC]">
               {weeklyTestsDue.length > 0
-                ? `${weeklyTestsDue.length} Topics Ready for Testing`
-                : 'All 7-day milestone checkpoints current'}
+                ? t('tests.questionsCount', '{count} Topics Ready for Testing', { count: weeklyTestsDue.length })
+                : t('tests.noMilestones', 'All 7-day milestone checkpoints current')}
             </h2>
           </div>
 
@@ -141,7 +141,7 @@ export const WeeklyTestsView: React.FC = () => {
               }}
               className="btn-gold-primary self-start sm:self-auto rounded-xl px-4 py-2 text-xs font-semibold shadow-xs transition-all"
             >
-              Start Diagnostic Test
+              {t('tests.takeTest', 'Start Diagnostic Test')}
             </button>
           )}
         </div>
@@ -158,7 +158,7 @@ export const WeeklyTestsView: React.FC = () => {
                     {subjectName}
                   </span>
                   <span className="font-mono text-[#858A93] dark:text-[#777F8C]">
-                    {topics.length} topic{topics.length === 1 ? '' : 's'}
+                    {topics.length} {t('common.topics', 'topics')}
                   </span>
                 </div>
                 <ul className="text-[#686D77] dark:text-[#A7ABB5] space-y-0.5 truncate text-[11px]">
@@ -168,7 +168,7 @@ export const WeeklyTestsView: React.FC = () => {
                     </li>
                   ))}
                   {topics.length > 3 && (
-                    <li className="text-[#858A93] dark:text-[#777F8C]">+{topics.length - 3} more</li>
+                    <li className="text-[#858A93] dark:text-[#777F8C]">+{topics.length - 3}</li>
                   )}
                 </ul>
               </div>
@@ -176,7 +176,7 @@ export const WeeklyTestsView: React.FC = () => {
           </div>
         ) : (
           <p className="text-xs text-[#858A93] dark:text-[#777F8C]">
-            Topics automatically enter this queue 6 days after their initial learning session.
+            {t('tests.noMilestonesSub', 'Topics automatically enter this queue 6 days after their initial learning session.')}
           </p>
         )}
       </div>
@@ -188,14 +188,14 @@ export const WeeklyTestsView: React.FC = () => {
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-[#E6C27A]" />
               <h3 className="text-sm font-bold text-[#20232A] dark:text-[#F6F3EC]">
-                Diagnostic Question Sheet (5 High-Yield Questions)
+                {t('tests.testDrawerTitle', 'Diagnostic Question Sheet (5 High-Yield Questions)')}
               </h3>
             </div>
             <button
               onClick={() => setIsQuestionsDrawerOpen(false)}
               className="text-xs text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC] transition-colors"
             >
-              Close Sheet
+              {t('common.close', 'Close Sheet')}
             </button>
           </div>
 
@@ -206,14 +206,14 @@ export const WeeklyTestsView: React.FC = () => {
                 className="rounded-2xl glass-subtle p-4 text-xs space-y-1.5"
               >
                 <div className="flex items-center justify-between font-mono text-[11px] text-[#858A93] dark:text-[#777F8C]">
-                  <span>Question #{q.questionNumber} · {q.topic}</span>
-                  <span className="font-semibold text-[#A97B32] dark:text-[#E6C27A]">{q.marks} Marks</span>
+                  <span>#{q.questionNumber} · {q.topic}</span>
+                  <span className="font-semibold text-[#A97B32] dark:text-[#E6C27A]">{q.marks}</span>
                 </div>
                 <div className="font-medium text-[#20232A] dark:text-[#F6F3EC]">
                   {q.question}
                 </div>
                 <div className="text-[11px] text-[#858A93] dark:text-[#777F8C] pt-1.5 border-t border-black/[0.06] dark:border-white/[0.08]">
-                  <span className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">Answer Key: </span>
+                  <span className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">Key: </span>
                   {q.answerOutline}
                 </div>
               </div>
@@ -226,55 +226,55 @@ export const WeeklyTestsView: React.FC = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-            Test Performance History ({state.weeklyTests.length})
+            {t('tests.testHistory', 'Test Performance History')} ({state.weeklyTests.length})
           </h2>
         </div>
 
         {state.weeklyTests.length === 0 ? (
           <div className="rounded-2xl glass-subtle border border-dashed border-black/[0.1] dark:border-white/[0.1] p-10 text-center text-xs text-[#858A93] dark:text-[#777F8C]">
-            No diagnostic tests recorded yet.
+            {t('tests.noHistory', 'No diagnostic tests recorded yet.')}
           </div>
         ) : (
           <div className="space-y-3">
-            {state.weeklyTests.map((t) => (
+            {state.weeklyTests.map((tRec) => (
               <div
-                key={t.id}
+                key={tRec.id}
                 className="rounded-2xl glass-subtle p-4.5 space-y-2 transition-all hover:border-[#E6C27A]/30"
               >
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-sm font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                      {t.title}
+                      {tRec.title}
                     </h3>
                     <div className="text-[11px] text-[#858A93] dark:text-[#777F8C] font-mono">
-                      Date: {formatDisplayDate(t.date, false)}
+                      {t('tests.date', 'Date')}: {formatDate(tRec.date, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <div className="font-mono text-lg font-bold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
-                        {t.marksObtained} / {t.totalMarks}
+                        {tRec.marksObtained} / {tRec.totalMarks}
                       </div>
                       <div className="text-[11px] font-semibold text-[#A97B32] dark:text-[#E6C27A]">
-                        {t.percentage}%
+                        {tRec.percentage}%
                       </div>
                     </div>
 
                     <button
-                      onClick={() => deleteWeeklyTest(t.id)}
+                      onClick={() => deleteWeeklyTest(tRec.id)}
                       className="p-1.5 text-[#858A93] hover:text-[#F87171] rounded-lg transition-colors"
-                      title="Delete record"
+                      title={t('common.delete', 'Delete')}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>
 
-                {t.mistakesNotes && (
+                {tRec.mistakesNotes && (
                   <div className="rounded-xl glass-subtle p-2.5 text-xs text-[#686D77] dark:text-[#A7ABB5] border border-black/[0.04] dark:border-white/[0.04]">
-                    <span className="font-semibold text-[#F87171]">Mistakes Noted: </span>
-                    {t.mistakesNotes}
+                    <span className="font-semibold text-[#F87171]">{t('tests.mistakesNotes', 'Mistakes Noted')}: </span>
+                    {tRec.mistakesNotes}
                   </div>
                 )}
               </div>
@@ -293,7 +293,7 @@ export const WeeklyTestsView: React.FC = () => {
           <div className="relative w-full max-w-lg rounded-3xl glass-premium p-6 shadow-2xl space-y-4 border border-white/20 dark:border-white/10">
             <div className="flex items-center justify-between border-b border-black/[0.06] pb-3 dark:border-white/[0.08]">
               <h2 className="text-base font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                Record Weekly Diagnostic Score
+                {t('tests.submitTest', 'Record Weekly Diagnostic Score')}
               </h2>
               <button
                 onClick={() => setIsLogModalOpen(false)}
@@ -306,7 +306,7 @@ export const WeeklyTestsView: React.FC = () => {
             <form onSubmit={handleSaveTest} className="space-y-4 text-xs">
               <div>
                 <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                  Test Title
+                  {t('tests.testTitle', 'Test Title')}
                 </label>
                 <input
                   type="text"
@@ -319,7 +319,7 @@ export const WeeklyTestsView: React.FC = () => {
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                    Test Date
+                    {t('tests.date', 'Test Date')}
                   </label>
                   <input
                     type="date"
@@ -331,7 +331,7 @@ export const WeeklyTestsView: React.FC = () => {
 
                 <div>
                   <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                    Total Marks
+                    {t('tests.totalMarks', 'Total Marks')}
                   </label>
                   <input
                     type="number"
@@ -343,7 +343,7 @@ export const WeeklyTestsView: React.FC = () => {
 
                 <div>
                   <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                    Marks Obtained
+                    {t('tests.marksObtained', 'Marks Obtained')}
                   </label>
                   <input
                     type="number"
@@ -356,11 +356,11 @@ export const WeeklyTestsView: React.FC = () => {
 
               <div>
                 <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                  Mistakes & Error Reflections
+                  {t('tests.testNotes', 'Mistakes & Error Reflections')}
                 </label>
                 <textarea
                   rows={3}
-                  placeholder="Which questions were missed and why? (Formula confusion, misread conditions, calculation error)..."
+                  placeholder={t('tests.testNotesPlaceholder', 'Which questions were missed and why? (Formula confusion, misread conditions, calculation error)...')}
                   value={mistakesNotes}
                   onChange={(e) => setMistakesNotes(e.target.value)}
                   className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 p-2.5 text-xs text-[#20232A] placeholder-[#858A93] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC] dark:placeholder-[#777F8C]"
@@ -373,13 +373,13 @@ export const WeeklyTestsView: React.FC = () => {
                   onClick={() => setIsLogModalOpen(false)}
                   className="rounded-xl px-3 py-2 text-xs text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
                   className="btn-gold-primary rounded-xl px-4 py-2 text-xs font-semibold shadow-xs"
                 >
-                  Save Result
+                  {t('common.save', 'Save Result')}
                 </button>
               </div>
             </form>

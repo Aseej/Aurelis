@@ -1,9 +1,11 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
+import { useI18n } from '../../i18n';
 import { Flame, Check, ArrowRight, Zap } from 'lucide-react';
 
 export const StreakCard: React.FC = () => {
   const { streakInfo, todayReviewsDue, startReviewSession, recordDailyCheckin } = useApp();
+  const { t } = useI18n();
 
   const {
     currentStreak,
@@ -15,8 +17,21 @@ export const StreakCard: React.FC = () => {
     nextMilestone,
     milestoneProgressPercentage,
     milestoneTitle,
-    statusMessage,
   } = streakInfo;
+
+  // Localized dynamic status message
+  const localizedStatusMessage = React.useMemo(() => {
+    if (studiedToday) {
+      return t('streak.statusActive', `${currentStreak}-day streak active. Keep reinforcing memory!`, { days: currentStreak });
+    }
+    if (currentStreak === 1) {
+      return t('streak.statusCompletedDay1', 'Day 1 completed. Come back tomorrow to extend your streak!');
+    }
+    if (currentStreak > 1) {
+      return t('streak.statusReviseToday', `Revise today to extend your ${currentStreak}-day streak!`, { days: currentStreak });
+    }
+    return t('streak.statusStart', 'Complete a revision today to start your streak!');
+  }, [studiedToday, currentStreak, t]);
 
   return (
     <section
@@ -37,13 +52,18 @@ export const StreakCard: React.FC = () => {
                 {String(currentStreak).padStart(2, '0')}
               </span>
               <span className="text-xs font-semibold uppercase tracking-wider text-[#686D77] dark:text-[#A7ABB5]">
-                {currentStreak === 1 ? 'Day Streak' : 'Days Streak'}
+                {currentStreak === 1 ? t('streak.dayStreak', 'Day Streak') : t('streak.daysStreak', 'Days Streak')}
               </span>
 
               {longestStreak > 0 && (
                 <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-[#858A93] dark:text-[#777F8C] font-mono">
                   <span aria-hidden="true">·</span>
-                  <span>Best: {longestStreak} {longestStreak === 1 ? 'day' : 'days'}</span>
+                  <span>
+                    {t('streak.best', `Best: ${longestStreak} ${longestStreak === 1 ? 'day' : 'days'}`, {
+                      days: longestStreak,
+                      unit: longestStreak === 1 ? t('common.day', 'day') : t('common.days', 'days'),
+                    })}
+                  </span>
                 </span>
               )}
             </div>
@@ -51,11 +71,11 @@ export const StreakCard: React.FC = () => {
             {/* Unboxed Status Metadata line */}
             <div className="flex flex-wrap items-center gap-2 text-xs text-[#686D77] dark:text-[#A7ABB5]">
               <span className={studiedToday ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-[#A97B32] dark:text-[#E6C27A] font-medium'}>
-                {statusMessage}
+                {localizedStatusMessage}
               </span>
               {longestStreak > 0 && (
                 <span className="sm:hidden text-[#858A93] dark:text-[#777F8C] font-mono">
-                  · Best: {longestStreak}d
+                  · {t('streak.best', `Best: ${longestStreak}d`, { days: longestStreak, unit: 'd' })}
                 </span>
               )}
             </div>
@@ -68,10 +88,13 @@ export const StreakCard: React.FC = () => {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-[11px] text-[#858A93] dark:text-[#777F8C]">
               <span className="font-medium text-[#20232A] dark:text-[#F6F3EC]">
-                7-Day Consistency Track
+                {t('streak.consistencyTrack', '7-Day Consistency Track')}
               </span>
               <span className="font-mono tabular-nums">
-                {weeklyActiveDaysCount}/7 days ({weeklyCompletionPercentage}%)
+                {t('streak.consistencySub', `${weeklyActiveDaysCount}/7 days (${weeklyCompletionPercentage}%)`, {
+                  active: weeklyActiveDaysCount,
+                  pct: weeklyCompletionPercentage,
+                })}
               </span>
             </div>
 
@@ -83,7 +106,7 @@ export const StreakCard: React.FC = () => {
                 return (
                   <div
                     key={day.dateStr}
-                    title={`${day.dayName} (${day.dateStr}): ${isDone ? 'Study completed' : 'No activity logged'}`}
+                    title={`${day.dayName} (${day.dateStr})`}
                     className="flex flex-col items-center gap-1"
                   >
                     <div
@@ -120,7 +143,7 @@ export const StreakCard: React.FC = () => {
           <div className="space-y-1.5 sm:min-w-[190px] border-t sm:border-t-0 sm:border-l border-black/[0.06] sm:pl-5 pt-3 sm:pt-0 dark:border-white/[0.08]">
             <div className="flex items-center justify-between text-[11px]">
               <span className="text-[#686D77] dark:text-[#A7ABB5] font-medium truncate max-w-[130px]">
-                {milestoneTitle}
+                {milestoneTitle || t('streak.milestoneTitle', 'Milestone Target')}
               </span>
               <span className="font-mono text-[#858A93] dark:text-[#777F8C] tabular-nums">
                 {currentStreak}/{nextMilestone}d
@@ -143,7 +166,7 @@ export const StreakCard: React.FC = () => {
                     onClick={() => startReviewSession(todayReviewsDue[0].topic.id, todayReviewsDue[0].item.stepIndex)}
                     className="inline-flex items-center gap-1 font-semibold text-[#A97B32] dark:text-[#E6C27A] hover:underline"
                   >
-                    <span>Revise now to lock in streak</span>
+                    <span>{t('streak.reviseNowToLock', 'Revise now to lock in streak')}</span>
                     <ArrowRight className="h-3 w-3" />
                   </button>
                 ) : (
@@ -152,13 +175,13 @@ export const StreakCard: React.FC = () => {
                     className="inline-flex items-center gap-1 font-semibold text-[#A97B32] dark:text-[#E6C27A] hover:underline"
                   >
                     <Zap className="h-3 w-3" />
-                    <span>Check in for today</span>
+                    <span>{t('streak.checkInToday', 'Check in for today')}</span>
                   </button>
                 )
               ) : (
                 <span className="text-emerald-600 dark:text-emerald-400 font-medium inline-flex items-center gap-1">
                   <Check className="h-3 w-3 stroke-[2.5]" />
-                  <span>Streak saved today</span>
+                  <span>{t('streak.savedToday', 'Streak saved today')}</span>
                 </span>
               )}
             </div>

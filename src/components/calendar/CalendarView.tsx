@@ -18,6 +18,7 @@ import {
 export const CalendarView: React.FC = () => {
   const {
     state,
+    activeSubjects,
     selectedCalendarDate,
     setSelectedCalendarDate,
     startReviewSession,
@@ -124,7 +125,12 @@ export const CalendarView: React.FC = () => {
       return entry;
     };
 
-    state.topics.forEach((topic) => {
+    const activeSubjectIds = new Set(activeSubjects.map((s) => s.id));
+    const activeTopics = state.topics.filter(
+      (t) => !t.isArchived && activeSubjectIds.has(t.subjectId)
+    );
+
+    activeTopics.forEach((topic) => {
       // New topic on studiedDate
       const studyEntry = getEntry(topic.studiedDate);
       studyEntry.newTopicCount++;
@@ -149,17 +155,22 @@ export const CalendarView: React.FC = () => {
     });
 
     return map;
-  }, [state.topics]);
+  }, [state.topics, activeSubjects]);
 
   // Events for selected date
   const selectedDateEvents = useMemo(() => {
     const targetDate = selectedCalendarDate || todayStr;
+    const activeSubjectIds = new Set(activeSubjects.map((s) => s.id));
+    const activeTopics = state.topics.filter(
+      (t) => !t.isArchived && activeSubjectIds.has(t.subjectId)
+    );
+
     const items: {
       topic: (typeof state.topics)[0];
       step: (typeof state.topics)[0]['schedule'][0];
     }[] = [];
 
-    state.topics.forEach((topic) => {
+    activeTopics.forEach((topic) => {
       topic.schedule.forEach((step) => {
         if (step.scheduledDate === targetDate || (step.status === 'completed' && step.completedDate === targetDate)) {
           items.push({ topic, step });
@@ -168,7 +179,7 @@ export const CalendarView: React.FC = () => {
     });
 
     return items;
-  }, [state.topics, selectedCalendarDate, todayStr]);
+  }, [state.topics, activeSubjects, selectedCalendarDate, todayStr]);
 
   const monthName = useMemo(() => {
     return i18nFormatDate(new Date(currentYear, currentMonth, 1), {
@@ -299,19 +310,19 @@ export const CalendarView: React.FC = () => {
           <div className="mt-5 flex flex-wrap items-center justify-center gap-5 border-t border-black/[0.06] pt-3 text-[11px] text-[#858A93] dark:border-white/[0.08] dark:text-[#777F8C]">
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-[#E6C27A]" />
-              <span>Review Due</span>
+              <span>{t('calendar.legendScheduled', 'Review Due')}</span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-[#60A5FA]" />
-              <span>Weekly Test</span>
+              <span>{t('nav.tests', 'Weekly Test')}</span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-[#F87171]" />
-              <span>Overdue</span>
+              <span>{t('calendar.legendOverdue', 'Overdue')}</span>
             </span>
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-[#34D399]" />
-              <span>Completed</span>
+              <span>{t('calendar.legendCompleted', 'Completed')}</span>
             </span>
           </div>
         </div>
@@ -321,10 +332,10 @@ export const CalendarView: React.FC = () => {
           <div className="flex items-center justify-between border-b border-black/[0.06] pb-3 dark:border-white/[0.08]">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-                Selected Schedule
+                {t('calendar.selectedDate', 'Selected Schedule')}
               </div>
               <h3 className="text-base font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                {formatDisplayDate(selectedCalendarDate || todayStr, true)}
+                {i18nFormatDate(selectedCalendarDate || todayStr, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
               </h3>
             </div>
 
@@ -333,14 +344,14 @@ export const CalendarView: React.FC = () => {
               className="btn-gold-primary flex h-8 items-center gap-1 rounded-xl px-2.5 text-[11px] font-semibold shadow-xs"
             >
               <Plus className="h-3 w-3 stroke-[2.5]" />
-              <span>Add</span>
+              <span>{t('subjects.addTopic', 'Add')}</span>
             </button>
           </div>
 
           {/* Events List */}
           {selectedDateEvents.length === 0 ? (
             <div className="py-12 text-center text-xs text-[#858A93] dark:text-[#777F8C]">
-              No spaced repetitions scheduled for this date.
+              {t('calendar.noReviewsOnDate', 'No spaced repetitions scheduled for this date.')}
             </div>
           ) : (
             <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
@@ -355,7 +366,7 @@ export const CalendarView: React.FC = () => {
                   >
                     <div className="flex items-center justify-between text-[11px] text-[#858A93] dark:text-[#777F8C]">
                       <span className="font-medium text-[#686D77] dark:text-[#A7ABB5]">
-                        {step.stageName} (Step {step.stepIndex + 1})
+                        {step.stageName} ({t('dashboard.stepOf', 'Step {current} of {total}', { current: step.stepIndex + 1, total: 7 })})
                       </span>
                       <span className="font-mono">~{topic.estimatedDurationMinutes}m</span>
                     </div>
@@ -375,11 +386,11 @@ export const CalendarView: React.FC = () => {
                           className="flex items-center gap-1 text-[11px] font-semibold text-[#A97B32] dark:text-[#E6C27A] hover:underline"
                         >
                           <Play className="h-3 w-3 fill-current" />
-                          <span>Review</span>
+                          <span>{t('subjects.revise', 'Review')}</span>
                         </button>
                       ) : (
                         <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-                          Done ({step.confidenceRating || 'Logged'})
+                          {t('common.done', 'Done')} ({step.confidenceRating || 'Logged'})
                         </span>
                       )}
                     </div>

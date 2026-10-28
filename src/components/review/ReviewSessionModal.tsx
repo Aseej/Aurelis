@@ -190,17 +190,17 @@ const ReviewSessionDialog: React.FC<ReviewSessionDialogProps> = ({ reviewingTopi
                 className="btn-gold-primary inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-semibold transition-all active:scale-95"
               >
                 <Eye className="h-4 w-4" />
-                <span>Reveal Study Notes & Verification</span>
+                <span>{t('topicDetailModal.conceptNotes', 'Reveal Study Notes & Verification')}</span>
               </button>
             </div>
           ) : (
             <div className="rounded-2xl glass-subtle p-4 space-y-2 border border-black/[0.08] dark:border-white/[0.08]">
               <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-                <span>Reference Notes</span>
+                <span>{t('topicDetailModal.conceptNotes', 'Reference Notes')}</span>
                 <span className="text-[11px] font-mono text-[#A97B32] dark:text-[#E6C27A]">Verified Concept</span>
               </div>
               <div className="prose prose-xs dark:prose-invert max-w-none text-xs text-[#20232A] dark:text-[#F6F3EC] leading-relaxed whitespace-pre-wrap font-sans">
-                {topic.notes || 'No reference notes provided when this topic was logged.'}
+                {topic.notes || t('topicDetailModal.noNotes', 'No reference notes provided when this topic was logged.')}
               </div>
             </div>
           )}

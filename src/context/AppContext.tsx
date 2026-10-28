@@ -44,6 +44,8 @@ interface AppContextType {
   // Modals & Active Drilldown State
   isAddTopicOpen: boolean;
   setIsAddTopicOpen: (open: boolean) => void;
+  isAddSubjectOpen: boolean;
+  setIsAddSubjectOpen: (open: boolean) => void;
   isSearchOpen: boolean;
   setIsSearchOpen: (open: boolean) => void;
   isSettingsOpen: boolean;
@@ -55,6 +57,11 @@ interface AppContextType {
   setSelectedSubjectId: (id: string | null) => void;
   selectedCalendarDate: string;
   setSelectedCalendarDate: (dateStr: string) => void;
+  // Active / Archived Subject Queries
+  activeSubjects: Subject[];
+  archivedSubjects: Subject[];
+  archiveSubject: (id: string) => void;
+  restoreSubject: (id: string) => void;
   // Data Mutations
   addTopic: (
     topicData: {
@@ -118,6 +125,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeView, setActiveView] = useState<ActiveView>('dashboard');
   const [theme, setTheme] = useState<'dark' | 'light'>(state.settings.theme || 'dark');
   const [isAddTopicOpen, setIsAddTopicOpen] = useState(false);
+  const [isAddSubjectOpen, setIsAddSubjectOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [reviewingTopic, setReviewingTopic] = useState<{ topic: Topic; stepIndex: number } | null>(null);
@@ -445,6 +453,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setState((prev) => ({
       ...prev,
       subjects: [...prev.subjects, newSubj],
+      isDemoData: false,
     }));
   }, []);
 
@@ -452,7 +461,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setState((prev) => ({
       ...prev,
       subjects: prev.subjects.map((s) => (s.id === id ? { ...s, ...updates } : s)),
+      isDemoData: false,
     }));
+  }, []);
+
+  const archiveSubject = useCallback((id: string) => {
+    setState((prev) => {
+      const updatedSubjects = prev.subjects.map((s) =>
+        s.id === id ? { ...s, isArchived: true, archivedAt: new Date().toISOString() } : s
+      );
+      const updatedTopics = prev.topics.map((t) =>
+        t.subjectId === id ? { ...t, isArchived: true } : t
+      );
+      return {
+        ...prev,
+        subjects: updatedSubjects,
+        topics: updatedTopics,
+        isDemoData: false,
+      };
+    });
+  }, []);
+
+  const restoreSubject = useCallback((id: string) => {
+    setState((prev) => {
+      const updatedSubjects = prev.subjects.map((s) =>
+        s.id === id ? { ...s, isArchived: false, archivedAt: undefined } : s
+      );
+      const updatedTopics = prev.topics.map((t) =>
+        t.subjectId === id ? { ...t, isArchived: false } : t
+      );
+      return {
+        ...prev,
+        subjects: updatedSubjects,
+        topics: updatedTopics,
+        isDemoData: false,
+      };
+    });
   }, []);
 
   const deleteSubject = useCallback((id: string) => {
@@ -461,6 +505,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       subjects: prev.subjects.filter((s) => s.id !== id),
       topics: prev.topics.filter((t) => t.subjectId !== id),
       errorLogs: prev.errorLogs.filter((e) => e.subjectId !== id),
+      weeklyTests: prev.weeklyTests.filter((w) => w.subjectId !== id),
+      isDemoData: false,
     }));
   }, []);
 
@@ -540,12 +586,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setReviewingTopic(null);
   }, []);
 
+  // Active / Archived Subjects & Topics Separation
+  const activeSubjects = useMemo(() => {
+    return state.subjects.filter((s) => !s.isArchived);
+  }, [state.subjects]);
+
+  const archivedSubjects = useMemo(() => {
+    return state.subjects.filter((s) => s.isArchived);
+  }, [state.subjects]);
+
+  const activeSubjectIds = useMemo(() => {
+    return new Set(activeSubjects.map((s) => s.id));
+  }, [activeSubjects]);
+
+  const activeTopics = useMemo(() => {
+    return state.topics.filter((t) => !t.isArchived && activeSubjectIds.has(t.subjectId));
+  }, [state.topics, activeSubjectIds]);
+
   // Aggregated Queries for Dashboard & Views
   const today = getTodayDateString();
 
   const todayReviewsDue = useMemo(() => {
     const results: { topic: Topic; item: ReviewScheduleItem }[] = [];
-    state.topics.forEach((topic) => {
+    activeTopics.forEach((topic) => {
       topic.schedule.forEach((item) => {
         // Due today or overdue, excluding step 0 (Learn) if it's already logged
         if (
@@ -559,11 +622,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
     // Sort overdue first, then by earliest scheduled date
     return results.sort((a, b) => a.item.scheduledDate.localeCompare(b.item.scheduledDate));
-  }, [state.topics, today]);
+  }, [activeTopics, today]);
 
   const todayCompletedReviews = useMemo(() => {
     const results: { topic: Topic; item: ReviewScheduleItem }[] = [];
-    state.topics.forEach((topic) => {
+    activeTopics.forEach((topic) => {
       topic.schedule.forEach((item) => {
         if (item.status === 'completed' && item.completedDate === today && item.stepIndex > 0) {
           results.push({ topic, item });
@@ -571,11 +634,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
     });
     return results;
-  }, [state.topics, today]);
+  }, [activeTopics, today]);
 
   const overdueReviews = useMemo(() => {
     const results: { topic: Topic; item: ReviewScheduleItem }[] = [];
-    state.topics.forEach((topic) => {
+    activeTopics.forEach((topic) => {
       topic.schedule.forEach((item) => {
         if (item.status === 'overdue' && item.stepIndex > 0) {
           results.push({ topic, item });
@@ -583,27 +646,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
     });
     return results;
-  }, [state.topics]);
+  }, [activeTopics]);
 
   const weeklyTestsDue = useMemo(() => {
-    return state.topics.filter((t) => {
+    return activeTopics.filter((t) => {
       const step3 = t.schedule.find((s) => s.stepIndex === 3);
       return step3 && (step3.status === 'scheduled' || step3.status === 'overdue') && step3.scheduledDate <= today;
     });
-  }, [state.topics, today]);
+  }, [activeTopics, today]);
 
   const topicsNeedingAttention = useMemo(() => {
     // Topics with unresolved error logs OR rated 'hard' in recent reviews
     const errorTopicIds = new Set(
       state.errorLogs.filter((e) => !e.resolved && e.topicId).map((e) => e.topicId as string)
     );
-    return state.topics.filter((t) => {
+    return activeTopics.filter((t) => {
       if (errorTopicIds.has(t.id)) return true;
       const lastReview = [...t.schedule].reverse().find((s) => s.status === 'completed');
       if (lastReview && lastReview.confidenceRating === 'hard') return true;
       return t.mastery === 'learning' && t.schedule.filter((s) => s.status === 'completed').length > 2;
     });
-  }, [state.topics, state.errorLogs]);
+  }, [activeTopics, state.errorLogs]);
 
   const streakInfo = useMemo(() => {
     return calculateStreak(state, today);
@@ -628,6 +691,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     toggleTheme,
     isAddTopicOpen,
     setIsAddTopicOpen,
+    isAddSubjectOpen,
+    setIsAddSubjectOpen,
     isSearchOpen,
     setIsSearchOpen,
     isSettingsOpen,
@@ -639,6 +704,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSelectedSubjectId,
     selectedCalendarDate,
     setSelectedCalendarDate,
+    activeSubjects,
+    archivedSubjects,
+    archiveSubject,
+    restoreSubject,
     addTopic,
     updateTopic,
     deleteTopic,

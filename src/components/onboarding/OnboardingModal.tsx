@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useI18n } from '../../i18n';
 import { Check, ArrowRight, ArrowLeft } from 'lucide-react';
 
 export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
@@ -7,6 +8,7 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
   onClose,
 }) => {
   const { updateSettings } = useApp();
+  const { t } = useI18n();
 
   const [step, setStep] = useState(1);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([
@@ -56,7 +58,7 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
           <span className="font-serif tracking-widest text-[#20232A] dark:text-[#F6F3EC] font-semibold">
             AURELIS
           </span>
-          <span className="font-mono">Step {step} of 5</span>
+          <span className="font-mono">{t('dashboard.stepOf', 'Step {current} of {total}', { current: step, total: 5 })}</span>
         </div>
 
         {/* Step 1: Welcome & Vision */}
@@ -68,10 +70,10 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
 
             <div className="space-y-2">
               <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
-                Remember what matters.
+                {t('landing.heroTitle', 'Remember what matters.')}
               </h1>
               <p className="text-xs text-[#686D77] dark:text-[#A7ABB5] max-w-sm mx-auto leading-relaxed">
-                Turn what you study today into what you remember months from now. Spaced repetition engineered for demanding academic examinations.
+                {t('landing.heroSubtitle', 'Turn what you study today into what you remember months from now. Spaced repetition engineered for demanding academic examinations.')}
               </p>
             </div>
 
@@ -80,7 +82,7 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
                 onClick={() => setStep(2)}
                 className="w-full btn-gold-primary py-3 rounded-xl text-xs font-semibold shadow-md inline-flex items-center justify-center gap-2"
               >
-                <span>Begin Setup</span>
+                <span>{t('landing.getStarted', 'Begin Setup')}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
@@ -92,10 +94,10 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
           <div className="space-y-4 py-2">
             <div>
               <h2 className="text-lg font-bold text-[#20232A] dark:text-[#F6F3EC]">
-                What do you study?
+                {t('subjects.title', 'What do you study?')}
               </h2>
               <p className="text-xs text-[#858A93] dark:text-[#777F8C]">
-                Select your academic subjects. You can customize or add more anytime.
+                {t('subjects.subtitle', 'Select your academic subjects. You can customize or add more anytime.')}
               </p>
             </div>
 
@@ -125,13 +127,13 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
                 onClick={() => setStep(1)}
                 className="text-xs text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]"
               >
-                Back
+                {t('common.back', 'Back')}
               </button>
               <button
                 onClick={() => setStep(3)}
                 className="btn-gold-primary inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold shadow-xs"
               >
-                <span>Continue</span>
+                <span>{t('common.next', 'Continue')}</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
@@ -143,10 +145,10 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
           <div className="space-y-4 py-2">
             <div>
               <h2 className="text-lg font-bold text-[#20232A] dark:text-[#F6F3EC]">
-                Daily Study Target
+                {t('settings.dailyTarget', 'Daily Study Target')}
               </h2>
               <p className="text-xs text-[#858A93] dark:text-[#777F8C]">
-                How many new topics do you plan to study each day?
+                {t('dashboard.dailyTarget', 'How many new topics do you plan to study each day?')}
               </p>
             </div>
 
@@ -163,27 +165,23 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
                   }`}
                 >
                   <span className="font-mono text-xl tabular-nums">{num}</span>
-                  <span className="text-[10px] text-[#858A93] dark:text-[#777F8C]">topic{num > 1 ? 's' : ''}/day</span>
+                  <span className="text-[10px] text-[#858A93] dark:text-[#777F8C]">{t('common.topics', 'topics')}/{t('common.day', 'day')}</span>
                 </button>
               ))}
             </div>
-
-            <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] text-center">
-              A target of 3 topics/day yields ~18 high-retention active recall sessions per week.
-            </p>
 
             <div className="flex items-center justify-between pt-4 border-t border-black/[0.06] dark:border-white/[0.08]">
               <button
                 onClick={() => setStep(2)}
                 className="text-xs text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]"
               >
-                Back
+                {t('common.back', 'Back')}
               </button>
               <button
                 onClick={() => setStep(4)}
                 className="btn-gold-primary inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold shadow-xs"
               >
-                <span>Continue</span>
+                <span>{t('common.next', 'Continue')}</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
@@ -195,10 +193,10 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
           <div className="space-y-4 py-2">
             <div>
               <h2 className="text-lg font-bold text-[#20232A] dark:text-[#F6F3EC]">
-                Your Spaced Repetition Rhythm
+                {t('settings.scheduleTitle', 'Your Spaced Repetition Rhythm')}
               </h2>
               <p className="text-xs text-[#858A93] dark:text-[#777F8C]">
-                AURELIS uses an evidence-based 7-stage consolidation rhythm:
+                {t('settings.scheduleSub', 'AURELIS uses an evidence-based 7-stage consolidation rhythm:')}
               </p>
             </div>
 
@@ -238,13 +236,13 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
                 onClick={() => setStep(3)}
                 className="text-xs text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]"
               >
-                Back
+                {t('common.back', 'Back')}
               </button>
               <button
                 onClick={() => setStep(5)}
                 className="btn-gold-primary inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold shadow-xs"
               >
-                <span>Continue</span>
+                <span>{t('common.next', 'Continue')}</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
@@ -260,10 +258,10 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
 
             <div className="space-y-2">
               <h2 className="text-xl font-bold text-[#20232A] dark:text-[#F6F3EC]">
-                You're ready.
+                {t('landing.ctaTitle', "You're ready.")}
               </h2>
               <p className="text-xs text-[#686D77] dark:text-[#A7ABB5] max-w-sm mx-auto leading-relaxed">
-                Log what you study today. Open AURELIS tomorrow to see exactly what needs your attention.
+                {t('landing.ctaSubtitle', 'Log what you study today. Open AURELIS tomorrow to see exactly what needs your attention.')}
               </p>
             </div>
 
@@ -272,7 +270,7 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
                 onClick={handleFinish}
                 className="w-full btn-gold-primary py-3 rounded-xl text-xs font-semibold shadow-md"
               >
-                Enter AURELIS
+                {t('landing.getStarted', 'Enter AURELIS')}
               </button>
             </div>
           </div>

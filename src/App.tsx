@@ -21,6 +21,7 @@ import { ReviewSessionModal } from './components/review/ReviewSessionModal';
 import { GlobalSearchModal } from './components/search/GlobalSearchModal';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { OnboardingModal } from './components/onboarding/OnboardingModal';
+import { AddSubjectModal } from './components/subjects/AddSubjectModal';
 
 import { I18nProvider } from './i18n';
 
@@ -71,6 +72,7 @@ const AppContent: React.FC = () => {
 
       {/* Global Modals - single consistent tree with keys */}
       <AddTopicModal key="modal-add-topic" />
+      <AddSubjectModal key="modal-add-subject" />
       <ReviewSessionModal key="modal-review-session" />
       <GlobalSearchModal key="modal-search" />
       <SettingsModal key="modal-settings" />

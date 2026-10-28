@@ -13,10 +13,16 @@ import {
 } from 'lucide-react';
 
 export const AnalyticsView: React.FC = () => {
-  const { state, setActiveView, setIsAddTopicOpen } = useApp();
+  const { state, activeSubjects, setActiveView, setIsAddTopicOpen } = useApp();
   const { t, formatNumber } = useI18n();
 
-  const totalTopics = state.topics.length;
+  const activeSubjectIds = useMemo(() => new Set(activeSubjects.map((s) => s.id)), [activeSubjects]);
+  const activeTopics = useMemo(
+    () => state.topics.filter((t) => !t.isArchived && activeSubjectIds.has(t.subjectId)),
+    [state.topics, activeSubjectIds]
+  );
+
+  const totalTopics = activeTopics.length;
 
   // Calculate real metrics without fake data
   const metrics = useMemo(() => {
@@ -24,7 +30,7 @@ export const AnalyticsView: React.FC = () => {
     let completedReviews = 0;
     let totalMinutesStudied = 0;
 
-    state.topics.forEach((topic) => {
+    activeTopics.forEach((topic) => {
       topic.schedule.forEach((s) => {
         if (s.stepIndex === 0) return; // step 0 is Learn
         totalScheduledReviews++;
@@ -51,16 +57,16 @@ export const AnalyticsView: React.FC = () => {
 
     // Mastery levels distribution
     const masteryDist = {
-      mastered: state.topics.filter((topic) => topic.mastery === 'mastered').length,
-      strong: state.topics.filter((topic) => topic.mastery === 'strong').length,
-      developing: state.topics.filter((topic) => topic.mastery === 'developing').length,
-      learning: state.topics.filter((topic) => topic.mastery === 'learning').length,
-      new: state.topics.filter((topic) => topic.mastery === 'new').length,
+      mastered: activeTopics.filter((topic) => topic.mastery === 'mastered').length,
+      strong: activeTopics.filter((topic) => topic.mastery === 'strong').length,
+      developing: activeTopics.filter((topic) => topic.mastery === 'developing').length,
+      learning: activeTopics.filter((topic) => topic.mastery === 'learning').length,
+      new: activeTopics.filter((topic) => topic.mastery === 'new').length,
     };
 
     // Subject breakdown
-    const subjectBreakdown = state.subjects.map((s) => {
-      const topics = state.topics.filter((topic) => topic.subjectId === s.id);
+    const subjectBreakdown = activeSubjects.map((s) => {
+      const topics = activeTopics.filter((topic) => topic.subjectId === s.id);
       const avg =
         topics.length > 0
           ? Math.round(topics.reduce((acc, topic) => acc + topic.masteryScore, 0) / topics.length)
@@ -73,7 +79,7 @@ export const AnalyticsView: React.FC = () => {
     });
 
     // Weakest topics based on mastery score
-    const weakTopics = [...state.topics]
+    const weakTopics = [...activeTopics]
       .sort((a, b) => a.masteryScore - b.masteryScore)
       .slice(0, 5);
 
@@ -87,23 +93,23 @@ export const AnalyticsView: React.FC = () => {
       subjectBreakdown,
       weakTopics,
     };
-  }, [state.topics, state.weeklyTests, state.subjects]);
+  }, [activeTopics, state.weeklyTests, activeSubjects]);
 
   if (totalTopics === 0) {
     return (
       <div className="py-20 text-center space-y-4">
         <Target className="mx-auto h-12 w-12 text-[#858A93] dark:text-[#777F8C]" />
         <h2 className="text-base font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-          Your analytics will appear as you build your revision history.
+          {t('analytics.overviewTitle', 'Your analytics will appear as you build your revision history.')}
         </h2>
         <p className="text-xs text-[#858A93] dark:text-[#777F8C] max-w-sm mx-auto">
-          Record topics and complete active spaced reviews to unlock retention insights and exam readiness diagnostics.
+          {t('analytics.overviewSubtitle', 'Record topics and complete active spaced reviews to unlock retention insights and exam readiness diagnostics.')}
         </p>
         <button
           onClick={() => setIsAddTopicOpen(true)}
           className="btn-gold-primary inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold"
         >
-          {t('common.addTopic')}
+          {t('subjects.addTopic', 'Add Topic')}
         </button>
       </div>
     );
@@ -114,76 +120,75 @@ export const AnalyticsView: React.FC = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
-          {t('analytics.title')}
+          {t('analytics.overviewTitle', 'Memory & Retention Analytics')}
         </h1>
         <p className="text-xs text-[#858A93] dark:text-[#777F8C] mt-0.5">
-          {t('analytics.subtitle')}
+          {t('analytics.overviewSubtitle', 'Real-time metrics on spaced repetition adherence, retention rates, and recall discipline')}
         </p>
       </div>
 
-      {/* Top 4 KPI Metrics (Tabular numerals, no pills) */}
+      {/* Top 4 KPI Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* 1. Topics Learned */}
         <div className="rounded-3xl glass-premium p-5 transition-all">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-            {t('nav.topics')}
+            {t('analytics.topicsLearned', 'Topics Logged')}
           </div>
           <div className="mt-2.5 flex items-baseline gap-2">
             <span className="font-mono text-3xl font-bold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
               {formatNumber(totalTopics)}
             </span>
-            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">{t('dashboard.stats.topicsLearned')}</span>
+            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">{t('common.topics', 'topics')}</span>
           </div>
           <p className="mt-1 text-[11px] text-[#858A93] dark:text-[#777F8C]">
-            Across {state.subjects.length} academic subjects
+            {activeSubjects.length} {t('common.subjects', 'subjects')}
           </p>
         </div>
 
         {/* 2. Repetition Completion Rate */}
         <div className="rounded-3xl glass-premium p-5 transition-all">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-            Review Adherence
+            {t('analytics.reviewAdherence', 'Schedule Adherence')}
           </div>
           <div className="mt-2.5 flex items-baseline gap-2">
             <span className="font-mono text-3xl font-bold tabular-nums text-[#A97B32] dark:text-[#E6C27A]">
               {metrics.completionRate}%
             </span>
-            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">adherence</span>
+            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">{t('analytics.completionRate', 'rate')}</span>
           </div>
           <p className="mt-1 text-[11px] text-[#858A93] dark:text-[#777F8C]">
-            {metrics.completedReviews} of {metrics.totalScheduledReviews} reviews completed
+            {metrics.completedReviews} / {metrics.totalScheduledReviews}
           </p>
         </div>
 
         {/* 3. Study Time */}
         <div className="rounded-3xl glass-premium p-5 transition-all">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-            Active Recall Time
+            {t('analytics.activeRecallTime', 'Active Recall Time')}
           </div>
           <div className="mt-2.5 flex items-baseline gap-2">
             <span className="font-mono text-3xl font-bold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
               {metrics.totalHours}
             </span>
-            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">hours</span>
+            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">h</span>
           </div>
           <p className="mt-1 text-[11px] text-[#858A93] dark:text-[#777F8C]">
-            Spaced repetition retrieval
+            {t('streak.activeConsistency', 'Active Consistency')}
           </p>
         </div>
 
         {/* 4. Diagnostic Average */}
         <div className="rounded-3xl glass-premium p-5 transition-all">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-            Diagnostic Test Avg
+            {t('analytics.diagnosticTestAvg', 'Day 7 Test Average')}
           </div>
           <div className="mt-2.5 flex items-baseline gap-2">
             <span className="font-mono text-3xl font-bold tabular-nums text-[#20232A] dark:text-[#F6F3EC]">
               {metrics.testAverage !== null ? `${metrics.testAverage}%` : 'N/A'}
             </span>
-            <span className="text-xs text-[#858A93] dark:text-[#777F8C]">score</span>
           </div>
           <p className="mt-1 text-[11px] text-[#858A93] dark:text-[#777F8C]">
-            {state.weeklyTests.length} tests logged
+            {state.weeklyTests.length} {t('nav.tests', 'tests')}
           </p>
         </div>
       </div>
@@ -194,20 +199,20 @@ export const AnalyticsView: React.FC = () => {
         <div className="rounded-3xl glass-subtle p-5 sm:p-6 space-y-4 transition-all">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-              Mastery Stage Distribution
+              {t('analytics.masteryDistributionTitle', 'Curriculum Retention Mastery')}
             </h3>
             <span className="text-xs text-[#858A93] dark:text-[#777F8C] font-mono">
-              {metrics.masteryDist.mastered} Mastered
+              {metrics.masteryDist.mastered} {t('subjects.mastered', 'Mastered')}
             </span>
           </div>
 
           <div className="space-y-3">
             {[
-              { label: 'Mastered (>= 90%)', count: metrics.masteryDist.mastered, color: 'bg-[#E6C27A]' },
-              { label: 'Strong (70 - 89%)', count: metrics.masteryDist.strong, color: 'bg-emerald-400' },
-              { label: 'Developing (40 - 69%)', count: metrics.masteryDist.developing, color: 'bg-[#60A5FA]' },
-              { label: 'Learning (15 - 39%)', count: metrics.masteryDist.learning, color: 'bg-orange-400' },
-              { label: 'New (< 15%)', count: metrics.masteryDist.new, color: 'bg-[#858A93]' },
+              { label: `${t('subjects.mastered', 'Mastered')} (>= 90%)`, count: metrics.masteryDist.mastered, color: 'bg-[#E6C27A]' },
+              { label: `${t('status.strong', 'Strong')} (70 - 89%)`, count: metrics.masteryDist.strong, color: 'bg-emerald-400' },
+              { label: `${t('status.developing', 'Developing')} (40 - 69%)`, count: metrics.masteryDist.developing, color: 'bg-[#60A5FA]' },
+              { label: `${t('status.learning', 'Learning')} (15 - 39%)`, count: metrics.masteryDist.learning, color: 'bg-orange-400' },
+              { label: `${t('status.new', 'New')} (< 15%)`, count: metrics.masteryDist.new, color: 'bg-[#858A93]' },
             ].map((row) => {
               const pct = totalTopics > 0 ? Math.round((row.count / totalTopics) * 100) : 0;
               return (
@@ -230,14 +235,14 @@ export const AnalyticsView: React.FC = () => {
           </div>
 
           <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] border-t border-black/[0.06] pt-3 dark:border-white/[0.08]">
-            Multi-factor model: 50% interval completions, 35% recall ratings, and 15% error notebook stability.
+            50% intervals · 35% recall · 15% errors
           </p>
         </div>
 
         {/* Subject Progress */}
         <div className="rounded-3xl glass-subtle p-5 sm:p-6 space-y-4 transition-all">
           <h3 className="text-sm font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-            Subject Relative Performance
+            {t('analytics.subjectPerformanceTitle', 'Subject Performance Breakdown')}
           </h3>
 
           <div className="space-y-3.5">
@@ -245,7 +250,7 @@ export const AnalyticsView: React.FC = () => {
               <div key={subject.id} className="space-y-1.5 text-xs">
                 <div className="flex justify-between items-center">
                   <span className="font-medium text-[#20232A] dark:text-[#F6F3EC]">
-                    {subject.name} ({topicCount} topics)
+                    {subject.name} ({topicCount} {t('common.topics', 'topics')})
                   </span>
                   <span className="font-mono font-semibold tabular-nums" style={{ color: subject.color }}>
                     {avgMastery}%
@@ -268,7 +273,7 @@ export const AnalyticsView: React.FC = () => {
         <div className="flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 text-[#E6C27A]" />
           <h3 className="text-sm font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-            Lowest Retention Topics (Prioritize in Upcoming Revisions)
+            {t('analytics.lowestRetentionTitle', 'Topics Needing Attention')}
           </h3>
         </div>
 

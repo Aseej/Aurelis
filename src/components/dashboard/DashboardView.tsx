@@ -48,7 +48,7 @@ export const DashboardView: React.FC = () => {
 
   // Today's topics logged (studied today)
   const newTopicsToday = useMemo(() => {
-    return state.topics.filter((t) => t.studiedDate === todayStr);
+    return state.topics.filter((t) => !t.isArchived && t.studiedDate === todayStr);
   }, [state.topics, todayStr]);
 
   const subjectMap = useMemo(() => {
@@ -67,10 +67,10 @@ export const DashboardView: React.FC = () => {
           <div className="text-[#686D77] dark:text-[#A7ABB5] space-y-0.5">
             <div className="font-semibold text-[#8C6221] dark:text-[#FFE6AD] flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-[#E6C27A]" />
-              <span>Demo Preview Active</span>
+              <span>{t('dashboard.demoBannerTitle', 'Demo Preview Active')}</span>
             </div>
             <p className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
-              Currently displaying sample academic syllabus records. Reset to start with a pristine personal study schedule.
+              {t('dashboard.demoBannerDesc', 'Currently displaying sample academic syllabus records. Reset to start with a pristine personal study schedule.')}
             </p>
           </div>
           <button
@@ -217,7 +217,7 @@ export const DashboardView: React.FC = () => {
                 </span>
                 <span aria-hidden="true">·</span>
                 <span className="font-mono text-[#858A93] dark:text-[#777F8C]">
-                  {nextFeaturedReview.item.stageName} (Step {nextFeaturedReview.item.stepIndex + 1} of 7)
+                  {nextFeaturedReview.item.stageName} ({t('dashboard.stepOf', 'Step {current} of {total}', { current: nextFeaturedReview.item.stepIndex + 1, total: 7 })})
                 </span>
               </div>
 
@@ -226,7 +226,7 @@ export const DashboardView: React.FC = () => {
               </h2>
 
               <p className="text-xs text-[#858A93] dark:text-[#777F8C]">
-                {subjectMap.get(nextFeaturedReview.topic.subjectId)?.name || 'General'} · {nextFeaturedReview.topic.chapterName} · {getDueReasonExplanation(nextFeaturedReview.item, nextFeaturedReview.topic.studiedDate, todayStr)}
+                {subjectMap.get(nextFeaturedReview.topic.subjectId)?.name || 'General'} · {nextFeaturedReview.topic.chapterName} · {getDueReasonExplanation(nextFeaturedReview.item, nextFeaturedReview.topic.studiedDate, todayStr, t)}
               </p>
             </div>
 
@@ -236,7 +236,7 @@ export const DashboardView: React.FC = () => {
                 className="btn-gold-primary flex h-11 items-center gap-2.5 rounded-xl px-5 text-xs font-semibold shadow-md active:scale-95 transition-all"
               >
                 <Play className="h-4 w-4 fill-current" />
-                <span className="tracking-wide">{t('dashboard.startSession', 'Start Review')}</span>
+                <span className="tracking-wide">{t('dashboard.startReview', 'Start Review')}</span>
               </button>
             </div>
           </div>
@@ -248,15 +248,15 @@ export const DashboardView: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
-              Active Revision Queue
+              {t('dashboard.activeQueue', 'Active Revision Queue')}
             </h2>
             <p className="text-xs text-[#858A93] dark:text-[#777F8C]">
-              Spaced repetitions ready for active recall today
+              {t('dashboard.activeQueueDesc', 'Spaced repetitions ready for active recall today')}
             </p>
           </div>
           {todayReviewsDue.length > 0 && (
             <span className="text-xs text-[#858A93] dark:text-[#777F8C] font-mono tabular-nums">
-              {todayReviewsDue.length} waiting
+              {todayReviewsDue.length} {t('dashboard.waiting', 'waiting')}
             </span>
           )}
         </div>
@@ -265,10 +265,10 @@ export const DashboardView: React.FC = () => {
           <div className="rounded-2xl glass-subtle border border-dashed border-black/[0.1] dark:border-white/[0.1] p-8 text-center">
             <CheckCircle2 className="mx-auto h-8 w-8 text-[#A97B32] dark:text-[#E6C27A] mb-2" />
             <h3 className="text-sm font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-              All caught up for today!
+              {t('dashboard.allCaughtUp', 'All caught up for today!')}
             </h3>
             <p className="mt-1 text-xs text-[#858A93] dark:text-[#777F8C] max-w-sm mx-auto">
-              Nothing is currently due. You can record newly studied chapters or inspect upcoming reviews in the calendar.
+              {t('dashboard.allCaughtUpDesc', 'Nothing is currently due. You can record newly studied chapters or inspect upcoming reviews in the calendar.')}
             </p>
             <div className="mt-4">
               <button
@@ -276,7 +276,7 @@ export const DashboardView: React.FC = () => {
                 className="btn-gold-primary inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-all"
               >
                 <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
-                <span>Add New Topic</span>
+                <span>{t('dashboard.addNewTopic', 'Add New Topic')}</span>
               </button>
             </div>
           </div>
@@ -288,7 +288,7 @@ export const DashboardView: React.FC = () => {
                 color: '#d4af37',
               };
               const isOverdue = item.status === 'overdue';
-              const reason = getDueReasonExplanation(item, topic.studiedDate, todayStr);
+              const reason = getDueReasonExplanation(item, topic.studiedDate, todayStr, t);
 
               return (
                 <div
@@ -319,7 +319,7 @@ export const DashboardView: React.FC = () => {
                         {isOverdue && (
                           <>
                             <span aria-hidden="true">·</span>
-                            <span className="text-[#F87171] font-medium">Overdue</span>
+                            <span className="text-[#F87171] font-medium">{t('common.overdue', 'Overdue')}</span>
                           </>
                         )}
                       </div>
@@ -342,7 +342,7 @@ export const DashboardView: React.FC = () => {
                           {item.stageName}
                         </div>
                         <div className="text-[11px] text-[#858A93] dark:text-[#777F8C] font-mono">
-                          Step {item.stepIndex + 1} of 7
+                          {t('dashboard.stepOf', 'Step {current} of {total}', { current: item.stepIndex + 1, total: 7 })}
                         </div>
                       </div>
 
@@ -351,7 +351,7 @@ export const DashboardView: React.FC = () => {
                         className="btn-gold-primary flex h-9 items-center gap-2 rounded-xl px-4 text-xs font-semibold shadow-xs transition-all active:scale-95"
                       >
                         <Play className="h-3.5 w-3.5 fill-current" />
-                        <span className="whitespace-nowrap">Start Review</span>
+                        <span className="whitespace-nowrap">{t('dashboard.startReview', 'Start Review')}</span>
                       </button>
                     </div>
                   </div>
@@ -369,17 +369,17 @@ export const DashboardView: React.FC = () => {
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#A97B32] dark:text-[#E6C27A]">
                 <FileCheck2 className="h-4 w-4" />
-                <span>Day 7 Weekly Testing Milestone Due</span>
+                <span>{t('dashboard.day7MilestoneDue', 'Day 7 Weekly Testing Milestone Due')}</span>
               </div>
               <p className="text-xs text-[#686D77] dark:text-[#A7ABB5]">
-                You have {weeklyTestsDue.length} topic{weeklyTestsDue.length === 1 ? '' : 's'} that reached the 7-day retention checkpoint. Complete a quick test to measure mastery before moving to bi-weekly reviews.
+                {t('dashboard.day7MilestoneDesc', 'You have {count} topic(s) that reached the 7-day retention checkpoint. Complete a quick test to measure mastery before moving to bi-weekly reviews.', { count: weeklyTestsDue.length })}
               </p>
             </div>
             <button
               onClick={() => setActiveView('tests')}
               className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#A97B32] dark:text-[#FFE6AD] hover:underline"
             >
-              <span>Go to Tests</span>
+              <span>{t('dashboard.goToTests', 'Go to Tests')}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -393,14 +393,14 @@ export const DashboardView: React.FC = () => {
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-[#E6C27A]" />
               <h2 className="text-sm font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
-                Topics Needing Attention
+                {t('dashboard.topicsNeedingAttention', 'Topics Needing Attention')}
               </h2>
             </div>
             <button
               onClick={() => setActiveView('errors')}
               className="text-xs text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]"
             >
-              View Error Notebook
+              {t('dashboard.viewErrorNotebook', 'View Error Notebook')}
             </button>
           </div>
 
@@ -428,7 +428,7 @@ export const DashboardView: React.FC = () => {
                   <div className="mt-2.5 flex items-center justify-between text-[11px] text-[#858A93] dark:text-[#777F8C]">
                     <span>{topic.chapterName}</span>
                     <span className="flex items-center gap-1 text-[#A97B32] dark:text-[#E6C27A] font-medium">
-                      Revise now <ArrowRight className="h-3 w-3" />
+                      {t('dashboard.reviseNow', 'Revise now')} <ArrowRight className="h-3 w-3" />
                     </span>
                   </div>
                 </div>
@@ -444,7 +444,7 @@ export const DashboardView: React.FC = () => {
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
             <h2 className="text-sm font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
-              Completed Today ({todayCompletedReviews.length})
+              {t('dashboard.completedTodayTitle', 'Completed Today ({count})', { count: todayCompletedReviews.length })}
             </h2>
           </div>
 
@@ -461,7 +461,7 @@ export const DashboardView: React.FC = () => {
                   <span className="text-[#858A93] dark:text-[#777F8C] ml-2">· {item.stageName}</span>
                 </div>
                 <div className="text-[#858A93] dark:text-[#777F8C] font-mono text-[11px] shrink-0">
-                  Recall: {item.confidenceRating || 'Logged'}
+                  {t('dashboard.recallScore', 'Recall: {score}', { score: item.confidenceRating || t('common.completed', 'Completed') })}
                 </div>
               </div>
             ))}

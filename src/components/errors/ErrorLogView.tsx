@@ -26,8 +26,26 @@ const CATEGORY_LABELS: Record<MistakeCategory, string> = {
 };
 
 export const ErrorLogView: React.FC = () => {
-  const { state, addErrorLog, toggleErrorResolved, deleteErrorLog } = useApp();
-  const { t } = useI18n();
+  const { state, activeSubjects, addErrorLog, toggleErrorResolved, deleteErrorLog } = useApp();
+  const { t, formatDate } = useI18n();
+
+  const getCategoryLabel = (cat: MistakeCategory) => {
+    switch (cat) {
+      case 'formula_error':
+        return t('errors.cat_formula', 'Formula Error');
+      case 'calculation_error':
+        return t('errors.cat_calculation', 'Calculation Error');
+      case 'misread_question':
+        return t('errors.cat_reading', 'Misread Question');
+      case 'careless_mistake':
+      case 'weak_recall':
+        return t('errors.cat_time', 'Careless / Recall Lapse');
+      case 'conceptual_misunderstanding':
+      case 'forgot_concept':
+      default:
+        return t('errors.cat_conceptual', 'Conceptual Gap');
+    }
+  };
 
   const todayStr = getTodayDateString();
 
@@ -40,7 +58,7 @@ export const ErrorLogView: React.FC = () => {
   // Add Error Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [problemText, setProblemText] = useState('');
-  const [subjectId, setSubjectId] = useState(state.subjects[0]?.id || 'subj_physics');
+  const [subjectId, setSubjectId] = useState(activeSubjects[0]?.id || '');
   const [chapterName, setChapterName] = useState('');
   const [topicId, setTopicId] = useState<string>('');
   const [mistakeCategory, setMistakeCategory] = useState<MistakeCategory>('formula_error');
@@ -54,7 +72,7 @@ export const ErrorLogView: React.FC = () => {
 
   // Topics for selected subject in modal
   const topicsForModal = useMemo(() => {
-    return state.topics.filter((t) => t.subjectId === subjectId);
+    return state.topics.filter((t) => !t.isArchived && t.subjectId === subjectId);
   }, [state.topics, subjectId]);
 
   // Filtered error list
@@ -145,7 +163,7 @@ export const ErrorLogView: React.FC = () => {
           <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#858A93] dark:text-[#777F8C]" />
           <input
             type="text"
-            placeholder="Search problems, mistake reasons, or correct methods..."
+            placeholder={t('common.search', 'Search') + '...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-xl border border-black/[0.08] bg-white/70 pl-8.5 pr-3 py-1.5 text-xs text-[#20232A] focus:outline-none focus:border-[#E6C27A] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-[#F6F3EC] dark:focus:border-[#E6C27A]"
@@ -158,10 +176,10 @@ export const ErrorLogView: React.FC = () => {
           onChange={(e) => setSelectedCategory(e.target.value)}
           className="rounded-xl border border-black/[0.08] bg-white/70 px-3 py-1.5 text-[#20232A] focus:outline-none focus:border-[#E6C27A] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-[#F6F3EC]"
         >
-          <option value="all">All Categories</option>
-          {Object.entries(CATEGORY_LABELS).map(([k, label]) => (
+          <option value="all">{t('errors.filterAll', 'All Categories')}</option>
+          {Object.entries(CATEGORY_LABELS).map(([k]) => (
             <option key={k} value={k}>
-              {label}
+              {getCategoryLabel(k as MistakeCategory)}
             </option>
           ))}
         </select>
@@ -172,7 +190,7 @@ export const ErrorLogView: React.FC = () => {
           onChange={(e) => setSelectedSubject(e.target.value)}
           className="rounded-xl border border-black/[0.08] bg-white/70 px-3 py-1.5 text-[#20232A] focus:outline-none focus:border-[#E6C27A] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-[#F6F3EC]"
         >
-          <option value="all">All Subjects</option>
+          <option value="all">{t('common.all', 'All')} {t('common.subjects', 'Subjects')}</option>
           {state.subjects.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
@@ -186,13 +204,13 @@ export const ErrorLogView: React.FC = () => {
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`rounded-lg px-2.5 py-1 text-[11px] font-medium capitalize transition-all ${
+              className={`rounded-lg px-2.5 py-1 text-[11px] font-medium transition-all ${
                 statusFilter === st
                   ? 'bg-white text-[#20232A] shadow-xs dark:bg-white/[0.12] dark:text-[#FFE6AD] font-semibold'
                   : 'text-[#686D77] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]'
               }`}
             >
-              {st}
+              {st === 'all' ? t('common.all', 'All') : st === 'unresolved' ? t('errors.unresolved', 'Unresolved') : t('errors.resolved', 'Resolved')}
             </button>
           ))}
         </div>
@@ -202,7 +220,7 @@ export const ErrorLogView: React.FC = () => {
       <div className="space-y-3.5">
         {filteredErrors.length === 0 ? (
           <div className="rounded-2xl glass-subtle border border-dashed border-black/[0.1] dark:border-white/[0.1] p-10 text-center text-xs text-[#858A93] dark:text-[#777F8C]">
-            Clean slate. No mistakes match your active filter.
+            {t('errors.allResolved', 'Clean slate. No mistakes match your active filter.')}
           </div>
         ) : (
           filteredErrors.map((err) => {
@@ -229,10 +247,10 @@ export const ErrorLogView: React.FC = () => {
                       <span className="truncate">{err.chapterName}</span>
                       <span aria-hidden="true">·</span>
                       <span className="font-mono text-[#A97B32] dark:text-[#E6C27A] font-medium">
-                        {CATEGORY_LABELS[err.mistakeCategory]}
+                        {getCategoryLabel(err.mistakeCategory)}
                       </span>
                       <span aria-hidden="true">·</span>
-                      <span className="font-mono">{formatDisplayDate(err.date, false)}</span>
+                      <span className="font-mono">{formatDate(err.date, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                     </div>
 
                     <h3 className="text-base font-semibold text-[#20232A] dark:text-[#F6F3EC]">
@@ -250,13 +268,13 @@ export const ErrorLogView: React.FC = () => {
                       }`}
                     >
                       <Check className="h-3 w-3 stroke-[2.5]" />
-                      <span>{err.resolved ? 'Resolved' : 'Mark Resolved'}</span>
+                      <span>{err.resolved ? t('errors.resolved', 'Resolved') : t('errors.markResolved', 'Mark Resolved')}</span>
                     </button>
 
                     <button
                       onClick={() => deleteErrorLog(err.id)}
                       className="p-1.5 text-[#858A93] hover:text-[#F87171] rounded-lg transition-colors"
-                      title="Delete"
+                      title={t('common.delete', 'Delete')}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -267,7 +285,7 @@ export const ErrorLogView: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                   <div className="rounded-2xl glass-subtle border border-[#F87171]/25 p-3.5 space-y-1">
                     <div className="font-semibold text-[#F87171] text-[11px] uppercase tracking-wide">
-                      Mistake / Trap:
+                      {t('errors.whyHappened', 'Mistake / Trap')}:
                     </div>
                     <p className="text-[#20232A] dark:text-[#F6F3EC] leading-relaxed font-mono">
                       {err.mistakeDescription}
@@ -276,7 +294,7 @@ export const ErrorLogView: React.FC = () => {
 
                   <div className="rounded-2xl glass-subtle border border-[#34D399]/25 p-3.5 space-y-1">
                     <div className="font-semibold text-emerald-600 dark:text-emerald-400 text-[11px] uppercase tracking-wide">
-                      Correct Method / Rule:
+                      {t('errors.correctApproach', 'Correct Method / Rule')}:
                     </div>
                     <p className="text-[#20232A] dark:text-[#F6F3EC] leading-relaxed font-mono">
                       {err.correctMethod}
@@ -293,7 +311,7 @@ export const ErrorLogView: React.FC = () => {
                   >
                     <Sparkles className="h-3.5 w-3.5 text-[#E6C27A]" />
                     <span>
-                      {isDiagnosingThis ? 'Diagnosing root cause...' : 'AI Cognitive Misconception Diagnosis'}
+                      {isDiagnosingThis ? t('common.loading', 'Diagnosing root cause...') : 'AI Cognitive Misconception Diagnosis'}
                     </span>
                   </button>
                 </div>
@@ -322,7 +340,7 @@ export const ErrorLogView: React.FC = () => {
           <div className="relative w-full max-w-lg rounded-3xl glass-premium p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto border border-white/20 dark:border-white/10">
             <div className="flex items-center justify-between border-b border-black/[0.06] pb-3 dark:border-white/[0.08]">
               <h2 className="text-base font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                Log Exam or Practice Problem Mistake
+                {t('errors.modalTitle', 'Log Exam or Practice Problem Mistake')}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -336,14 +354,14 @@ export const ErrorLogView: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                    Subject
+                    {t('topicModal.subjectLabel', 'Subject')}
                   </label>
                   <select
                     value={subjectId}
                     onChange={(e) => setSubjectId(e.target.value)}
                     className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                   >
-                    {state.subjects.map((s) => (
+                    {activeSubjects.map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.name}
                       </option>
@@ -353,14 +371,14 @@ export const ErrorLogView: React.FC = () => {
 
                 <div>
                   <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                    Link to Topic (Optional)
+                    {t('common.topics', 'Topic')} ({t('common.done', 'Optional')})
                   </label>
                   <select
                     value={topicId}
                     onChange={(e) => setTopicId(e.target.value)}
                     className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                   >
-                    <option value="">No specific topic</option>
+                    <option value="">{t('common.all', 'None')}</option>
                     {topicsForModal.map((t) => (
                       <option key={t.id} value={t.id}>
                         {t.title}
@@ -372,12 +390,12 @@ export const ErrorLogView: React.FC = () => {
 
               <div>
                 <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                  Question or Problem Statement
+                  {t('errors.questionLabel', 'Question / Concept')}
                 </label>
                 <textarea
                   rows={2}
                   required
-                  placeholder="e.g. Find angular acceleration when rod is released from horizontal..."
+                  placeholder={t('errors.questionPlaceholder', 'e.g. Find angular acceleration when rod is released from horizontal...')}
                   value={problemText}
                   onChange={(e) => setProblemText(e.target.value)}
                   className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 p-2.5 text-xs text-[#20232A] placeholder-[#858A93] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC] dark:placeholder-[#777F8C]"
@@ -386,16 +404,16 @@ export const ErrorLogView: React.FC = () => {
 
               <div>
                 <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                  Mistake Classification
+                  {t('errors.categoryLabel', 'Root Cause Category')}
                 </label>
                 <select
                   value={mistakeCategory}
                   onChange={(e) => setMistakeCategory(e.target.value as MistakeCategory)}
                   className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 px-3 py-2 text-xs text-[#20232A] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC]"
                 >
-                  {Object.entries(CATEGORY_LABELS).map(([k, label]) => (
+                  {Object.entries(CATEGORY_LABELS).map(([k]) => (
                     <option key={k} value={k}>
-                      {label}
+                      {getCategoryLabel(k as MistakeCategory)}
                     </option>
                   ))}
                 </select>
@@ -403,12 +421,12 @@ export const ErrorLogView: React.FC = () => {
 
               <div>
                 <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                  What did you do wrong?
+                  {t('errors.whyLabel', 'What did you do wrong?')}
                 </label>
                 <textarea
                   rows={2}
                   required
-                  placeholder="e.g. Forgot to account for center of mass torque, calculated torque about center rather than pivot..."
+                  placeholder={t('errors.whyPlaceholder', 'e.g. Forgot to account for center of mass torque, calculated torque about center rather than pivot...')}
                   value={mistakeDescription}
                   onChange={(e) => setMistakeDescription(e.target.value)}
                   className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 p-2.5 text-xs text-[#20232A] placeholder-[#858A93] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC] dark:placeholder-[#777F8C] font-mono"
@@ -417,11 +435,11 @@ export const ErrorLogView: React.FC = () => {
 
               <div>
                 <label className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                  Correct Method & Rule to Remember
+                  {t('errors.correctionLabel', 'Correct Method & Rule to Remember')}
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="e.g. Torque about pivot is Mg * (L/2). Moment of inertia about end is ML^2 / 3. Angular acceleration = 3g / 2L."
+                  placeholder={t('errors.correctionPlaceholder', 'e.g. Torque about pivot is Mg * (L/2). Moment of inertia about end is ML^2 / 3. Angular acceleration = 3g / 2L.')}
                   value={correctMethod}
                   onChange={(e) => setCorrectMethod(e.target.value)}
                   className="mt-1 w-full rounded-xl border border-black/[0.08] bg-white/70 p-2.5 text-xs text-[#20232A] placeholder-[#858A93] focus:border-[#E6C27A] focus:outline-none dark:border-white/[0.08] dark:bg-black/30 dark:text-[#F6F3EC] dark:placeholder-[#777F8C] font-mono"
@@ -434,13 +452,13 @@ export const ErrorLogView: React.FC = () => {
                   onClick={() => setIsModalOpen(false)}
                   className="rounded-xl px-3 py-2 text-xs text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
                   className="btn-gold-primary rounded-xl px-4 py-2 text-xs font-semibold shadow-xs"
                 >
-                  Save Mistake
+                  {t('errors.saveError', 'Save Mistake')}
                 </button>
               </div>
             </form>

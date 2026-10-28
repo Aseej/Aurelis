@@ -205,24 +205,42 @@ export function refreshReviewStatuses(
 export function getDueReasonExplanation(
   item: ReviewScheduleItem,
   studiedDate: string,
-  today: string = getTodayDateString()
+  today: string = getTodayDateString(),
+  t?: (key: string, fallback?: string, params?: Record<string, string | number>) => string
 ): string {
   const diffFromToday = differenceInCalendarDays(today, item.scheduledDate);
   const daysSinceStudied = differenceInCalendarDays(today, studiedDate);
 
   if (item.stepIndex === 3) {
+    if (t) {
+      return t('scheduler.dueDay7Test', `Due for Day 7 Weekly Test (${daysSinceStudied} days after initial study).`, { days: daysSinceStudied });
+    }
     return `Due for Day 7 Weekly Test (${daysSinceStudied} days after initial study).`;
   }
   if (diffFromToday > 0) {
-    return `Overdue by ${diffFromToday} ${diffFromToday === 1 ? 'day' : 'days'} (scheduled for ${formatDisplayDate(item.scheduledDate, false)}).`;
+    const unit = diffFromToday === 1 ? (t ? t('common.day', 'day') : 'day') : (t ? t('common.days', 'days') : 'days');
+    const formattedDate = formatDisplayDate(item.scheduledDate, false);
+    if (t) {
+      return t('scheduler.overdueBy', `Overdue by ${diffFromToday} ${unit} (scheduled for ${formattedDate}).`, { days: diffFromToday, unit, date: formattedDate });
+    }
+    return `Overdue by ${diffFromToday} ${unit} (scheduled for ${formattedDate}).`;
   }
   if (diffFromToday === 0) {
     if (item.intervalDaysFromStart === 0) {
+      if (t) return t('scheduler.initialToday', 'Initial learning session logged for today.');
       return 'Initial learning session logged for today.';
+    }
+    if (t) {
+      return t('scheduler.dueTodayInterval', `Due today (${item.stageName}) based on your ${item.intervalDaysFromStart}-day interval.`, { stage: item.stageName, interval: item.intervalDaysFromStart });
     }
     return `Due today (${item.stageName}) based on your ${item.intervalDaysFromStart}-day interval.`;
   }
-  return `Scheduled for ${formatDisplayDate(item.scheduledDate)} (in ${Math.abs(diffFromToday)} days).`;
+  const formattedDate = formatDisplayDate(item.scheduledDate);
+  const absDays = Math.abs(diffFromToday);
+  if (t) {
+    return t('scheduler.scheduledIn', `Scheduled for ${formattedDate} (in ${absDays} days).`, { date: formattedDate, days: absDays });
+  }
+  return `Scheduled for ${formattedDate} (in ${absDays} days).`;
 }
 
 /**

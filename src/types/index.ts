@@ -27,6 +27,8 @@ export interface Subject {
   color: string; // Tailwind-friendly hex or token (e.g., #d4af37, #38bdf8, #818cf8, #34d399, etc.)
   iconName: string;
   description?: string;
+  isArchived?: boolean;
+  archivedAt?: string;
 }
 
 export interface Chapter {
@@ -64,6 +66,7 @@ export interface Topic {
   createdAt: string;
   updatedAt: string;
   schedule: ReviewScheduleItem[];
+  isArchived?: boolean;
 }
 
 export interface WeeklyTest {
