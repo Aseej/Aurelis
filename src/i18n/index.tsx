@@ -20,6 +20,7 @@ import { ja } from './locales/ja';
 import { ar } from './locales/ar';
 import { ru } from './locales/ru';
 import { pt } from './locales/pt';
+import { LANDING_TRANSLATIONS } from './landingTranslations';
 
 // Dictionary registry for fully supported languages
 const TRANSLATION_REGISTRY: Record<string, TranslationMap> = {
@@ -80,11 +81,16 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
   const t = useCallback(
     (key: string, fallback?: string, params?: Record<string, string | number>): string => {
       const activeDict = TRANSLATION_REGISTRY[currentLanguage];
+      const activeLanding = LANDING_TRANSLATIONS[currentLanguage];
       let translated = activeDict ? activeDict[key] : undefined;
 
-      // Safe fallback to English dictionary
+      if (!translated && activeLanding) {
+        translated = activeLanding[key];
+      }
+
+      // Safe fallback to English dictionary / landing
       if (!translated) {
-        translated = en[key];
+        translated = en[key] || LANDING_TRANSLATIONS.en?.[key];
       }
 
       // Safe fallback to parameter or key
