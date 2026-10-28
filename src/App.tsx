@@ -40,13 +40,15 @@ const AppContent: React.FC = () => {
         <div className="absolute -bottom-[80px] right-[15%] h-[420px] w-[420px] rounded-full bg-gradient-to-t from-[#B88A43]/5 to-transparent blur-[110px] dark:from-[#B88A43]/8" />
       </div>
 
-      {/* Top Bar following Top Bar Contract */}
-      <div className="relative z-30">
-        <Navbar />
-      </div>
+      {/* Top Bar following Top Bar Contract (hidden on public landing page) */}
+      {activeView !== 'landing' && (
+        <div className="relative z-30">
+          <Navbar />
+        </div>
+      )}
 
       {activeView === 'landing' ? (
-        <div className="relative z-10">
+        <div className="relative z-10 w-full min-h-screen">
           <LandingPage />
         </div>
       ) : (
