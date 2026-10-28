@@ -11,7 +11,7 @@ import {
   AlertCircle,
   BarChart3,
   Settings as SettingsIcon,
-  Globe,
+  Compass,
   X,
 } from 'lucide-react';
 
@@ -104,7 +104,7 @@ export const MobileNav: React.FC = () => {
                     : 'text-[#20232A] dark:text-[#F6F3EC] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]'
                 }`}
               >
-                <Globe className="h-4 w-4 shrink-0 text-[#34D399]" />
+                <Compass className="h-4 w-4 shrink-0 text-[#34D399]" />
                 <span>{t('nav.landing', 'Public Overview')}</span>
               </button>
 
