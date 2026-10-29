@@ -109,6 +109,51 @@ export interface UserSettings {
   notificationTime: string;
   onboarded: boolean;
   aiAssistanceEnabled: boolean;
+  autoCloudBackupEnabled?: boolean;
+  lastCloudBackupDate?: string; // ISO string
+  lastCloudBackupStatus?: 'success' | 'failed';
+  lastCloudBackupSize?: number; // in bytes
+  lastCloudBackupError?: string;
+  lastCloudBackupId?: string;
+}
+
+export interface CloudBackupMetadata {
+  subjectsCount: number;
+  topicsCount: number;
+  weeklyTestsCount: number;
+  errorLogsCount: number;
+  streakDays: number;
+  studentName: string;
+  targetExam: string;
+  backupTimestamp: string;
+}
+
+export interface AurelisCloudBackup {
+  format: 'aurelis_cloud_backup';
+  schemaVersion: '1.0.0';
+  backupId: string;
+  timestamp: string; // ISO string
+  appVersion: string;
+  metadata: CloudBackupMetadata;
+  data: AppState;
+  checksum: string;
+}
+
+export interface CloudBackupSummary {
+  id: string; // Drive file id
+  name: string;
+  size?: number; // In bytes
+  createdTime: string;
+  modifiedTime: string;
+  metadata?: CloudBackupMetadata;
+  description?: string;
+}
+
+export interface SafetySnapshot {
+  snapshotId: string;
+  timestamp: string;
+  state: AppState;
+  reason: string;
 }
 
 export interface AppState {

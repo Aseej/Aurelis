@@ -34,6 +34,7 @@ import {
 } from '../utils/scheduler';
 import { calculateTopicMastery } from '../utils/mastery';
 import { calculateStreak, StreakInfo } from '../utils/streak';
+import { uploadBackupToDrive, getCachedAccessToken } from '../services/googleDriveService';
 
 interface AppContextType {
   state: AppState;
@@ -682,6 +683,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       };
     });
   }, [today]);
+
+  // Background Auto Cloud Backup Runner
+  useEffect(() => {
+    if (!state.settings.autoCloudBackupEnabled) return;
+    const token = getCachedAccessToken();
+    if (!token) return;
+
+    const lastBackupStr = state.settings.lastCloudBackupDate;
+    const isEligible = !lastBackupStr || Date.now() - new Date(lastBackupStr).getTime() > 24 * 60 * 60 * 1000;
+    if (!isEligible) return;
+
+    const runAutoBackup = async () => {
+      try {
+        const { summary } = await uploadBackupToDrive(state, streakInfo.currentStreak);
+        setState((prev) => ({
+          ...prev,
+          settings: {
+            ...prev.settings,
+            lastCloudBackupDate: summary.createdTime,
+            lastCloudBackupStatus: 'success',
+            lastCloudBackupSize: summary.size,
+            lastCloudBackupError: undefined,
+            lastCloudBackupId: summary.id,
+          },
+        }));
+      } catch (err: any) {
+        console.warn('Background auto cloud backup skipped:', err);
+      }
+    };
+
+    const timer = setTimeout(runAutoBackup, 3000);
+    return () => clearTimeout(timer);
+  }, [state.settings.autoCloudBackupEnabled, state.settings.lastCloudBackupDate, streakInfo.currentStreak]);
 
   const value = {
     state,

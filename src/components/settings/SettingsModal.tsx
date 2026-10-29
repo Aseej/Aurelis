@@ -12,7 +12,10 @@ import {
   Trash2,
   Shield,
   Check,
+  Cloud,
+  HardDrive,
 } from 'lucide-react';
+import { CloudBackupSection } from './CloudBackupSection';
 
 export const SettingsModal: React.FC = () => {
   const {
@@ -29,7 +32,8 @@ export const SettingsModal: React.FC = () => {
 
   const { t, setLanguage } = useI18n();
 
-  const [activeTab, setActiveTab] = useState<'profile' | 'schedule' | 'data' | 'privacy'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'schedule' | 'backup' | 'privacy'>('profile');
+  const [backupSubTab, setBackupSubTab] = useState<'cloud' | 'local'>('cloud');
   const [studentName, setStudentName] = useState(state.settings.studentName || 'Aakash Panjiyar');
   const [targetExam, setTargetExam] = useState(state.settings.targetExam || '');
   const [targetDailyTopics, setTargetDailyTopics] = useState(state.settings.targetDailyTopics || 3);
@@ -147,7 +151,7 @@ export const SettingsModal: React.FC = () => {
             {[
               { id: 'profile', label: t('settings.tabProfile', 'Profile & Targets') },
               { id: 'schedule', label: t('settings.tabSchedule', 'Revision Rhythm') },
-              { id: 'data', label: t('settings.tabData', 'Data & Backup') },
+              { id: 'backup', label: t('settings.tabBackup', 'Backup & Recovery') },
               { id: 'privacy', label: t('settings.tabPrivacy', 'Privacy') },
             ].map((tab) => (
               <button
@@ -305,107 +309,143 @@ export const SettingsModal: React.FC = () => {
               </form>
             )}
 
-            {/* 3. Data & Backup Tab */}
-            {activeTab === 'data' && (
+            {/* 3. Backup & Recovery Tab */}
+            {activeTab === 'backup' && (
               <div className="space-y-4">
-                {importStatus && (
-                  <div className="rounded-2xl glass-subtle p-3 font-mono text-[11px] text-[#20232A] dark:text-[#F6F3EC]">
-                    {importStatus}
+                {/* Segmented Liquid Glass Mode Switcher */}
+                <div className="flex p-1 rounded-2xl glass-subtle border border-black/[0.06] dark:border-white/[0.08]">
+                  <button
+                    type="button"
+                    onClick={() => setBackupSubTab('cloud')}
+                    className={`flex-1 py-2 px-3 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition-all ${
+                      backupSubTab === 'cloud'
+                        ? 'bg-white dark:bg-white/10 text-[#20232A] dark:text-[#FFE6AD] shadow-xs font-semibold'
+                        : 'text-[#686D77] dark:text-[#777F8C] hover:text-[#20232A] dark:hover:text-[#F6F3EC]'
+                    }`}
+                  >
+                    <Cloud className="h-3.5 w-3.5 text-[#A97B32] dark:text-[#E6C27A]" />
+                    <span>{t('settings.cloudBackupTab', 'Google Drive Cloud')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBackupSubTab('local')}
+                    className={`flex-1 py-2 px-3 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition-all ${
+                      backupSubTab === 'local'
+                        ? 'bg-white dark:bg-white/10 text-[#20232A] dark:text-[#FFE6AD] shadow-xs font-semibold'
+                        : 'text-[#686D77] dark:text-[#777F8C] hover:text-[#20232A] dark:hover:text-[#F6F3EC]'
+                    }`}
+                  >
+                    <HardDrive className="h-3.5 w-3.5 text-[#A97B32] dark:text-[#E6C27A]" />
+                    <span>{t('settings.localBackupTab', 'Local File & Data')}</span>
+                  </button>
+                </div>
+
+                {/* Sub Tab: Google Drive Cloud */}
+                {backupSubTab === 'cloud' && <CloudBackupSection />}
+
+                {/* Sub Tab: Local JSON File & Reset */}
+                {backupSubTab === 'local' && (
+                  <div className="space-y-3.5 animate-fadeIn">
+                    {importStatus && (
+                      <div className="rounded-2xl glass-subtle p-3 font-mono text-[11px] text-[#20232A] dark:text-[#F6F3EC]">
+                        {importStatus}
+                      </div>
+                    )}
+
+                    {/* Export */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl glass-subtle border border-black/[0.06] dark:border-white/[0.08] p-4">
+                      <div>
+                        <h4 className="font-semibold text-xs text-[#20232A] dark:text-[#F6F3EC]">
+                          {t('settings.exportBackup', 'Export JSON Backup')}
+                        </h4>
+                        <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] mt-0.5">
+                          {t('settings.exportBackupSub', 'Download your complete study log, topics, test scores, and error notebook as a JSON file.')}
+                        </p>
+                      </div>
+                      <button
+                        onClick={exportData}
+                        className="btn-gold-primary flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 font-semibold text-xs shrink-0 shadow-xs"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        <span>{t('settings.downloadJSON', 'Download File')}</span>
+                      </button>
+                    </div>
+
+                    {/* Import */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl glass-subtle border border-black/[0.06] dark:border-white/[0.08] p-4">
+                      <div>
+                        <h4 className="font-semibold text-xs text-[#20232A] dark:text-[#F6F3EC]">
+                          {t('settings.restoreBackup', 'Restore from Local File')}
+                        </h4>
+                        <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] mt-0.5">
+                          {t('settings.restoreBackupSub', 'Import a previously saved AURELIS JSON backup file.')}
+                        </p>
+                      </div>
+                      <label className="btn-glass-secondary flex cursor-pointer items-center justify-center gap-1.5 rounded-xl px-4 py-2 font-medium text-xs shrink-0">
+                        <Upload className="h-3.5 w-3.5" />
+                        <span>{t('settings.selectBackupFile', 'Select File')}</span>
+                        <input
+                          type="file"
+                          accept=".json"
+                          onChange={handleFileImport}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+
+                    {/* Demo Data Management */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl glass-subtle border border-black/[0.06] dark:border-white/[0.08] p-4">
+                      <div>
+                        <h4 className="font-semibold text-xs text-[#20232A] dark:text-[#F6F3EC]">
+                          Demo Syllabus Data
+                        </h4>
+                        <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] mt-0.5">
+                          {state.isDemoData
+                            ? 'Currently viewing sample academic dataset. Reset to begin your personal revision notebook.'
+                            : 'Load realistic sample physics, chemistry, and math syllabus records.'}
+                        </p>
+                      </div>
+                      {state.isDemoData ? (
+                        <button
+                          onClick={purgeDemoData}
+                          className="rounded-xl border border-[#E6C27A]/40 bg-[#E6C27A]/15 px-3.5 py-2 font-semibold text-xs text-[#8C6221] dark:text-[#FFE6AD] hover:bg-[#E6C27A]/25 transition-colors shrink-0"
+                        >
+                          {t('nav.resetDemo', 'Reset Demo Data')}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={loadDemoData}
+                          className="btn-glass-secondary rounded-xl px-3.5 py-2 font-medium text-xs shrink-0"
+                        >
+                          Load Demo Data
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Destructive Clear */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl glass-subtle border border-[#F87171]/20 p-4">
+                      <div>
+                        <h4 className="font-semibold text-xs text-[#F87171]">
+                          {t('settings.clearAllData', 'Delete All Study Data')}
+                        </h4>
+                        <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] mt-0.5">
+                          Permanently delete all subjects, topics, and mistake logs in this browser session.
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleReset}
+                        className="flex items-center justify-center gap-1.5 rounded-xl border border-[#F87171]/40 bg-[#F87171]/10 px-3.5 py-2 font-semibold text-xs text-[#F87171] hover:bg-[#F87171]/20 transition-colors shrink-0"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>{t('common.delete', 'Delete All')}</span>
+                      </button>
+                    </div>
                   </div>
                 )}
-
-                {/* Export */}
-                <div className="flex items-center justify-between rounded-2xl glass-subtle p-4">
-                  <div>
-                    <h4 className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                      {t('settings.exportBackup', 'Export Data Backup')}
-                    </h4>
-                    <p className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
-                      {t('settings.exportBackupSub', 'Download your complete study log, topics, test scores, and error notebook as a JSON file.')}
-                    </p>
-                  </div>
-                  <button
-                    onClick={exportData}
-                    className="btn-glass-secondary flex items-center gap-1.5 rounded-xl px-3.5 py-2 font-medium shrink-0 ml-3"
-                  >
-                    <Download className="h-3.5 w-3.5" />
-                    <span>{t('settings.downloadJSON', 'Download JSON Backup')}</span>
-                  </button>
-                </div>
-
-                {/* Import */}
-                <div className="flex items-center justify-between rounded-2xl glass-subtle p-4">
-                  <div>
-                    <h4 className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                      {t('settings.restoreBackup', 'Restore from Backup')}
-                    </h4>
-                    <p className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
-                      {t('settings.restoreBackupSub', 'Import a previously saved AURELIS JSON backup file.')}
-                    </p>
-                  </div>
-                  <label className="btn-glass-secondary flex cursor-pointer items-center gap-1.5 rounded-xl px-3.5 py-2 font-medium shrink-0 ml-3">
-                    <Upload className="h-3.5 w-3.5" />
-                    <span>{t('settings.selectBackupFile', 'Select Backup File')}</span>
-                    <input
-                      type="file"
-                      accept=".json"
-                      onChange={handleFileImport}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-
-                {/* Demo Data Management */}
-                <div className="flex items-center justify-between rounded-2xl glass-subtle p-4">
-                  <div>
-                    <h4 className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                      Demo Preview Data
-                    </h4>
-                    <p className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
-                      {state.isDemoData
-                        ? 'Currently viewing sample academic dataset. Purge to begin your personal revision notebook.'
-                        : 'Load realistic sample physics, chemistry, and math syllabus records.'}
-                    </p>
-                  </div>
-                  {state.isDemoData ? (
-                    <button
-                      onClick={purgeDemoData}
-                      className="rounded-xl border border-[#E6C27A]/40 bg-[#E6C27A]/15 px-3.5 py-2 font-semibold text-[#8C6221] dark:text-[#FFE6AD] hover:bg-[#E6C27A]/25 transition-colors shrink-0 ml-3"
-                    >
-                      {t('nav.resetDemo', 'Reset Demo Data')}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={loadDemoData}
-                      className="btn-glass-secondary rounded-xl px-3.5 py-2 font-medium shrink-0 ml-3"
-                    >
-                      Load Demo Data
-                    </button>
-                  )}
-                </div>
-
-                {/* Destructive Clear */}
-                <div className="flex items-center justify-between rounded-2xl glass-subtle border border-[#F87171]/20 p-4">
-                  <div>
-                    <h4 className="font-semibold text-[#F87171]">
-                      {t('settings.clearAllData', 'Delete All Study Data')}
-                    </h4>
-                    <p className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
-                      Permanently delete all subjects, topics, and mistake logs in this browser session.
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleReset}
-                    className="flex items-center gap-1.5 rounded-xl border border-[#F87171]/40 bg-[#F87171]/10 px-3.5 py-2 font-semibold text-[#F87171] hover:bg-[#F87171]/20 transition-colors shrink-0 ml-3"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    <span>{t('common.delete', 'Delete')}</span>
-                  </button>
-                </div>
               </div>
             )}
 
-            {/* 4. Privacy Tab */}
+            {/* 5. Privacy Tab */}
             {activeTab === 'privacy' && (
               <div className="space-y-3 leading-relaxed text-[#686D77] dark:text-[#A7ABB5] text-xs">
                 <div className="flex items-center gap-2 text-sm font-semibold text-[#20232A] dark:text-[#F6F3EC]">

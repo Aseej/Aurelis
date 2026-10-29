@@ -201,7 +201,11 @@ export const en: TranslationMap = {
   'settings.subtitle': 'Customize revision rhythm, personal targets, and local data backups',
   'settings.tabProfile': 'Profile & Targets',
   'settings.tabSchedule': 'Revision Rhythm',
-  'settings.tabData': 'Data & Backup',
+  'settings.tabBackup': 'Backup & Recovery',
+  'settings.tabData': 'Data & Local Backup',
+  'settings.tabCloudBackup': 'Cloud Backup & Recovery',
+  'settings.cloudBackupTab': 'Google Drive Cloud',
+  'settings.localBackupTab': 'Local File (JSON)',
   'settings.tabPrivacy': 'Privacy',
 
   // Profile Settings Tab
