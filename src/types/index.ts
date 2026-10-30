@@ -115,7 +115,25 @@ export interface UserSettings {
   lastCloudBackupSize?: number; // in bytes
   lastCloudBackupError?: string;
   lastCloudBackupId?: string;
+  lastCloudRestoreDate?: string; // ISO string
 }
+
+export type CloudConnectionState =
+  | 'initializing'
+  | 'connected'
+  | 'reauth_required'
+  | 'signed_out'
+  | 'error';
+
+export type AutoBackupSyncStatus =
+  | 'idle'
+  | 'preparing'
+  | 'uploading'
+  | 'success'
+  | 'pending'
+  | 'offline'
+  | 'reauth_required'
+  | 'error';
 
 export interface CloudBackupMetadata {
   subjectsCount: number;

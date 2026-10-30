@@ -3,11 +3,16 @@
  * Manages Google OAuth authorization with minimum required scopes
  * ('drive.appdata' + 'userinfo.email') and interacts directly with Google Drive REST v3
  * using the secure, isolated appDataFolder for private learning data backups.
+ *
+ * Implements reliable session persistence, separate lifecycles for Firebase Auth
+ * vs Google OAuth access tokens, silent token reacquisition, and explicit connection states.
  */
 
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import {
   getAuth,
+  setPersistence,
+  browserLocalPersistence,
   GoogleAuthProvider,
   signInWithPopup,
   signOut as firebaseSignOut,
@@ -16,7 +21,13 @@ import {
   Auth,
 } from 'firebase/auth';
 import firebaseConfig from '../../firebase-applet-config.json';
-import { AppState, AurelisCloudBackup, CloudBackupMetadata, CloudBackupSummary } from '../types';
+import {
+  AppState,
+  AurelisCloudBackup,
+  CloudBackupMetadata,
+  CloudBackupSummary,
+  CloudConnectionState,
+} from '../types';
 
 // Minimum required scopes: Drive AppData (private hidden folder) + email identity
 export const GOOGLE_DRIVE_APPDATA_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
@@ -25,12 +36,12 @@ export const GOOGLE_USERINFO_EMAIL_SCOPE = 'https://www.googleapis.com/auth/user
 // In-Memory Token Management (NEVER stored in localStorage or persisted to disk)
 let inMemoryAccessToken: string | null = null;
 let tokenIssuedAt: number | null = null;
-const TOKEN_TTL_MS = 3500 * 1000; // ~58 minutes (Google access tokens usually last 60 minutes)
+const TOKEN_TTL_MS = 3500 * 1000; // ~58 minutes
 
 export function getCachedAccessToken(): string | null {
   if (!inMemoryAccessToken) return null;
   if (tokenIssuedAt && Date.now() - tokenIssuedAt > TOKEN_TTL_MS) {
-    // Token has expired
+    // Token expired
     inMemoryAccessToken = null;
     tokenIssuedAt = null;
     return null;
@@ -67,8 +78,30 @@ export function getFirebaseAuth(): Auth {
   if (!authInstance) {
     const app = getFirebaseApp();
     authInstance = getAuth(app);
+    // Explicitly configure browser persistence
+    setPersistence(authInstance, browserLocalPersistence).catch((err) => {
+      console.warn('Failed to set browserLocalPersistence on Firebase Auth:', err);
+    });
   }
   return authInstance;
+}
+
+/**
+ * Waits for Firebase's initial authentication-state resolution before
+ * deciding whether a user is signed out or a session has expired.
+ */
+export async function waitForAuthReady(): Promise<User | null> {
+  const auth = getFirebaseAuth();
+  if (typeof (auth as any).authStateReady === 'function') {
+    await (auth as any).authStateReady();
+    return auth.currentUser;
+  }
+  return new Promise((resolve) => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      unsub();
+      resolve(user);
+    });
+  });
 }
 
 /**
@@ -83,8 +116,17 @@ export async function calculateSha256(dataStr: string): Promise<string> {
 }
 
 /**
- * Connect to Google Drive using Google Identity Services (OAuth Popup).
- * Requests access to drive.appdata and user email.
+ * In-memory token reacquisition helper.
+ * Strictly non-interactive: never prompts or triggers popup windows.
+ * Google OAuth popups are ONLY initiated when the user explicitly clicks 'Connect' or 'Reauthorize'.
+ */
+export async function attemptSilentTokenReacquisition(_email?: string): Promise<string | null> {
+  return getCachedAccessToken();
+}
+
+/**
+ * Connect or re-authorize Google Drive using standard popup authorization.
+ * Handles both new sign-in and re-acquiring an expired OAuth access token.
  */
 export async function connectGoogleDrive(): Promise<{ user: User; accessToken: string }> {
   const auth = getFirebaseAuth();
@@ -114,14 +156,118 @@ export async function disconnectGoogleDrive(): Promise<void> {
   await firebaseSignOut(auth);
 }
 
+export interface CloudConnectionInfo {
+  state: CloudConnectionState;
+  user: User | null;
+  email: string | null;
+  hasValidToken: boolean;
+  errorMessage?: string;
+}
+
 /**
- * Subscribes to auth state changes.
+ * Subscribes to truthful Google connection changes, respecting Firebase initialization
+ * and separating Firebase Auth state from Google OAuth access token validity.
  */
-export function onGoogleAuthStateChanged(callback: (user: User | null, hasToken: boolean) => void): () => void {
+export function subscribeToCloudConnection(
+  callback: (info: CloudConnectionInfo) => void
+): () => void {
   const auth = getFirebaseAuth();
-  return onAuthStateChanged(auth, (user) => {
-    callback(user, !!getCachedAccessToken());
+  let isMounted = true;
+
+  // 1. Initial State: Initializing
+  callback({
+    state: 'initializing',
+    user: null,
+    email: null,
+    hasValidToken: false,
   });
+
+  // 2. Resolve initial auth readiness first
+  waitForAuthReady().then(async (initialUser) => {
+    if (!isMounted) return;
+
+    if (!initialUser) {
+      callback({
+        state: 'signed_out',
+        user: null,
+        email: null,
+        hasValidToken: false,
+      });
+      return;
+    }
+
+    const email = initialUser.email || null;
+    const existingToken = getCachedAccessToken();
+
+    if (existingToken) {
+      callback({
+        state: 'connected',
+        user: initialUser,
+        email,
+        hasValidToken: true,
+      });
+    } else {
+      // User is signed into Firebase, but Google Drive OAuth token is not active in memory.
+      // Reauthorization required for Google Drive API access (interactive click only).
+      callback({
+        state: 'reauth_required',
+        user: initialUser,
+        email,
+        hasValidToken: false,
+      });
+    }
+  });
+
+  // 3. Listen to subsequent auth state changes
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if (!isMounted) return;
+
+    if (!user) {
+      clearCachedAccessToken();
+      callback({
+        state: 'signed_out',
+        user: null,
+        email: null,
+        hasValidToken: false,
+      });
+      return;
+    }
+
+    const email = user.email || null;
+    const token = getCachedAccessToken();
+
+    if (token) {
+      callback({
+        state: 'connected',
+        user,
+        email,
+        hasValidToken: true,
+      });
+    } else {
+      callback({
+        state: 'reauth_required',
+        user,
+        email,
+        hasValidToken: false,
+      });
+    }
+  });
+
+  return () => {
+    isMounted = false;
+    unsubscribe();
+  };
+}
+
+/**
+ * Ensures an active access token is available.
+ * Never initiates popups; throws AUTH_REQUIRED if user needs to connect/reauthorize.
+ */
+async function ensureValidAccessToken(): Promise<string> {
+  const token = getCachedAccessToken();
+  if (token) return token;
+
+  throw new Error('AUTH_REQUIRED: Google Drive authorization expired or required. Please reconnect.');
 }
 
 /**
@@ -131,10 +277,7 @@ export async function uploadBackupToDrive(
   state: AppState,
   streakDays: number
 ): Promise<{ summary: CloudBackupSummary; backup: AurelisCloudBackup }> {
-  const accessToken = getCachedAccessToken();
-  if (!accessToken) {
-    throw new Error('Google Drive session expired or not connected. Please connect Google Drive.');
-  }
+  const accessToken = await ensureValidAccessToken();
 
   const now = new Date();
   const timestampStr = now.toISOString();
@@ -214,10 +357,10 @@ export async function uploadBackupToDrive(
   if (!response.ok) {
     if (response.status === 401) {
       clearCachedAccessToken();
-      throw new Error('Google Drive access authorization expired. Please reconnect.');
+      throw new Error('AUTH_REQUIRED: Google Drive authorization expired. Please reconnect.');
     }
     const errText = await response.text();
-    throw new Error(`Google Drive backup failed (${response.status}): ${errText}`);
+    throw new Error(`Google Drive backup upload failed (${response.status}): ${errText}`);
   }
 
   const uploadedFile = await response.json();
@@ -246,10 +389,7 @@ export async function uploadBackupToDrive(
  * Lists all backups available in the user's private Google Drive appDataFolder.
  */
 export async function listBackupsFromDrive(): Promise<CloudBackupSummary[]> {
-  const accessToken = getCachedAccessToken();
-  if (!accessToken) {
-    throw new Error('Google Drive not connected or session expired. Please connect Google Drive.');
-  }
+  const accessToken = await ensureValidAccessToken();
 
   const query = encodeURIComponent("trashed = false and name contains 'aurelis_backup'");
   const url = `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${query}&fields=files(id,name,size,createdTime,modifiedTime,properties,description)&orderBy=createdTime desc&pageSize=20`;
@@ -263,7 +403,7 @@ export async function listBackupsFromDrive(): Promise<CloudBackupSummary[]> {
   if (!response.ok) {
     if (response.status === 401) {
       clearCachedAccessToken();
-      throw new Error('Google Drive authorization expired. Please reconnect.');
+      throw new Error('AUTH_REQUIRED: Google Drive authorization expired. Please reconnect.');
     }
     const errText = await response.text();
     throw new Error(`Failed to list backups (${response.status}): ${errText}`);
@@ -305,10 +445,7 @@ export async function listBackupsFromDrive(): Promise<CloudBackupSummary[]> {
 export async function downloadBackupFromDrive(
   fileId: string
 ): Promise<{ backup: AurelisCloudBackup; verified: boolean; rawPayload: any }> {
-  const accessToken = getCachedAccessToken();
-  if (!accessToken) {
-    throw new Error('Google Drive not connected. Please connect Google Drive.');
-  }
+  const accessToken = await ensureValidAccessToken();
 
   const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
   const response = await fetch(url, {
@@ -320,7 +457,7 @@ export async function downloadBackupFromDrive(
   if (!response.ok) {
     if (response.status === 401) {
       clearCachedAccessToken();
-      throw new Error('Google Drive authorization expired. Please reconnect.');
+      throw new Error('AUTH_REQUIRED: Google Drive authorization expired. Please reconnect.');
     }
     throw new Error(`Failed to download backup file (${response.status})`);
   }
@@ -368,17 +505,14 @@ export async function downloadBackupFromDrive(
     };
   }
 
-  throw new Error('Invalid AURELIS backup format. The file appears to be corrupted or from an incompatible version.');
+  throw new Error('Invalid AURELIS backup format. The file appears to be corrupted or incompatible.');
 }
 
 /**
  * Deletes a single backup file from Google Drive.
  */
 export async function deleteBackupFromDrive(fileId: string): Promise<boolean> {
-  const accessToken = getCachedAccessToken();
-  if (!accessToken) {
-    throw new Error('Google Drive not connected. Please connect Google Drive.');
-  }
+  const accessToken = await ensureValidAccessToken();
 
   const url = `https://www.googleapis.com/drive/v3/files/${fileId}`;
   const response = await fetch(url, {
@@ -403,10 +537,9 @@ export async function enforceRetentionPolicy(maxBackups: number = 5): Promise<nu
   try {
     const backups = await listBackupsFromDrive();
     if (backups.length <= maxBackups) {
-      return 0; // Within limits
+      return 0;
     }
 
-    // Keep the most recent maxBackups, delete the excess older ones
     const toDelete = backups.slice(maxBackups);
     let deletedCount = 0;
 

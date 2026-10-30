@@ -34,7 +34,7 @@ import {
 } from '../utils/scheduler';
 import { calculateTopicMastery } from '../utils/mastery';
 import { calculateStreak, StreakInfo } from '../utils/streak';
-import { uploadBackupToDrive, getCachedAccessToken } from '../services/googleDriveService';
+import { cloudBackupManager } from '../services/cloudBackupManager';
 
 interface AppContextType {
   state: AppState;
@@ -42,6 +42,8 @@ interface AppContextType {
   setActiveView: (view: ActiveView) => void;
   theme: 'dark' | 'light';
   toggleTheme: () => void;
+  // Backup / Reset / Demo Management
+  restoreAppState: (backupData: AppState) => boolean;
   // Modals & Active Drilldown State
   isAddTopicOpen: boolean;
   setIsAddTopicOpen: (open: boolean) => void;
@@ -151,10 +153,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [theme]);
 
-  // Persist state whenever it changes
+  // Persist state locally whenever it changes, and notify centralized cloud backup system
   useEffect(() => {
     savePersistedState(state);
+    const today = getTodayDateString();
+    const streak = calculateStreak(state, today).currentStreak;
+    cloudBackupManager.notifyDataChanged(state, streak);
   }, [state]);
+
+  // Connect cloud backup manager's settings updater to state
+  useEffect(() => {
+    cloudBackupManager.setSettingsUpdateHandler((updates) => {
+      setState((prev) => ({
+        ...prev,
+        settings: { ...prev.settings, ...updates },
+      }));
+    });
+  }, []);
 
   const toggleTheme = useCallback(() => {
     setTheme((prev) => {
@@ -545,6 +560,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return false;
   }, []);
 
+  const restoreAppState = useCallback((backupData: AppState): boolean => {
+    try {
+      if (!backupData || !Array.isArray(backupData.topics) || !Array.isArray(backupData.subjects)) {
+        throw new Error('Invalid backup data structure.');
+      }
+      const today = getTodayDateString();
+      const updatedTopics = backupData.topics.map((t) => ({
+        ...t,
+        schedule: refreshReviewStatuses(t.schedule || [], today),
+      }));
+
+      const cleanRestoredState: AppState = {
+        subjects: backupData.subjects,
+        topics: updatedTopics,
+        weeklyTests: Array.isArray(backupData.weeklyTests) ? backupData.weeklyTests : [],
+        errorLogs: Array.isArray(backupData.errorLogs) ? backupData.errorLogs : [],
+        settings: {
+          ...DEFAULT_SETTINGS,
+          ...backupData.settings,
+          lastCloudRestoreDate: new Date().toISOString(),
+        },
+        isDemoData: false,
+        studyDaysHistory: Array.isArray(backupData.studyDaysHistory) ? backupData.studyDaysHistory : [],
+      };
+
+      // Atomic persistence and in-memory update
+      savePersistedState(cleanRestoredState);
+      setState(cleanRestoredState);
+
+      // Prevent immediate redundant re-upload of what was just restored
+      cloudBackupManager.setLastBackedUpHash(cloudBackupManager.computeStateHash(cleanRestoredState));
+
+      return true;
+    } catch (err) {
+      console.error('Failed to restore app state:', err);
+      return false;
+    }
+  }, []);
+
   const clearAllData = useCallback(() => {
     const cleanState: AppState = {
       subjects: DEFAULT_SUBJECTS,
@@ -684,39 +738,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   }, [today]);
 
-  // Background Auto Cloud Backup Runner
-  useEffect(() => {
-    if (!state.settings.autoCloudBackupEnabled) return;
-    const token = getCachedAccessToken();
-    if (!token) return;
-
-    const lastBackupStr = state.settings.lastCloudBackupDate;
-    const isEligible = !lastBackupStr || Date.now() - new Date(lastBackupStr).getTime() > 24 * 60 * 60 * 1000;
-    if (!isEligible) return;
-
-    const runAutoBackup = async () => {
-      try {
-        const { summary } = await uploadBackupToDrive(state, streakInfo.currentStreak);
-        setState((prev) => ({
-          ...prev,
-          settings: {
-            ...prev.settings,
-            lastCloudBackupDate: summary.createdTime,
-            lastCloudBackupStatus: 'success',
-            lastCloudBackupSize: summary.size,
-            lastCloudBackupError: undefined,
-            lastCloudBackupId: summary.id,
-          },
-        }));
-      } catch (err: any) {
-        console.warn('Background auto cloud backup skipped:', err);
-      }
-    };
-
-    const timer = setTimeout(runAutoBackup, 3000);
-    return () => clearTimeout(timer);
-  }, [state.settings.autoCloudBackupEnabled, state.settings.lastCloudBackupDate, streakInfo.currentStreak]);
-
   const value = {
     state,
     activeView,
@@ -761,6 +782,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     purgeDemoData,
     exportData,
     importData,
+    restoreAppState,
     clearAllData,
     todayReviewsDue,
     todayCompletedReviews,
