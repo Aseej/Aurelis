@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import crypto from 'crypto';
 
 dotenv.config();
 
@@ -206,17 +207,48 @@ interface DriveSession {
 const DATA_DIR = path.resolve(__dirname, '.data');
 const SESSIONS_FILE = path.join(DATA_DIR, 'drive-sessions.json');
 
+// Derive encryption key for server-side encrypted vault at rest
+const ENCRYPTION_SECRET = process.env.SESSION_SECRET || 'aurelis-vault-encryption-secret-key-32b-stable';
+const VAULT_KEY = crypto.scryptSync(ENCRYPTION_SECRET, 'aurelis-drive-salt', 32);
+
+function encryptVault(data: string): string {
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv('aes-256-gcm', VAULT_KEY, iv);
+  let enc = cipher.update(data, 'utf8', 'hex');
+  enc += cipher.final('hex');
+  const tag = cipher.getAuthTag();
+  return JSON.stringify({ v: 1, iv: iv.toString('hex'), tag: tag.toString('hex'), d: enc });
+}
+
+function decryptVault(encryptedStr: string): string {
+  try {
+    const obj = JSON.parse(encryptedStr);
+    if (obj.v === 1 && obj.iv && obj.tag && obj.d) {
+      const decipher = crypto.createDecipheriv('aes-256-gcm', VAULT_KEY, Buffer.from(obj.iv, 'hex'));
+      decipher.setAuthTag(Buffer.from(obj.tag, 'hex'));
+      let dec = decipher.update(obj.d, 'hex', 'utf8');
+      dec += decipher.final('utf8');
+      return dec;
+    }
+    return encryptedStr;
+  } catch {
+    return encryptedStr;
+  }
+}
+
 function getSessions(): Record<string, DriveSession> {
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true, mode: 0o700 });
     }
     if (!fs.existsSync(SESSIONS_FILE)) {
-      fs.writeFileSync(SESSIONS_FILE, JSON.stringify({}), { encoding: 'utf8', mode: 0o600 });
+      const emptyEncrypted = encryptVault(JSON.stringify({}));
+      fs.writeFileSync(SESSIONS_FILE, emptyEncrypted, { encoding: 'utf8', mode: 0o600 });
       return {};
     }
     const raw = fs.readFileSync(SESSIONS_FILE, 'utf8');
-    return JSON.parse(raw);
+    const decrypted = decryptVault(raw);
+    return JSON.parse(decrypted);
   } catch (e) {
     console.error('Failed to read drive sessions:', e);
     return {};
@@ -228,7 +260,9 @@ function saveSessions(sessions: Record<string, DriveSession>): void {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true, mode: 0o700 });
     }
-    fs.writeFileSync(SESSIONS_FILE, JSON.stringify(sessions, null, 2), { encoding: 'utf8', mode: 0o600 });
+    const raw = JSON.stringify(sessions, null, 2);
+    const encrypted = encryptVault(raw);
+    fs.writeFileSync(SESSIONS_FILE, encrypted, { encoding: 'utf8', mode: 0o600 });
   } catch (e) {
     console.error('Failed to save drive sessions:', e);
   }
@@ -295,7 +329,7 @@ app.get('/api/drive/status', (req: Request, res: Response) => {
 });
 
 // 7. Get Active Token for Authorized User
-app.get('/api/drive/token', (req: Request, res: Response) => {
+app.get('/api/drive/token', async (req: Request, res: Response) => {
   try {
     const uid = (req.query.uid as string) || (req.headers['x-user-id'] as string);
     if (!uid) {
@@ -304,19 +338,124 @@ app.get('/api/drive/token', (req: Request, res: Response) => {
     const sessions = getSessions();
     const session = sessions[uid];
     if (!session) {
-      return res.status(404).json({ error: 'No Drive session found for this user' });
+      return res.status(404).json({ error: 'No Drive session found for this user', reauthRequired: true });
     }
     const now = Date.now();
-    if (now >= session.expiresAt) {
-      return res.status(401).json({ error: 'Drive session has expired', expiresAt: session.expiresAt });
+    if (now < session.expiresAt) {
+      return res.json({
+        accessToken: session.accessToken,
+        expiresAt: session.expiresAt,
+        email: session.email,
+      });
     }
-    return res.json({
-      accessToken: session.accessToken,
+
+    // If expired and refresh token available, attempt server-side token refresh
+    if (session.refreshToken && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_CLIENT_ID) {
+      try {
+        const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            client_id: process.env.GOOGLE_CLIENT_ID,
+            client_secret: process.env.GOOGLE_CLIENT_SECRET,
+            refresh_token: session.refreshToken,
+            grant_type: 'refresh_token',
+          }),
+        });
+
+        if (tokenRes.ok) {
+          const tokenData = await tokenRes.json();
+          const newAccessToken = tokenData.access_token;
+          const expiresIn = tokenData.expires_in || 3600;
+          const newExpiresAt = Date.now() + (expiresIn - 60) * 1000;
+
+          session.accessToken = newAccessToken;
+          session.expiresAt = newExpiresAt;
+          session.updatedAt = Date.now();
+          sessions[uid] = session;
+          saveSessions(sessions);
+
+          return res.json({
+            accessToken: newAccessToken,
+            expiresAt: newExpiresAt,
+            email: session.email,
+          });
+        }
+      } catch (refreshErr) {
+        console.warn('Server-side refresh failed:', refreshErr);
+      }
+    }
+
+    return res.status(401).json({
+      error: 'Drive session has expired',
       expiresAt: session.expiresAt,
-      email: session.email,
+      reauthRequired: true,
     });
   } catch (err: any) {
     return res.status(500).json({ error: 'Failed to retrieve drive token' });
+  }
+});
+
+// 7.5. Silent Server-side Refresh of Access Token
+app.post('/api/drive/refresh', async (req: Request, res: Response) => {
+  try {
+    const { uid } = req.body;
+    if (!uid) {
+      return res.status(400).json({ error: 'Missing user id', reauthRequired: true });
+    }
+    const sessions = getSessions();
+    const session = sessions[uid];
+    if (!session) {
+      return res.status(404).json({ error: 'No session found for this user', reauthRequired: true });
+    }
+
+    const now = Date.now();
+    if (now < session.expiresAt - 60000) {
+      return res.json({
+        accessToken: session.accessToken,
+        expiresAt: session.expiresAt,
+        email: session.email,
+      });
+    }
+
+    if (session.refreshToken && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_CLIENT_ID) {
+      const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: process.env.GOOGLE_CLIENT_ID,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET,
+          refresh_token: session.refreshToken,
+          grant_type: 'refresh_token',
+        }),
+      });
+
+      if (tokenRes.ok) {
+        const tokenData = await tokenRes.json();
+        const newAccessToken = tokenData.access_token;
+        const expiresIn = tokenData.expires_in || 3600;
+        const newExpiresAt = Date.now() + (expiresIn - 60) * 1000;
+
+        session.accessToken = newAccessToken;
+        session.expiresAt = newExpiresAt;
+        session.updatedAt = Date.now();
+        sessions[uid] = session;
+        saveSessions(sessions);
+
+        return res.json({
+          accessToken: newAccessToken,
+          expiresAt: newExpiresAt,
+          email: session.email,
+        });
+      }
+    }
+
+    return res.status(401).json({
+      error: 'Google Drive authorization expired. Reauthorization required.',
+      reauthRequired: true,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message, reauthRequired: true });
   }
 });
 

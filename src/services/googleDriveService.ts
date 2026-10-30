@@ -203,24 +203,6 @@ export async function calculateSha256(dataStr: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-let gisScriptPromise: Promise<void> | null = null;
-function loadGisScript(): Promise<void> {
-  if (typeof window === 'undefined') return Promise.reject(new Error('Window unavailable'));
-  if ((window as any).google?.accounts?.oauth2) return Promise.resolve();
-  if (!gisScriptPromise) {
-    gisScriptPromise = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      script.onload = () => resolve();
-      script.onerror = (e) => reject(e);
-      document.head.appendChild(script);
-    });
-  }
-  return gisScriptPromise;
-}
-
 /**
  * In-memory and backend token reacquisition helper.
  * Strictly non-interactive: never prompts or triggers popup windows.
@@ -232,77 +214,46 @@ export async function attemptSilentTokenReacquisition(email?: string): Promise<s
 
   const auth = getFirebaseAuth();
   const user = auth.currentUser;
-
-  // Try backend token endpoint first
-  if (user?.uid) {
+  let uid = user?.uid;
+  if (!uid && typeof window !== 'undefined') {
     try {
-      const res = await fetch(`/api/drive/token?uid=${encodeURIComponent(user.uid)}`);
+      const saved = localStorage.getItem(CONNECTED_ACCOUNT_STORAGE_KEY);
+      if (saved) uid = JSON.parse(saved).uid;
+    } catch {}
+  }
+
+  // Try backend token endpoint
+  if (uid) {
+    try {
+      const res = await fetch(`/api/drive/token?uid=${encodeURIComponent(uid)}`);
       if (res.ok) {
         const data = await res.json();
         if (data.accessToken && data.expiresAt && Date.now() < data.expiresAt) {
-          setCachedAccessToken(data.accessToken, data.expiresAt, user);
+          setCachedAccessToken(data.accessToken, data.expiresAt, user || { uid, email: data.email || email });
+          return data.accessToken;
+        }
+      }
+    } catch {}
+
+    // Try backend silent refresh endpoint if available
+    try {
+      const refreshRes = await fetch('/api/drive/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid }),
+      });
+      if (refreshRes.ok) {
+        const data = await refreshRes.json();
+        if (data.accessToken && data.expiresAt && Date.now() < data.expiresAt) {
+          setCachedAccessToken(data.accessToken, data.expiresAt, user || { uid, email: data.email || email });
           return data.accessToken;
         }
       }
     } catch {}
   }
 
-  // Try silent GIS reacquisition in hidden iframe
-  const targetEmail = email || user?.email;
-  if (!targetEmail) return null;
-
-  try {
-    await loadGisScript();
-    const google = (window as any).google;
-    if (!google?.accounts?.oauth2) return null;
-
-    return new Promise<string | null>((resolve) => {
-      let resolved = false;
-      const timer = setTimeout(() => {
-        if (!resolved) {
-          resolved = true;
-          resolve(null);
-        }
-      }, 7000);
-
-      try {
-        const client = google.accounts.oauth2.initTokenClient({
-          client_id: firebaseConfig.oAuthClientId,
-          scope: `${GOOGLE_DRIVE_APPDATA_SCOPE} ${GOOGLE_USERINFO_EMAIL_SCOPE}`,
-          callback: (resp: any) => {
-            if (resolved) return;
-            resolved = true;
-            clearTimeout(timer);
-            if (resp?.access_token) {
-              const expiresInSec = resp.expires_in ? parseInt(resp.expires_in, 10) : 3500;
-              const expiresAt = Date.now() + (expiresInSec - 60) * 1000;
-              setCachedAccessToken(resp.access_token, expiresAt, user);
-              resolve(resp.access_token);
-            } else {
-              resolve(null);
-            }
-          },
-          error_callback: () => {
-            if (resolved) return;
-            resolved = true;
-            clearTimeout(timer);
-            resolve(null);
-          },
-        });
-
-        // Strictly non-interactive silent request in hidden iframe (prompt: '')
-        client.requestAccessToken({ prompt: '', hint: targetEmail });
-      } catch {
-        if (!resolved) {
-          resolved = true;
-          clearTimeout(timer);
-          resolve(null);
-        }
-      }
-    });
-  } catch {
-    return null;
-  }
+  // Strictly non-interactive: never launch any popup, modal, or iframe prompt
+  return null;
 }
 
 /**
@@ -384,54 +335,35 @@ export function subscribeToCloudConnection(
   const evaluateConnection = async (user: User | null) => {
     if (!isMounted) return;
 
-    if (!user) {
-      let savedAccount: any = null;
-      try {
-        const saved = localStorage.getItem(CONNECTED_ACCOUNT_STORAGE_KEY);
-        if (saved) savedAccount = JSON.parse(saved);
-      } catch {}
+    let savedAccount: any = null;
+    try {
+      const saved = localStorage.getItem(CONNECTED_ACCOUNT_STORAGE_KEY);
+      if (saved) savedAccount = JSON.parse(saved);
+    } catch {}
 
+    const email = user?.email || savedAccount?.email || null;
+    const uid = user?.uid || savedAccount?.uid || null;
+
+    if (!user && !savedAccount?.uid) {
       callback({
         state: 'signed_out',
         user: null,
-        email: savedAccount?.email || null,
+        email: null,
         hasValidToken: false,
       });
       return;
     }
 
-    const email = user.email || null;
     let token = getCachedAccessToken();
 
-    // If not in memory/sessionStorage, check backend token endpoint
-    if (!token && user.uid) {
-      try {
-        const res = await fetch(`/api/drive/token?uid=${encodeURIComponent(user.uid)}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.accessToken && data.expiresAt && Date.now() < data.expiresAt) {
-            setCachedAccessToken(data.accessToken, data.expiresAt, user);
-            token = data.accessToken;
-          }
-        }
-      } catch {}
+    // If not in memory, check backend token or refresh endpoint
+    if (!token && uid) {
+      token = await attemptSilentTokenReacquisition(email || undefined);
     }
 
-    if (token) {
-      callback({
-        state: 'connected',
-        user,
-        email,
-        hasValidToken: true,
-      });
-      return;
-    }
-
-    // If token is expired or missing, attempt silent non-interactive renewal
-    const renewedToken = await attemptSilentTokenReacquisition(email || undefined);
     if (!isMounted) return;
 
-    if (renewedToken) {
+    if (token) {
       callback({
         state: 'connected',
         user,
@@ -474,24 +406,23 @@ export async function ensureValidAccessToken(): Promise<string> {
 
   const auth = getFirebaseAuth();
   const user = auth.currentUser;
+  let uid = user?.uid;
+  let email = user?.email || undefined;
 
-  // Try backend token endpoint
-  if (user?.uid) {
+  if (!uid && typeof window !== 'undefined') {
     try {
-      const res = await fetch(`/api/drive/token?uid=${encodeURIComponent(user.uid)}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.accessToken && data.expiresAt && Date.now() < data.expiresAt) {
-          setCachedAccessToken(data.accessToken, data.expiresAt, user);
-          return data.accessToken;
-        }
+      const saved = localStorage.getItem(CONNECTED_ACCOUNT_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        uid = parsed.uid;
+        email = email || parsed.email;
       }
     } catch {}
   }
 
-  // Try silent background reacquisition
-  if (user?.email) {
-    token = await attemptSilentTokenReacquisition(user.email);
+  // Try silent backend token/refresh retrieval
+  if (uid || email) {
+    token = await attemptSilentTokenReacquisition(email);
     if (token) return token;
   }
 
