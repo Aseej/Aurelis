@@ -3,6 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 dotenv.config();
 
@@ -12,7 +13,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Initialize GoogleGenAI server-side with User-Agent header
 const apiKey = process.env.GEMINI_API_KEY;
@@ -189,8 +191,269 @@ Format as JSON array with properties:
   }
 });
 
+// --- Google Drive Persistent Session & Backup Proxy Backend ---
+interface DriveSession {
+  uid: string;
+  email: string;
+  displayName?: string;
+  accessToken: string;
+  refreshToken?: string;
+  expiresAt: number;
+  scope?: string;
+  updatedAt: number;
+}
+
+const DATA_DIR = path.resolve(__dirname, '.data');
+const SESSIONS_FILE = path.join(DATA_DIR, 'drive-sessions.json');
+
+function getSessions(): Record<string, DriveSession> {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true, mode: 0o700 });
+    }
+    if (!fs.existsSync(SESSIONS_FILE)) {
+      fs.writeFileSync(SESSIONS_FILE, JSON.stringify({}), { encoding: 'utf8', mode: 0o600 });
+      return {};
+    }
+    const raw = fs.readFileSync(SESSIONS_FILE, 'utf8');
+    return JSON.parse(raw);
+  } catch (e) {
+    console.error('Failed to read drive sessions:', e);
+    return {};
+  }
+}
+
+function saveSessions(sessions: Record<string, DriveSession>): void {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true, mode: 0o700 });
+    }
+    fs.writeFileSync(SESSIONS_FILE, JSON.stringify(sessions, null, 2), { encoding: 'utf8', mode: 0o600 });
+  } catch (e) {
+    console.error('Failed to save drive sessions:', e);
+  }
+}
+
+// 5. Store / Refresh Google Drive Session
+app.post('/api/drive/session', (req: Request, res: Response) => {
+  try {
+    const { uid, email, displayName, accessToken, refreshToken, expiresAt, scope } = req.body;
+    if (!uid || !accessToken) {
+      return res.status(400).json({ error: 'Missing required session parameters: uid and accessToken' });
+    }
+    const sessions = getSessions();
+    const now = Date.now();
+    const calculatedExpiry = expiresAt ? parseInt(expiresAt, 10) : (now + 3500 * 1000);
+
+    sessions[uid] = {
+      uid,
+      email: email || (sessions[uid]?.email ?? ''),
+      displayName: displayName || (sessions[uid]?.displayName ?? ''),
+      accessToken,
+      refreshToken: refreshToken || sessions[uid]?.refreshToken,
+      expiresAt: calculatedExpiry,
+      scope: scope || sessions[uid]?.scope || 'https://www.googleapis.com/auth/drive.appdata',
+      updatedAt: now,
+    };
+    saveSessions(sessions);
+    return res.json({
+      success: true,
+      validUntil: calculatedExpiry,
+      email: sessions[uid].email,
+    });
+  } catch (err: any) {
+    console.error('Error saving drive session:', err);
+    return res.status(500).json({ error: 'Internal server error saving session' });
+  }
+});
+
+// 6. Get Google Drive Session Status
+app.get('/api/drive/status', (req: Request, res: Response) => {
+  try {
+    const uid = (req.query.uid as string) || (req.headers['x-user-id'] as string);
+    if (!uid) {
+      return res.status(200).json({ connected: false, valid: false, reason: 'no_uid' });
+    }
+    const sessions = getSessions();
+    const session = sessions[uid];
+    if (!session) {
+      return res.status(200).json({ connected: false, valid: false, reason: 'no_session' });
+    }
+    const now = Date.now();
+    const isValid = now < session.expiresAt;
+    return res.status(200).json({
+      connected: true,
+      valid: isValid,
+      email: session.email,
+      displayName: session.displayName,
+      expiresAt: session.expiresAt,
+      timeRemainingSeconds: Math.max(0, Math.floor((session.expiresAt - now) / 1000)),
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to retrieve drive status' });
+  }
+});
+
+// 7. Get Active Token for Authorized User
+app.get('/api/drive/token', (req: Request, res: Response) => {
+  try {
+    const uid = (req.query.uid as string) || (req.headers['x-user-id'] as string);
+    if (!uid) {
+      return res.status(401).json({ error: 'Unauthorized: missing user id' });
+    }
+    const sessions = getSessions();
+    const session = sessions[uid];
+    if (!session) {
+      return res.status(404).json({ error: 'No Drive session found for this user' });
+    }
+    const now = Date.now();
+    if (now >= session.expiresAt) {
+      return res.status(401).json({ error: 'Drive session has expired', expiresAt: session.expiresAt });
+    }
+    return res.json({
+      accessToken: session.accessToken,
+      expiresAt: session.expiresAt,
+      email: session.email,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to retrieve drive token' });
+  }
+});
+
+// 8. Disconnect / Clear Session
+app.post('/api/drive/disconnect', (req: Request, res: Response) => {
+  try {
+    const { uid } = req.body;
+    if (uid) {
+      const sessions = getSessions();
+      delete sessions[uid];
+      saveSessions(sessions);
+    }
+    return res.json({ success: true });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to disconnect session' });
+  }
+});
+
+// 9. Proxy: List Backups from Drive
+app.get('/api/drive/backups', async (req: Request, res: Response) => {
+  try {
+    const uid = (req.query.uid as string) || (req.headers['x-user-id'] as string);
+    const authHeader = req.headers.authorization;
+    let token: string | null = null;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else if (uid) {
+      const sessions = getSessions();
+      const session = sessions[uid];
+      if (session && Date.now() < session.expiresAt) {
+        token = session.accessToken;
+      }
+    }
+
+    if (!token) {
+      return res.status(401).json({ error: 'AUTH_REQUIRED: No active Drive token' });
+    }
+
+    const query = encodeURIComponent("trashed = false and name contains 'aurelis_backup'");
+    const driveUrl = `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${query}&fields=files(id,name,size,createdTime,modifiedTime,properties,description)&orderBy=createdTime desc&pageSize=20`;
+    const driveRes = await fetch(driveUrl, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!driveRes.ok) {
+      const errText = await driveRes.text();
+      return res.status(driveRes.status).send(errText);
+    }
+    const data = await driveRes.json();
+    return res.json(data);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// 10. Proxy: Upload Backup Snapshot to Drive
+app.post('/api/drive/backup', async (req: Request, res: Response) => {
+  try {
+    const { uid, backupPayload, streakDays } = req.body;
+    const authHeader = req.headers.authorization;
+    let token: string | null = null;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else if (uid) {
+      const sessions = getSessions();
+      const session = sessions[uid];
+      if (session && Date.now() < session.expiresAt) {
+        token = session.accessToken;
+      }
+    }
+
+    if (!token) {
+      return res.status(401).json({ error: 'AUTH_REQUIRED: No active Drive token' });
+    }
+
+    const now = new Date();
+    const timestampStr = now.toISOString();
+    const dateFormatted = timestampStr.replace(/[:.]/g, '-').slice(0, 19);
+    const fileName = `aurelis_backup_${dateFormatted}.json`;
+    const payloadString = typeof backupPayload === 'string' ? backupPayload : JSON.stringify(backupPayload, null, 2);
+
+    const boundary = '-------AURELIS_BOUNDARY_' + Date.now();
+    const delimiter = `\r\n--${boundary}\r\n`;
+    const closeDelimiter = `\r\n--${boundary}--`;
+
+    const fileMetadata = {
+      name: fileName,
+      parents: ['appDataFolder'],
+      description: `AURELIS Spaced Repetition Study Backup (${backupPayload?.metadata?.topicsCount || 0} topics, ${streakDays || 0}d streak)`,
+      properties: {
+        format: 'aurelis_cloud_backup',
+        version: '1.0.0',
+        subjectsCount: String(backupPayload?.metadata?.subjectsCount || 0),
+        topicsCount: String(backupPayload?.metadata?.topicsCount || 0),
+        testsCount: String(backupPayload?.metadata?.weeklyTestsCount || 0),
+        errorsCount: String(backupPayload?.metadata?.errorLogsCount || 0),
+        streakDays: String(streakDays || 0),
+        backupTimestamp: timestampStr,
+        checksum: backupPayload?.checksum || '',
+      },
+    };
+
+    const multipartRequestBody =
+      delimiter +
+      'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+      JSON.stringify(fileMetadata) +
+      delimiter +
+      'Content-Type: application/json\r\n\r\n' +
+      payloadString +
+      closeDelimiter;
+
+    const driveRes = await fetch(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,size,createdTime,modifiedTime,properties,description',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': `multipart/related; boundary=${boundary}`,
+        },
+        body: multipartRequestBody,
+      }
+    );
+
+    if (!driveRes.ok) {
+      const errText = await driveRes.text();
+      return res.status(driveRes.status).send(errText);
+    }
+
+    const uploadedFile = await driveRes.json();
+    return res.json({ success: true, file: uploadedFile });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // Setup Vite middlewares in development or static serve in production
 async function startServer() {
+
   const isProd = process.env.NODE_ENV === 'production';
 
   if (!isProd) {

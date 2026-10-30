@@ -33,30 +33,118 @@ import {
 export const GOOGLE_DRIVE_APPDATA_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
 export const GOOGLE_USERINFO_EMAIL_SCOPE = 'https://www.googleapis.com/auth/userinfo.email';
 
-// In-Memory Token Management (NEVER stored in localStorage or persisted to disk)
+const DRIVE_SESSION_STORAGE_KEY = 'aurelis_drive_session_v1';
+const CONNECTED_ACCOUNT_STORAGE_KEY = 'aurelis_drive_connected_account';
+
+// Token state management with sessionStorage and backend session synchronization
 let inMemoryAccessToken: string | null = null;
-let tokenIssuedAt: number | null = null;
-const TOKEN_TTL_MS = 3500 * 1000; // ~58 minutes
+let tokenExpiresAt: number | null = null;
+
+// Initialize from persistent browser session storage on module load (zero flash on refresh)
+if (typeof window !== 'undefined') {
+  try {
+    const saved = sessionStorage.getItem(DRIVE_SESSION_STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.accessToken && parsed.expiresAt && Date.now() < parsed.expiresAt) {
+        inMemoryAccessToken = parsed.accessToken;
+        tokenExpiresAt = parsed.expiresAt;
+      }
+    }
+  } catch (e) {
+    console.warn('Could not restore drive session from sessionStorage:', e);
+  }
+}
 
 export function getCachedAccessToken(): string | null {
-  if (!inMemoryAccessToken) return null;
-  if (tokenIssuedAt && Date.now() - tokenIssuedAt > TOKEN_TTL_MS) {
-    // Token expired
-    inMemoryAccessToken = null;
-    tokenIssuedAt = null;
+  if (!inMemoryAccessToken) {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = sessionStorage.getItem(DRIVE_SESSION_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.accessToken && parsed.expiresAt && Date.now() < parsed.expiresAt) {
+            inMemoryAccessToken = parsed.accessToken;
+            tokenExpiresAt = parsed.expiresAt;
+            return inMemoryAccessToken;
+          }
+        }
+      } catch {}
+    }
     return null;
   }
+
+  if (tokenExpiresAt && Date.now() >= tokenExpiresAt) {
+    inMemoryAccessToken = null;
+    tokenExpiresAt = null;
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.removeItem(DRIVE_SESSION_STORAGE_KEY);
+      } catch {}
+    }
+    return null;
+  }
+
   return inMemoryAccessToken;
 }
 
-export function setCachedAccessToken(token: string | null): void {
+export function setCachedAccessToken(
+  token: string | null,
+  expiresAt?: number | null,
+  user?: { uid?: string; email?: string | null; displayName?: string | null } | null
+): void {
   inMemoryAccessToken = token;
-  tokenIssuedAt = token ? Date.now() : null;
+  tokenExpiresAt = token ? (expiresAt || Date.now() + 3500 * 1000) : null;
+
+  if (typeof window !== 'undefined') {
+    try {
+      if (token && tokenExpiresAt) {
+        sessionStorage.setItem(
+          DRIVE_SESSION_STORAGE_KEY,
+          JSON.stringify({
+            accessToken: token,
+            expiresAt: tokenExpiresAt,
+            email: user?.email,
+            uid: user?.uid,
+          })
+        );
+        if (user?.email) {
+          localStorage.setItem(
+            CONNECTED_ACCOUNT_STORAGE_KEY,
+            JSON.stringify({ email: user.email, uid: user.uid })
+          );
+        }
+      } else {
+        sessionStorage.removeItem(DRIVE_SESSION_STORAGE_KEY);
+      }
+    } catch {}
+  }
+
+  // Synchronize to secure backend session storage
+  if (token && user?.uid) {
+    fetch('/api/drive/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        accessToken: token,
+        expiresAt: tokenExpiresAt,
+        scope: GOOGLE_DRIVE_APPDATA_SCOPE,
+      }),
+    }).catch((err) => console.warn('Non-fatal error syncing drive session to backend:', err));
+  }
 }
 
 export function clearCachedAccessToken(): void {
   inMemoryAccessToken = null;
-  tokenIssuedAt = null;
+  tokenExpiresAt = null;
+  if (typeof window !== 'undefined') {
+    try {
+      sessionStorage.removeItem(DRIVE_SESSION_STORAGE_KEY);
+    } catch {}
+  }
 }
 
 // Firebase App & Auth Singleton
@@ -115,13 +203,106 @@ export async function calculateSha256(dataStr: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+let gisScriptPromise: Promise<void> | null = null;
+function loadGisScript(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.reject(new Error('Window unavailable'));
+  if ((window as any).google?.accounts?.oauth2) return Promise.resolve();
+  if (!gisScriptPromise) {
+    gisScriptPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => resolve();
+      script.onerror = (e) => reject(e);
+      document.head.appendChild(script);
+    });
+  }
+  return gisScriptPromise;
+}
+
 /**
- * In-memory token reacquisition helper.
+ * In-memory and backend token reacquisition helper.
  * Strictly non-interactive: never prompts or triggers popup windows.
  * Google OAuth popups are ONLY initiated when the user explicitly clicks 'Connect' or 'Reauthorize'.
  */
-export async function attemptSilentTokenReacquisition(_email?: string): Promise<string | null> {
-  return getCachedAccessToken();
+export async function attemptSilentTokenReacquisition(email?: string): Promise<string | null> {
+  const cached = getCachedAccessToken();
+  if (cached) return cached;
+
+  const auth = getFirebaseAuth();
+  const user = auth.currentUser;
+
+  // Try backend token endpoint first
+  if (user?.uid) {
+    try {
+      const res = await fetch(`/api/drive/token?uid=${encodeURIComponent(user.uid)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.accessToken && data.expiresAt && Date.now() < data.expiresAt) {
+          setCachedAccessToken(data.accessToken, data.expiresAt, user);
+          return data.accessToken;
+        }
+      }
+    } catch {}
+  }
+
+  // Try silent GIS reacquisition in hidden iframe
+  const targetEmail = email || user?.email;
+  if (!targetEmail) return null;
+
+  try {
+    await loadGisScript();
+    const google = (window as any).google;
+    if (!google?.accounts?.oauth2) return null;
+
+    return new Promise<string | null>((resolve) => {
+      let resolved = false;
+      const timer = setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          resolve(null);
+        }
+      }, 7000);
+
+      try {
+        const client = google.accounts.oauth2.initTokenClient({
+          client_id: firebaseConfig.oAuthClientId,
+          scope: `${GOOGLE_DRIVE_APPDATA_SCOPE} ${GOOGLE_USERINFO_EMAIL_SCOPE}`,
+          callback: (resp: any) => {
+            if (resolved) return;
+            resolved = true;
+            clearTimeout(timer);
+            if (resp?.access_token) {
+              const expiresInSec = resp.expires_in ? parseInt(resp.expires_in, 10) : 3500;
+              const expiresAt = Date.now() + (expiresInSec - 60) * 1000;
+              setCachedAccessToken(resp.access_token, expiresAt, user);
+              resolve(resp.access_token);
+            } else {
+              resolve(null);
+            }
+          },
+          error_callback: () => {
+            if (resolved) return;
+            resolved = true;
+            clearTimeout(timer);
+            resolve(null);
+          },
+        });
+
+        // Strictly non-interactive silent request in hidden iframe (prompt: '')
+        client.requestAccessToken({ prompt: '', hint: targetEmail });
+      } catch {
+        if (!resolved) {
+          resolved = true;
+          clearTimeout(timer);
+          resolve(null);
+        }
+      }
+    });
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -143,16 +324,34 @@ export async function connectGoogleDrive(): Promise<{ user: User; accessToken: s
     throw new Error('Could not obtain Google Drive access token. Please authorize application access.');
   }
 
-  setCachedAccessToken(accessToken);
+  const expiresAt = Date.now() + 3500 * 1000;
+  setCachedAccessToken(accessToken, expiresAt, result.user);
   return { user: result.user, accessToken };
 }
 
 /**
- * Disconnect Google Drive and clear in-memory tokens.
+ * Disconnect Google Drive and clear all tokens and sessions.
  */
 export async function disconnectGoogleDrive(): Promise<void> {
-  clearCachedAccessToken();
   const auth = getFirebaseAuth();
+  const user = auth.currentUser;
+  const uid = user?.uid;
+
+  clearCachedAccessToken();
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem(CONNECTED_ACCOUNT_STORAGE_KEY);
+    } catch {}
+  }
+
+  if (uid) {
+    fetch('/api/drive/disconnect', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uid }),
+    }).catch(() => {});
+  }
+
   await firebaseSignOut(auth);
 }
 
@@ -165,8 +364,8 @@ export interface CloudConnectionInfo {
 }
 
 /**
- * Subscribes to truthful Google connection changes, respecting Firebase initialization
- * and separating Firebase Auth state from Google OAuth access token validity.
+ * Subscribes to truthful Google connection changes, respecting Firebase initialization,
+ * backend session verification, and persistent access token caching.
  */
 export function subscribeToCloudConnection(
   callback: (info: CloudConnectionInfo) => void
@@ -182,59 +381,41 @@ export function subscribeToCloudConnection(
     hasValidToken: false,
   });
 
-  // 2. Resolve initial auth readiness first
-  waitForAuthReady().then(async (initialUser) => {
-    if (!isMounted) return;
-
-    if (!initialUser) {
-      callback({
-        state: 'signed_out',
-        user: null,
-        email: null,
-        hasValidToken: false,
-      });
-      return;
-    }
-
-    const email = initialUser.email || null;
-    const existingToken = getCachedAccessToken();
-
-    if (existingToken) {
-      callback({
-        state: 'connected',
-        user: initialUser,
-        email,
-        hasValidToken: true,
-      });
-    } else {
-      // User is signed into Firebase, but Google Drive OAuth token is not active in memory.
-      // Reauthorization required for Google Drive API access (interactive click only).
-      callback({
-        state: 'reauth_required',
-        user: initialUser,
-        email,
-        hasValidToken: false,
-      });
-    }
-  });
-
-  // 3. Listen to subsequent auth state changes
-  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+  const evaluateConnection = async (user: User | null) => {
     if (!isMounted) return;
 
     if (!user) {
-      clearCachedAccessToken();
+      let savedAccount: any = null;
+      try {
+        const saved = localStorage.getItem(CONNECTED_ACCOUNT_STORAGE_KEY);
+        if (saved) savedAccount = JSON.parse(saved);
+      } catch {}
+
       callback({
         state: 'signed_out',
         user: null,
-        email: null,
+        email: savedAccount?.email || null,
         hasValidToken: false,
       });
       return;
     }
 
     const email = user.email || null;
-    const token = getCachedAccessToken();
+    let token = getCachedAccessToken();
+
+    // If not in memory/sessionStorage, check backend token endpoint
+    if (!token && user.uid) {
+      try {
+        const res = await fetch(`/api/drive/token?uid=${encodeURIComponent(user.uid)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.accessToken && data.expiresAt && Date.now() < data.expiresAt) {
+            setCachedAccessToken(data.accessToken, data.expiresAt, user);
+            token = data.accessToken;
+          }
+        }
+      } catch {}
+    }
 
     if (token) {
       callback({
@@ -243,6 +424,20 @@ export function subscribeToCloudConnection(
         email,
         hasValidToken: true,
       });
+      return;
+    }
+
+    // If token is expired or missing, attempt silent non-interactive renewal
+    const renewedToken = await attemptSilentTokenReacquisition(email || undefined);
+    if (!isMounted) return;
+
+    if (renewedToken) {
+      callback({
+        state: 'connected',
+        user,
+        email,
+        hasValidToken: true,
+      });
     } else {
       callback({
         state: 'reauth_required',
@@ -251,6 +446,16 @@ export function subscribeToCloudConnection(
         hasValidToken: false,
       });
     }
+  };
+
+  // 2. Resolve initial auth readiness
+  waitForAuthReady().then((initialUser) => {
+    evaluateConnection(initialUser);
+  });
+
+  // 3. Listen to subsequent auth state changes
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    evaluateConnection(user);
   });
 
   return () => {
@@ -260,15 +465,39 @@ export function subscribeToCloudConnection(
 }
 
 /**
- * Ensures an active access token is available.
+ * Ensures an active access token is available with automatic renewal.
  * Never initiates popups; throws AUTH_REQUIRED if user needs to connect/reauthorize.
  */
-async function ensureValidAccessToken(): Promise<string> {
-  const token = getCachedAccessToken();
+export async function ensureValidAccessToken(): Promise<string> {
+  let token = getCachedAccessToken();
   if (token) return token;
 
-  throw new Error('AUTH_REQUIRED: Google Drive authorization expired or required. Please reconnect.');
+  const auth = getFirebaseAuth();
+  const user = auth.currentUser;
+
+  // Try backend token endpoint
+  if (user?.uid) {
+    try {
+      const res = await fetch(`/api/drive/token?uid=${encodeURIComponent(user.uid)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.accessToken && data.expiresAt && Date.now() < data.expiresAt) {
+          setCachedAccessToken(data.accessToken, data.expiresAt, user);
+          return data.accessToken;
+        }
+      }
+    } catch {}
+  }
+
+  // Try silent background reacquisition
+  if (user?.email) {
+    token = await attemptSilentTokenReacquisition(user.email);
+    if (token) return token;
+  }
+
+  throw new Error('AUTH_REQUIRED: Google Drive authorization expired or required. Please reconnect in Settings.');
 }
+
 
 /**
  * Uploads a complete encrypted/integrity-checked backup payload to Google Drive's appDataFolder.

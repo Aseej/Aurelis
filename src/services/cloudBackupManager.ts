@@ -14,6 +14,7 @@ import { AppState, AutoBackupSyncStatus, UserSettings } from '../types';
 import {
   uploadBackupToDrive,
   getCachedAccessToken,
+  ensureValidAccessToken,
 } from './googleDriveService';
 
 const PENDING_BACKUP_STORAGE_KEY = 'aurelis_pending_cloud_backup';
@@ -196,8 +197,11 @@ class CloudBackupManager {
       return false;
     }
 
-    // Check active in-memory token. If none is available, mark pending and notify without prompting.
-    const token = getCachedAccessToken();
+    // Check active token or obtain refreshed token from backend / silent renewal
+    let token = getCachedAccessToken();
+    if (!token) {
+      token = await ensureValidAccessToken().catch(() => null);
+    }
 
     if (!token) {
       this.setPendingBackup(true);
