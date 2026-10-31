@@ -22,6 +22,7 @@ import { GlobalSearchModal } from './components/search/GlobalSearchModal';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { OnboardingModal } from './components/onboarding/OnboardingModal';
 import { AddSubjectModal } from './components/subjects/AddSubjectModal';
+import { GoogleDriveReauthModal } from './components/settings/GoogleDriveReauthModal';
 
 import { I18nProvider } from './i18n';
 
@@ -83,6 +84,7 @@ const AppContent: React.FC = () => {
         isOpen={!state.settings.onboarded}
         onClose={() => updateSettings({ onboarded: true })}
       />
+      <GoogleDriveReauthModal key="modal-drive-reauth" />
     </div>
   );
 };

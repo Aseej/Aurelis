@@ -36,8 +36,57 @@ import {
 export const GOOGLE_DRIVE_APPDATA_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
 export const GOOGLE_USERINFO_EMAIL_SCOPE = 'https://www.googleapis.com/auth/userinfo.email';
 
-const DRIVE_SESSION_STORAGE_KEY = 'aurelis_drive_session_v1';
-const CONNECTED_ACCOUNT_STORAGE_KEY = 'aurelis_drive_connected_account';
+export const DRIVE_SESSION_STORAGE_KEY = 'aurelis_drive_session_v1';
+export const CONNECTED_ACCOUNT_STORAGE_KEY = 'aurelis_drive_connected_account';
+export const DRIVE_REAUTH_PROMPT_SHOWN_KEY = 'aurelis_drive_reauth_prompt_shown_v1';
+
+export interface PersistedDriveMetadata {
+  email: string;
+  uid?: string;
+  displayName?: string | null;
+  connectedAt?: string;
+  previouslyConnected?: boolean;
+  explicitlyDisconnected?: boolean;
+  disconnectedAt?: string;
+}
+
+export function getPersistedDriveMetadata(): PersistedDriveMetadata | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(CONNECTED_ACCOUNT_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Returns true only if the user previously connected Google Drive and has not
+ * explicitly disconnected.
+ */
+export function isPreviouslyConnectedUser(): boolean {
+  const meta = getPersistedDriveMetadata();
+  if (!meta) return false;
+  if (meta.explicitlyDisconnected) return false;
+  return Boolean(meta.previouslyConnected || meta.email || meta.uid);
+}
+
+export function wasReauthReminderShownThisSession(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return sessionStorage.getItem(DRIVE_REAUTH_PROMPT_SHOWN_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+export function markReauthReminderShownThisSession(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.setItem(DRIVE_REAUTH_PROMPT_SHOWN_KEY, 'true');
+  } catch {}
+}
 
 // Token state management with in-memory cache and sessionStorage (same browser session)
 let inMemoryAccessToken: string | null = null;
@@ -112,12 +161,16 @@ export function setCachedAccessToken(
           })
         );
         if (user?.email) {
+          const existing = getPersistedDriveMetadata();
           localStorage.setItem(
             CONNECTED_ACCOUNT_STORAGE_KEY,
             JSON.stringify({
               email: user.email,
-              uid: user?.uid,
-              displayName: user?.displayName,
+              uid: user?.uid || existing?.uid,
+              displayName: user?.displayName || existing?.displayName,
+              connectedAt: existing?.connectedAt || new Date().toISOString(),
+              previouslyConnected: true,
+              explicitlyDisconnected: false,
             })
           );
         }
@@ -214,6 +267,22 @@ export async function connectGoogleDrive(): Promise<{ user: User; accessToken: s
   }
 
   const expiresAt = Date.now() + 3500 * 1000;
+
+  // Persist connection metadata so AURELIS recognizes previously connected users
+  if (typeof window !== 'undefined') {
+    try {
+      const meta: PersistedDriveMetadata = {
+        email: result.user.email || '',
+        uid: result.user.uid,
+        displayName: result.user.displayName,
+        connectedAt: new Date().toISOString(),
+        previouslyConnected: true,
+        explicitlyDisconnected: false,
+      };
+      localStorage.setItem(CONNECTED_ACCOUNT_STORAGE_KEY, JSON.stringify(meta));
+    } catch {}
+  }
+
   setCachedAccessToken(accessToken, expiresAt, result.user);
 
   return { user: result.user, accessToken };
@@ -228,7 +297,19 @@ export async function disconnectGoogleDrive(): Promise<void> {
   clearCachedAccessToken();
   if (typeof window !== 'undefined') {
     try {
-      localStorage.removeItem(CONNECTED_ACCOUNT_STORAGE_KEY);
+      const existing = getPersistedDriveMetadata();
+      if (existing) {
+        localStorage.setItem(
+          CONNECTED_ACCOUNT_STORAGE_KEY,
+          JSON.stringify({
+            ...existing,
+            explicitlyDisconnected: true,
+            disconnectedAt: new Date().toISOString(),
+          })
+        );
+      } else {
+        localStorage.removeItem(CONNECTED_ACCOUNT_STORAGE_KEY);
+      }
     } catch {}
   }
 
@@ -248,8 +329,8 @@ export interface CloudConnectionInfo {
 /**
  * Subscribes to truthful Google connection changes.
  * - Connected: valid access token available in memory/sessionStorage.
- * - Authorization Required: account is known, but token is unavailable or expired.
- * - Not connected: no account linked.
+ * - Authorization Required: account is known and not explicitly disconnected, but token is unavailable or expired.
+ * - Not connected: never connected or explicitly disconnected.
  * Never initiates interactive popups or prompts.
  */
 export function subscribeToCloudConnection(
@@ -269,12 +350,17 @@ export function subscribeToCloudConnection(
   const evaluateConnection = (user: User | null) => {
     if (!isMounted) return;
 
-    let savedAccount: any = null;
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem(CONNECTED_ACCOUNT_STORAGE_KEY);
-        if (saved) savedAccount = JSON.parse(saved);
-      } catch {}
+    const savedAccount = getPersistedDriveMetadata();
+
+    // If user explicitly disconnected, report signed_out
+    if (savedAccount?.explicitlyDisconnected && !user) {
+      callback({
+        state: 'signed_out',
+        user: null,
+        email: null,
+        hasValidToken: false,
+      });
+      return;
     }
 
     const email = user?.email || savedAccount?.email || null;
