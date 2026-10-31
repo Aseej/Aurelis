@@ -4,8 +4,11 @@
  * ('drive.appdata' + 'userinfo.email') and interacts directly with Google Drive REST v3
  * using the secure, isolated appDataFolder for private learning data backups.
  *
- * Implements reliable session persistence, separate lifecycles for Firebase Auth
- * vs Google OAuth access tokens, silent token reacquisition, and explicit connection states.
+ * Implements clean session handling:
+ * - Access token cached in memory and sessionStorage (persists across page reloads).
+ * - Connected account metadata preserved in localStorage.
+ * - When browser restarts or token expires, shows "Authorization Required" and waits for explicit user click.
+ * - Never opens Google popups automatically on startup, navigation, or background checks.
  */
 
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
@@ -36,11 +39,11 @@ export const GOOGLE_USERINFO_EMAIL_SCOPE = 'https://www.googleapis.com/auth/user
 const DRIVE_SESSION_STORAGE_KEY = 'aurelis_drive_session_v1';
 const CONNECTED_ACCOUNT_STORAGE_KEY = 'aurelis_drive_connected_account';
 
-// Token state management with sessionStorage and backend session synchronization
+// Token state management with in-memory cache and sessionStorage (same browser session)
 let inMemoryAccessToken: string | null = null;
 let tokenExpiresAt: number | null = null;
 
-// Initialize from persistent browser session storage on module load (zero flash on refresh)
+// Initialize from browser sessionStorage on module load (preserves token across page refresh)
 if (typeof window !== 'undefined') {
   try {
     const saved = sessionStorage.getItem(DRIVE_SESSION_STORAGE_KEY);
@@ -111,29 +114,17 @@ export function setCachedAccessToken(
         if (user?.email) {
           localStorage.setItem(
             CONNECTED_ACCOUNT_STORAGE_KEY,
-            JSON.stringify({ email: user.email, uid: user.uid })
+            JSON.stringify({
+              email: user.email,
+              uid: user?.uid,
+              displayName: user?.displayName,
+            })
           );
         }
       } else {
         sessionStorage.removeItem(DRIVE_SESSION_STORAGE_KEY);
       }
     } catch {}
-  }
-
-  // Synchronize to secure backend session storage
-  if (token && user?.uid) {
-    fetch('/api/drive/session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        accessToken: token,
-        expiresAt: tokenExpiresAt,
-        scope: GOOGLE_DRIVE_APPDATA_SCOPE,
-      }),
-    }).catch((err) => console.warn('Non-fatal error syncing drive session to backend:', err));
   }
 }
 
@@ -166,7 +157,7 @@ export function getFirebaseAuth(): Auth {
   if (!authInstance) {
     const app = getFirebaseApp();
     authInstance = getAuth(app);
-    // Explicitly configure browser persistence
+    // Configure local persistence for user identity
     setPersistence(authInstance, browserLocalPersistence).catch((err) => {
       console.warn('Failed to set browserLocalPersistence on Firebase Auth:', err);
     });
@@ -204,61 +195,8 @@ export async function calculateSha256(dataStr: string): Promise<string> {
 }
 
 /**
- * In-memory and backend token reacquisition helper.
- * Strictly non-interactive: never prompts or triggers popup windows.
- * Google OAuth popups are ONLY initiated when the user explicitly clicks 'Connect' or 'Reauthorize'.
- */
-export async function attemptSilentTokenReacquisition(email?: string): Promise<string | null> {
-  const cached = getCachedAccessToken();
-  if (cached) return cached;
-
-  const auth = getFirebaseAuth();
-  const user = auth.currentUser;
-  let uid = user?.uid;
-  if (!uid && typeof window !== 'undefined') {
-    try {
-      const saved = localStorage.getItem(CONNECTED_ACCOUNT_STORAGE_KEY);
-      if (saved) uid = JSON.parse(saved).uid;
-    } catch {}
-  }
-
-  // Try backend token endpoint
-  if (uid) {
-    try {
-      const res = await fetch(`/api/drive/token?uid=${encodeURIComponent(uid)}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.accessToken && data.expiresAt && Date.now() < data.expiresAt) {
-          setCachedAccessToken(data.accessToken, data.expiresAt, user || { uid, email: data.email || email });
-          return data.accessToken;
-        }
-      }
-    } catch {}
-
-    // Try backend silent refresh endpoint if available
-    try {
-      const refreshRes = await fetch('/api/drive/refresh', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid }),
-      });
-      if (refreshRes.ok) {
-        const data = await refreshRes.json();
-        if (data.accessToken && data.expiresAt && Date.now() < data.expiresAt) {
-          setCachedAccessToken(data.accessToken, data.expiresAt, user || { uid, email: data.email || email });
-          return data.accessToken;
-        }
-      }
-    } catch {}
-  }
-
-  // Strictly non-interactive: never launch any popup, modal, or iframe prompt
-  return null;
-}
-
-/**
  * Connect or re-authorize Google Drive using standard popup authorization.
- * Handles both new sign-in and re-acquiring an expired OAuth access token.
+ * Only called on explicit user button click ("Connect Google Drive" or "Reauthorize Google Drive").
  */
 export async function connectGoogleDrive(): Promise<{ user: User; accessToken: string }> {
   const auth = getFirebaseAuth();
@@ -277,16 +215,15 @@ export async function connectGoogleDrive(): Promise<{ user: User; accessToken: s
 
   const expiresAt = Date.now() + 3500 * 1000;
   setCachedAccessToken(accessToken, expiresAt, result.user);
+
   return { user: result.user, accessToken };
 }
 
 /**
- * Disconnect Google Drive and clear all tokens and sessions.
+ * Disconnect Google Drive and clear all tokens and saved account identity.
  */
 export async function disconnectGoogleDrive(): Promise<void> {
   const auth = getFirebaseAuth();
-  const user = auth.currentUser;
-  const uid = user?.uid;
 
   clearCachedAccessToken();
   if (typeof window !== 'undefined') {
@@ -295,15 +232,9 @@ export async function disconnectGoogleDrive(): Promise<void> {
     } catch {}
   }
 
-  if (uid) {
-    fetch('/api/drive/disconnect', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uid }),
-    }).catch(() => {});
-  }
-
-  await firebaseSignOut(auth);
+  try {
+    await firebaseSignOut(auth);
+  } catch {}
 }
 
 export interface CloudConnectionInfo {
@@ -315,8 +246,11 @@ export interface CloudConnectionInfo {
 }
 
 /**
- * Subscribes to truthful Google connection changes, respecting Firebase initialization,
- * backend session verification, and persistent access token caching.
+ * Subscribes to truthful Google connection changes.
+ * - Connected: valid access token available in memory/sessionStorage.
+ * - Authorization Required: account is known, but token is unavailable or expired.
+ * - Not connected: no account linked.
+ * Never initiates interactive popups or prompts.
  */
 export function subscribeToCloudConnection(
   callback: (info: CloudConnectionInfo) => void
@@ -332,19 +266,20 @@ export function subscribeToCloudConnection(
     hasValidToken: false,
   });
 
-  const evaluateConnection = async (user: User | null) => {
+  const evaluateConnection = (user: User | null) => {
     if (!isMounted) return;
 
     let savedAccount: any = null;
-    try {
-      const saved = localStorage.getItem(CONNECTED_ACCOUNT_STORAGE_KEY);
-      if (saved) savedAccount = JSON.parse(saved);
-    } catch {}
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(CONNECTED_ACCOUNT_STORAGE_KEY);
+        if (saved) savedAccount = JSON.parse(saved);
+      } catch {}
+    }
 
     const email = user?.email || savedAccount?.email || null;
-    const uid = user?.uid || savedAccount?.uid || null;
 
-    if (!user && !savedAccount?.uid) {
+    if (!user && !savedAccount?.email) {
       callback({
         state: 'signed_out',
         user: null,
@@ -354,12 +289,7 @@ export function subscribeToCloudConnection(
       return;
     }
 
-    let token = getCachedAccessToken();
-
-    // If not in memory, check backend token or refresh endpoint
-    if (!token && uid) {
-      token = await attemptSilentTokenReacquisition(email || undefined);
-    }
+    const token = getCachedAccessToken();
 
     if (!isMounted) return;
 
@@ -397,38 +327,15 @@ export function subscribeToCloudConnection(
 }
 
 /**
- * Ensures an active access token is available with automatic renewal.
- * Never initiates popups; throws AUTH_REQUIRED if user needs to connect/reauthorize.
+ * Ensures an active access token is available.
+ * Never initiates popups; throws AUTH_REQUIRED if user needs to reauthorize.
  */
 export async function ensureValidAccessToken(): Promise<string> {
-  let token = getCachedAccessToken();
+  const token = getCachedAccessToken();
   if (token) return token;
-
-  const auth = getFirebaseAuth();
-  const user = auth.currentUser;
-  let uid = user?.uid;
-  let email = user?.email || undefined;
-
-  if (!uid && typeof window !== 'undefined') {
-    try {
-      const saved = localStorage.getItem(CONNECTED_ACCOUNT_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        uid = parsed.uid;
-        email = email || parsed.email;
-      }
-    } catch {}
-  }
-
-  // Try silent backend token/refresh retrieval
-  if (uid || email) {
-    token = await attemptSilentTokenReacquisition(email);
-    if (token) return token;
-  }
 
   throw new Error('AUTH_REQUIRED: Google Drive authorization expired or required. Please reconnect in Settings.');
 }
-
 
 /**
  * Uploads a complete encrypted/integrity-checked backup payload to Google Drive's appDataFolder.
@@ -471,7 +378,6 @@ export async function uploadBackupToDrive(
 
   const payloadString = JSON.stringify(backupPayload, null, 2);
 
-  // Construct multipart/related request body for Google Drive v3 upload
   const boundary = '-------AURELIS_BOUNDARY_' + Date.now();
   const delimiter = `\r\n--${boundary}\r\n`;
   const closeDelimiter = `\r\n--${boundary}--`;
@@ -517,7 +423,7 @@ export async function uploadBackupToDrive(
   if (!response.ok) {
     if (response.status === 401) {
       clearCachedAccessToken();
-      throw new Error('AUTH_REQUIRED: Google Drive authorization expired. Please reconnect.');
+      throw new Error('AUTH_REQUIRED: Google Drive authorization expired. Please reconnect in Settings.');
     }
     const errText = await response.text();
     throw new Error(`Google Drive backup upload failed (${response.status}): ${errText}`);
@@ -563,7 +469,7 @@ export async function listBackupsFromDrive(): Promise<CloudBackupSummary[]> {
   if (!response.ok) {
     if (response.status === 401) {
       clearCachedAccessToken();
-      throw new Error('AUTH_REQUIRED: Google Drive authorization expired. Please reconnect.');
+      throw new Error('AUTH_REQUIRED: Google Drive authorization expired. Please reconnect in Settings.');
     }
     const errText = await response.text();
     throw new Error(`Failed to list backups (${response.status}): ${errText}`);
@@ -617,14 +523,13 @@ export async function downloadBackupFromDrive(
   if (!response.ok) {
     if (response.status === 401) {
       clearCachedAccessToken();
-      throw new Error('AUTH_REQUIRED: Google Drive authorization expired. Please reconnect.');
+      throw new Error('AUTH_REQUIRED: Google Drive authorization expired. Please reconnect in Settings.');
     }
     throw new Error(`Failed to download backup file (${response.status})`);
   }
 
   const rawJson = await response.json();
 
-  // Validate format and structure
   if (rawJson.format === 'aurelis_cloud_backup' && rawJson.data) {
     const expectedChecksum = rawJson.checksum;
     const computedChecksum = await calculateSha256(JSON.stringify(rawJson.data));
@@ -637,7 +542,6 @@ export async function downloadBackupFromDrive(
     };
   }
 
-  // Fallback for standard exported JSON or legacy format
   if (rawJson.topics && rawJson.subjects) {
     const fallbackBackup: AurelisCloudBackup = {
       format: 'aurelis_cloud_backup',
@@ -704,7 +608,6 @@ export async function enforceRetentionPolicy(maxBackups: number = 5): Promise<nu
     let deletedCount = 0;
 
     for (const b of toDelete) {
-      // Safety check: ensure at least 1 backup remains in the total pool
       if (backups.length - deletedCount <= 1) break;
 
       try {

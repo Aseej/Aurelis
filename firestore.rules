@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidDriveSession(data, userId) {
+      return data.uid == userId &&
+        data.updatedAt is number &&
+        (!('email' in data) || (data.email is string && data.email.size() <= 256)) &&
+        (!('encryptedAccessToken' in data) || (data.encryptedAccessToken is string && data.encryptedAccessToken.size() <= 4096)) &&
+        (!('encryptedRefreshToken' in data) || (data.encryptedRefreshToken is string && data.encryptedRefreshToken.size() <= 4096)) &&
+        (!('expiresAt' in data) || data.expiresAt is number) &&
+        (!('scope' in data) || (data.scope is string && data.scope.size() <= 512));
+    }
+
+    // Drive sessions: strictly locked to the authenticated user owning the document
+    match /drive_sessions/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false; // Never list drive sessions
+      allow create: if isOwner(userId) && isValidId(userId) && isValidDriveSession(request.resource.data, userId);
+      allow update: if isOwner(userId) && isValidId(userId) && isValidDriveSession(request.resource.data, userId);
+      allow delete: if isOwner(userId) && isValidId(userId);
+    }
+  }
+}
