@@ -10,6 +10,7 @@ import {
   FileText,
   AlertCircle,
   BarChart3,
+  Calculator,
   Settings as SettingsIcon,
   Compass,
   X,
@@ -91,6 +92,21 @@ export const MobileNav: React.FC = () => {
               >
                 <BarChart3 className="h-4 w-4 shrink-0 text-[#60A5FA]" />
                 <span>{t('nav.analytics', 'Analytics')}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveView('tools');
+                  setIsMoreMenuOpen(false);
+                }}
+                className={`flex items-center gap-2.5 rounded-xl p-3 text-left transition-all ${
+                  activeView === 'tools'
+                    ? 'bg-[#E6C27A]/15 text-[#8C6221] dark:text-[#FFE6AD] border border-[#E6C27A]/30 font-semibold'
+                    : 'text-[#20232A] dark:text-[#F6F3EC] hover:bg-black/[0.04] dark:hover:bg-white/[0.06]'
+                }`}
+              >
+                <Calculator className="h-4 w-4 shrink-0 text-[#E6C27A]" />
+                <span>{t('nav.tools', 'Tools')}</span>
               </button>
 
               <button

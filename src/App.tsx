@@ -15,6 +15,7 @@ import { SubjectsView } from './components/subjects/SubjectsView';
 import { WeeklyTestsView } from './components/tests/WeeklyTestsView';
 import { ErrorLogView } from './components/errors/ErrorLogView';
 import { AnalyticsView } from './components/analytics/AnalyticsView';
+import { ToolsView } from './components/tools/ToolsView';
 import { LandingPage } from './components/landing/LandingPage';
 import { AddTopicModal } from './components/topics/AddTopicModal';
 import { ReviewSessionModal } from './components/review/ReviewSessionModal';
@@ -66,6 +67,7 @@ const AppContent: React.FC = () => {
             {activeView === 'tests' && <WeeklyTestsView />}
             {activeView === 'errors' && <ErrorLogView />}
             {activeView === 'analytics' && <AnalyticsView />}
+            {activeView === 'tools' && <ToolsView />}
           </main>
         </div>
       )}

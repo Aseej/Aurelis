@@ -9,6 +9,7 @@ import {
   FileCheck2,
   AlertCircle,
   BarChart3,
+  Calculator,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -39,6 +40,7 @@ export const Sidebar: React.FC = () => {
     { id: 'tests', label: t('nav.tests', 'Weekly Tests'), icon: FileCheck2, badge: testCount > 0 ? testCount : null },
     { id: 'errors', label: t('nav.errors', 'Error Notebook'), icon: AlertCircle },
     { id: 'analytics', label: t('nav.analytics', 'Analytics'), icon: BarChart3 },
+    { id: 'tools', label: t('nav.tools', 'Tools'), icon: Calculator },
     { id: 'landing', label: t('nav.landing', 'Public Overview'), icon: Compass },
   ];
 

@@ -192,5 +192,6 @@ export type ActiveView =
   | 'tests'
   | 'errors'
   | 'analytics'
+  | 'tools'
   | 'settings'
   | 'landing';

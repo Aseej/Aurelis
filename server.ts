@@ -29,6 +29,202 @@ if (apiKey) {
   });
 }
 
+// ==========================================
+// GOOGLE DRIVE API PROXY ROUTES
+// Eliminates browser CORS preflight blocks for file uploads & downloads.
+// Passes client-side Bearer token directly to Google Drive REST API v3.
+// ==========================================
+
+// 1. Google Drive Multipart Upload (images & files)
+app.post('/api/drive/upload', async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Missing Authorization header' });
+  }
+
+  try {
+    const { name, parents, properties, description, mimeType, base64Data, content } = req.body;
+
+    let fileBuffer: Buffer;
+    let fileMime = mimeType || 'application/octet-stream';
+
+    if (base64Data) {
+      fileBuffer = Buffer.from(base64Data, 'base64');
+    } else if (content !== undefined) {
+      fileBuffer = Buffer.from(typeof content === 'string' ? content : JSON.stringify(content), 'utf-8');
+      fileMime = 'application/json; charset=UTF-8';
+    } else {
+      return res.status(400).json({ error: 'Missing base64Data or content' });
+    }
+
+    const boundary = '-------AURELIS_PROXY_' + Date.now();
+    const delimiter = `\r\n--${boundary}\r\n`;
+    const closeDelimiter = `\r\n--${boundary}--`;
+
+    const fileMetadata = {
+      name: name || 'file',
+      parents: parents || ['appDataFolder'],
+      properties: properties || {},
+      description: description || '',
+    };
+
+    const metadataPart = Buffer.from(
+      delimiter +
+        'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+        JSON.stringify(fileMetadata) +
+        delimiter +
+        `Content-Type: ${fileMime}\r\n\r\n`,
+      'utf-8'
+    );
+
+    const endPart = Buffer.from(closeDelimiter, 'utf-8');
+    const multipartBody = Buffer.concat([metadataPart, fileBuffer, endPart]);
+
+    const driveRes = await fetch(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,size,createdTime,modifiedTime,properties,description',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: authHeader,
+          'Content-Type': `multipart/related; boundary=${boundary}`,
+        },
+        body: multipartBody,
+      }
+    );
+
+    const data = await driveRes.json();
+    if (!driveRes.ok) {
+      return res.status(driveRes.status).json(data);
+    }
+
+    return res.status(200).json(data);
+  } catch (err: any) {
+    console.error('Server proxy error uploading to Google Drive:', err);
+    return res.status(500).json({ error: err.message || 'Internal proxy upload error' });
+  }
+});
+
+// 2. Google Drive Patch Existing File (e.g., updating index JSON)
+app.patch('/api/drive/files/:fileId', async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Missing Authorization header' });
+  }
+
+  try {
+    const { fileId } = req.params;
+    const { content, base64Data, mimeType } = req.body;
+
+    let bodyData: any;
+    let contentType = mimeType || 'application/json; charset=UTF-8';
+
+    if (base64Data) {
+      bodyData = Buffer.from(base64Data, 'base64');
+    } else {
+      bodyData = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
+    }
+
+    const driveRes = await fetch(
+      `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: authHeader,
+          'Content-Type': contentType,
+        },
+        body: bodyData,
+      }
+    );
+
+    const data = await driveRes.json();
+    if (!driveRes.ok) {
+      return res.status(driveRes.status).json(data);
+    }
+
+    return res.status(200).json(data);
+  } catch (err: any) {
+    console.error('Server proxy error patching file on Google Drive:', err);
+    return res.status(500).json({ error: err.message || 'Internal proxy patch error' });
+  }
+});
+
+// 3. Google Drive List Files
+app.get('/api/drive/files', async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Missing Authorization header' });
+  }
+
+  try {
+    const params = new URLSearchParams(req.query as Record<string, string>);
+    const driveRes = await fetch(`https://www.googleapis.com/drive/v3/files?${params.toString()}`, {
+      headers: { Authorization: authHeader },
+    });
+
+    const data = await driveRes.json();
+    if (!driveRes.ok) {
+      return res.status(driveRes.status).json(data);
+    }
+
+    return res.status(200).json(data);
+  } catch (err: any) {
+    console.error('Server proxy error listing files from Google Drive:', err);
+    return res.status(500).json({ error: err.message || 'Internal proxy list error' });
+  }
+});
+
+// 4. Google Drive Download File Media (images and JSON)
+app.get('/api/drive/files/:fileId/media', async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Missing Authorization header' });
+  }
+
+  try {
+    const { fileId } = req.params;
+    const driveRes = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+      headers: { Authorization: authHeader },
+    });
+
+    if (!driveRes.ok) {
+      return res.status(driveRes.status).json({ error: `Google Drive returned status ${driveRes.status}` });
+    }
+
+    const contentType = driveRes.headers.get('content-type') || 'application/octet-stream';
+    res.setHeader('Content-Type', contentType);
+    const arrayBuf = await driveRes.arrayBuffer();
+    return res.send(Buffer.from(arrayBuf));
+  } catch (err: any) {
+    console.error('Server proxy error downloading media from Google Drive:', err);
+    return res.status(500).json({ error: err.message || 'Internal proxy download error' });
+  }
+});
+
+// 5. Google Drive Delete File
+app.delete('/api/drive/files/:fileId', async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Missing Authorization header' });
+  }
+
+  try {
+    const { fileId } = req.params;
+    const driveRes = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
+      method: 'DELETE',
+      headers: { Authorization: authHeader },
+    });
+
+    if (!driveRes.ok && driveRes.status !== 404) {
+      return res.status(driveRes.status).json({ error: `Delete failed with status ${driveRes.status}` });
+    }
+
+    return res.status(204).send();
+  } catch (err: any) {
+    console.error('Server proxy error deleting file from Google Drive:', err);
+    return res.status(500).json({ error: err.message || 'Internal proxy delete error' });
+  }
+});
+
 // 1. AI Practice Questions Endpoint
 app.post('/api/ai/practice-questions', async (req: Request, res: Response) => {
   try {

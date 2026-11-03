@@ -14,6 +14,7 @@ export const en: TranslationMap = {
   'nav.tests': 'Weekly Tests',
   'nav.errors': 'Error Notebook',
   'nav.analytics': 'Analytics',
+  'nav.tools': 'Tools',
   'nav.landing': 'Public Overview',
   'nav.settings': 'Settings & Backup',
   'nav.addTopic': 'Add Topic',

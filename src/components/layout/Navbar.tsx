@@ -133,6 +133,16 @@ export const Navbar: React.FC = () => {
           >
             {t('nav.analytics', 'Analytics')}
           </button>
+          <button
+            onClick={() => setActiveView('tools')}
+            className={`transition-colors hover:text-[#20232A] dark:hover:text-[#F6F3EC] ${
+              activeView === 'tools'
+                ? 'text-[#20232A] font-semibold border-b-2 border-[#A97B32] pb-0.5 dark:text-[#F6F3EC] dark:border-[#E6C27A]'
+                : ''
+            }`}
+          >
+            {t('nav.tools', 'Tools')}
+          </button>
         </nav>
 
         {/* Zone 3: 1-2 primary actions */}
