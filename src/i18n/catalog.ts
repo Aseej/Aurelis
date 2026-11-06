@@ -31,6 +31,15 @@ export const LANGUAGE_CATALOG: LanguageCatalogItem[] = [
     script: 'Devanagari',
   },
   {
+    code: 'mai',
+    name: 'Maithili',
+    nativeName: 'मैथिली',
+    dir: 'ltr',
+    status: 'fully_supported',
+    script: 'Devanagari',
+    region: 'Bihar & Terai of Nepal',
+  },
+  {
     code: 'zh-Hans',
     name: 'Chinese, Simplified',
     nativeName: '简体中文',

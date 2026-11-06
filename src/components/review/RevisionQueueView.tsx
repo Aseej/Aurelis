@@ -5,7 +5,9 @@ import {
   getTodayDateString,
   getDueReasonExplanation,
   differenceInCalendarDays,
+  getTranslatedStageName,
 } from '../../utils/scheduler';
+import { getTranslatedMastery } from '../../utils/mastery';
 import {
   Play,
   Check,
@@ -479,7 +481,7 @@ export const RevisionQueueView: React.FC = () => {
                       {topic.title}
                     </h3>
                     <span className="shrink-0 text-xs font-mono font-medium text-[#A97B32] dark:text-[#E6C27A]">
-                      {item.stageName} ({t('queue.stageBadge', 'Step')} {item.stepIndex + 1}/7)
+                      {getTranslatedStageName(item.stageName, t)} ({t('queue.stageBadge', 'Step')} {item.stepIndex + 1}/7)
                     </span>
                   </div>
 
@@ -492,9 +494,9 @@ export const RevisionQueueView: React.FC = () => {
                 {/* 7-Stage Visual Timeline Stepper */}
                 <div className="mt-4 pt-3 border-t border-black/[0.05] dark:border-white/[0.05]">
                   <div className="flex items-center justify-between text-[10px] font-mono text-[#858A93] dark:text-[#777F8C] mb-1.5">
-                    <span className="uppercase tracking-wider">7-Stage Spaced Curve</span>
+                    <span className="uppercase tracking-wider">{t('queue.sevenStageSpacedCurve', '7-Stage Spaced Curve')}</span>
                     <span>
-                      {topic.schedule.filter((s) => s.status === 'completed').length} of 7 steps mastered
+                      {t('queue.stepsMastered', '{completed} of {total} steps mastered', { completed: topic.schedule.filter((s) => s.status === 'completed').length, total: 7 })}
                     </span>
                   </div>
 
@@ -548,7 +550,7 @@ export const RevisionQueueView: React.FC = () => {
                       className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC] transition-colors"
                     >
                       <BookOpen className="h-3 w-3" />
-                      <span>{isNotesOpen ? 'Hide Concept Notes' : 'View Concept Notes'}</span>
+                      <span>{isNotesOpen ? t('queue.hideNotes', 'Hide Concept Notes') : t('queue.viewNotes', 'View Concept Notes')}</span>
                       {isNotesOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                     </button>
                     {isNotesOpen && (
@@ -574,7 +576,7 @@ export const RevisionQueueView: React.FC = () => {
                       <>
                         <span aria-hidden="true">·</span>
                         <span className="capitalize text-[11px] font-medium text-[#A97B32] dark:text-[#E6C27A]">
-                          {topic.mastery}
+                          {getTranslatedMastery(topic.mastery, t)}
                         </span>
                       </>
                     )}

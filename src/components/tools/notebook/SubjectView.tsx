@@ -15,6 +15,7 @@ import {
   ArrowRight,
   BookOpen,
 } from 'lucide-react';
+import { useI18n } from '../../../i18n';
 
 interface SubjectViewProps {
   subject: NotebookSubject;
@@ -39,6 +40,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
   onRenameTopic,
   onDeleteTopic,
 }) => {
+  const { t } = useI18n();
   // Add Topic Modal
   const [isAddTopicOpen, setIsAddTopicOpen] = useState(false);
   const [newTopicName, setNewTopicName] = useState('');
@@ -151,7 +153,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
           className="self-start sm:self-auto flex items-center gap-1.5 px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold rounded-xl shadow-xs transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>New Topic</span>
+          <span>{t('notebook.newTopic', 'New Topic')}</span>
         </button>
       </div>
 
@@ -163,7 +165,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
           </div>
           <div>
             <h3 className="font-serif font-bold text-base text-[#20232A] dark:text-[#F6F3EC]">
-              No Topics in {subject.name}
+              {t('notebook.noTopics', 'No Topics')}
             </h3>
             <p className="text-xs text-[#858A93] dark:text-[#A0A5B0] mt-1">
               Add your first topic to organize your handwritten pages (e.g. &ldquo;Rotational Motion&rdquo; or &ldquo;Chemical Bonding&rdquo;).
@@ -174,7 +176,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
             className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold rounded-xl inline-flex items-center gap-1.5 transition-colors shadow-xs"
           >
             <Plus className="w-4 h-4" />
-            <span>Create Topic</span>
+            <span>{t('notebook.createTopic', 'Create Topic')}</span>
           </button>
         </div>
       ) : (
@@ -295,7 +297,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
                 className="text-xs text-rose-500 hover:text-rose-400 font-semibold flex items-center gap-1"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>Delete Subject</span>
+                <span>{t('notebook.deleteSubject', 'Delete Subject')}</span>
               </button>
 
               <div className="flex gap-2">
@@ -304,7 +306,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
                   onClick={() => setIsEditSubjectOpen(false)}
                   className="px-3 py-1.5 text-xs text-[#858A93] hover:text-[#20232A] dark:hover:text-[#F6F3EC]"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
                 <button
                   type="button"
@@ -312,7 +314,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
                   onClick={handleSaveSubjectRename}
                   className="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold rounded-xl transition-colors disabled:opacity-40"
                 >
-                  Save
+                  {t('common.save', 'Save')}
                 </button>
               </div>
             </div>
@@ -326,13 +328,13 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
           <div className="w-full max-w-sm rounded-3xl bg-slate-900 border border-slate-800 p-5 shadow-2xl space-y-4 text-slate-100">
             <div className="flex items-center gap-2.5 text-rose-400">
               <AlertTriangle className="w-5 h-5 shrink-0" />
-              <h3 className="font-semibold text-sm">Delete Subject & All Notes?</h3>
+              <h3 className="font-semibold text-sm">{t('notebook.deleteSubjectTitle', 'Delete Subject & All Notes?')}</h3>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
               Deleting <strong className="text-white">&ldquo;{subject.name}&rdquo;</strong> will permanently remove it along with its <strong className="text-amber-400">{subjectTopics.length} topics</strong> and all <strong className="text-amber-400">{subjectPages.length} captured notebook pages</strong> from your Google Drive.
             </p>
             <p className="text-[11px] text-slate-400">
-              This action cannot be undone.
+              {t('notebook.cannotUndo', 'This action cannot be undone.')}
             </p>
             <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
               <button
@@ -341,7 +343,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
                 onClick={() => setIsConfirmDeleteSubjectOpen(false)}
                 className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </button>
               <button
                 type="button"
@@ -350,7 +352,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
                 className="px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors disabled:opacity-40"
               >
                 {isProcessing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                <span>Delete Subject</span>
+                <span>{t('notebook.deleteSubject', 'Delete Subject')}</span>
               </button>
             </div>
           </div>
@@ -362,12 +364,12 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
           <div className="w-full max-w-sm rounded-3xl glass-premium border border-black/[0.08] dark:border-white/[0.12] p-5 shadow-2xl space-y-4">
             <h3 className="font-serif font-bold text-base text-[#20232A] dark:text-[#F6F3EC]">
-              Edit Topic
+              {t('notebook.editTopic', 'Edit Topic')}
             </h3>
 
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-[#858A93] dark:text-[#A0A5B0]">
-                Topic Name
+                {t('notebook.topicName', 'Topic Name')}
               </label>
               <input
                 type="text"
@@ -384,7 +386,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
                 className="text-xs text-rose-500 hover:text-rose-400 font-semibold flex items-center gap-1"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>Delete Topic</span>
+                <span>{t('notebook.deleteTopic', 'Delete Topic')}</span>
               </button>
 
               <div className="flex gap-2">
@@ -393,7 +395,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
                   onClick={() => setEditingTopic(null)}
                   className="px-3 py-1.5 text-xs text-[#858A93] hover:text-[#20232A] dark:hover:text-[#F6F3EC]"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
                 <button
                   type="button"
@@ -401,7 +403,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
                   onClick={handleSaveTopicRename}
                   className="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold rounded-xl transition-colors disabled:opacity-40"
                 >
-                  Save
+                  {t('common.save', 'Save')}
                 </button>
               </div>
             </div>
@@ -415,7 +417,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
           <div className="w-full max-w-sm rounded-3xl bg-slate-900 border border-slate-800 p-5 shadow-2xl space-y-4 text-slate-100">
             <div className="flex items-center gap-2.5 text-rose-400">
               <AlertTriangle className="w-5 h-5 shrink-0" />
-              <h3 className="font-semibold text-sm">Delete Topic?</h3>
+              <h3 className="font-semibold text-sm">{t('notebook.deleteTopicTitle', 'Delete Topic?')}</h3>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
               Deleting <strong className="text-white">&ldquo;{editingTopic.name}&rdquo;</strong> will permanently remove it and all of its captured pages from your Google Drive.
@@ -427,7 +429,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
                 onClick={() => setIsConfirmDeleteTopicOpen(false)}
                 className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </button>
               <button
                 type="button"
@@ -436,7 +438,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
                 className="px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors disabled:opacity-40"
               >
                 {isProcessing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                <span>Delete Topic</span>
+                <span>{t('notebook.deleteTopic', 'Delete Topic')}</span>
               </button>
             </div>
           </div>

@@ -630,17 +630,32 @@ export function evaluateComplexExpression(exprStr: string, context: EvalContext)
 // 4. BASE-N CONVERSIONS & BITWISE LOGIC
 // ==========================================
 
-export function convertBase(valueStr: string, fromRadix: number, toRadix: number): string {
+export function convertBase(
+  valueStr: string,
+  fromRadix: number | 'DEC' | 'HEX' | 'BIN' | 'OCT',
+  toRadix: number | 'DEC' | 'HEX' | 'BIN' | 'OCT'
+): string {
+  const resolveRadix = (r: number | string): number => {
+    if (typeof r === 'number') return r;
+    if (r === 'HEX') return 16;
+    if (r === 'BIN') return 2;
+    if (r === 'OCT') return 8;
+    return 10;
+  };
+
+  const fRadix = resolveRadix(fromRadix);
+  const tRadix = resolveRadix(toRadix);
+
   const clean = valueStr.trim().replace(/\s+/g, '');
   if (!clean) return '0';
-  const parsed = parseInt(clean, fromRadix);
+  const parsed = parseInt(clean, fRadix);
   if (isNaN(parsed)) throw new Error('Syntax ERROR: Invalid Base-N digit');
   // 32-bit signed wrap
   const int32 = parsed | 0;
-  if (toRadix === 10) return int32.toString(10);
+  if (tRadix === 10) return int32.toString(10);
   // Unsigned presentation for hex, bin, oct
   const uint32 = int32 >>> 0;
-  return uint32.toString(toRadix).toUpperCase();
+  return uint32.toString(tRadix).toUpperCase();
 }
 
 export function baseNBitwiseOp(a: number, b: number, op: 'AND' | 'OR' | 'XOR' | 'XNOR'): number {

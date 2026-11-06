@@ -576,9 +576,9 @@ export const LandingPage: React.FC = () => {
                 </div>
                 {[
                   { name: t('landing.preview.sampleSubject', 'Physics'), color: '#38bdf8', count: 24, mastery: '78%' },
-                  { name: 'Chemistry', color: '#f43f5e', count: 18, mastery: '82%' },
-                  { name: 'Mathematics', color: '#eab308', count: 20, mastery: '75%' },
-                  { name: 'Biology', color: '#10b981', count: 16, mastery: '88%' },
+                  { name: t('landing.preview.sampleSubjectChem', 'Chemistry'), color: '#f43f5e', count: 18, mastery: '82%' },
+                  { name: t('landing.preview.sampleSubjectMath', 'Mathematics'), color: '#eab308', count: 20, mastery: '75%' },
+                  { name: t('landing.preview.sampleSubjectBio', 'Biology'), color: '#10b981', count: 16, mastery: '88%' },
                 ].map((s) => (
                   <div
                     key={s.name}

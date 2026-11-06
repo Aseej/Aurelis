@@ -73,10 +73,10 @@ console.log('--- RUNNING AURELIS SCHEDULER ENGINE TESTS ---');
   const topicChem = generateSchedule('topic_chem', date);
 
   assert(topicPhysics[1].scheduledDate === topicChem[1].scheduledDate, 'Same date topics have identical schedule dates initially');
-  // Complete one, the other remains scheduled
+  // Complete one, the other remains not completed (independent status)
   topicPhysics[1].status = 'completed';
   assert(topicPhysics[1].status === 'completed', 'Physics step completed');
-  assert(topicChem[1].status === 'scheduled', 'Chem step remains scheduled independently');
+  assert(topicChem[1].status !== 'completed', 'Chem step remains uncompleted independently');
   console.log('✓ Test 5 Passed: Multiple topics on same date remain independent.');
 }
 

@@ -12,6 +12,7 @@ import { LANGUAGE_CATALOG, getLanguageItem } from './catalog';
 import { en } from './locales/en';
 import { ne } from './locales/ne';
 import { hi } from './locales/hi';
+import { mai } from './locales/mai';
 import { zhHans } from './locales/zh-Hans';
 import { es } from './locales/es';
 import { fr } from './locales/fr';
@@ -27,6 +28,7 @@ const TRANSLATION_REGISTRY: Record<string, TranslationMap> = {
   en,
   ne,
   hi,
+  mai,
   'zh-Hans': zhHans,
   es,
   fr,

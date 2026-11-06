@@ -13,6 +13,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { NotebookPage, getNotebookPageImageUrl } from '../../../services/captureNotebookService';
+import { useI18n } from '../../../i18n';
 
 interface NotebookReaderModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ export const NotebookReaderModal: React.FC<NotebookReaderModalProps> = ({
   initialPageIndex,
   topicName,
 }) => {
+  const { t } = useI18n();
   const [currentIndex, setCurrentIndex] = useState<number>(initialPageIndex);
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [panOffset, setPanOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -215,7 +217,7 @@ export const NotebookReaderModal: React.FC<NotebookReaderModalProps> = ({
           <button
             onClick={onClose}
             className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 transition-colors"
-            title="Return to notebook collection (Esc)"
+            title={t('notebook.returnToCollection', 'Return to notebook collection (Esc)')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -224,7 +226,7 @@ export const NotebookReaderModal: React.FC<NotebookReaderModalProps> = ({
               {topicName}
             </h3>
             <span className="text-[11px] font-mono text-amber-400">
-              Page {currentIndex + 1} of {pages.length}
+              {t('notebook.pageOfPages', 'Page {current} of {total}', { current: currentIndex + 1, total: pages.length })}
             </span>
           </div>
         </div>
@@ -234,7 +236,7 @@ export const NotebookReaderModal: React.FC<NotebookReaderModalProps> = ({
           <button
             onClick={() => setZoomLevel((z) => Math.max(0.5, z - 0.25))}
             className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition-colors"
-            title="Zoom Out (-)"
+            title={t('notebook.zoomOut', 'Zoom Out (-)')}
           >
             <ZoomOut className="w-4 h-4" />
           </button>
@@ -244,7 +246,7 @@ export const NotebookReaderModal: React.FC<NotebookReaderModalProps> = ({
           <button
             onClick={() => setZoomLevel((z) => Math.min(4, z + 0.25))}
             className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition-colors"
-            title="Zoom In (+)"
+            title={t('notebook.zoomIn', 'Zoom In (+)')}
           >
             <ZoomIn className="w-4 h-4" />
           </button>
@@ -254,7 +256,7 @@ export const NotebookReaderModal: React.FC<NotebookReaderModalProps> = ({
               setPanOffset({ x: 0, y: 0 });
             }}
             className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition-colors"
-            title="Reset Zoom (0)"
+            title={t('notebook.resetZoom', 'Reset Zoom (0)')}
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -277,7 +279,7 @@ export const NotebookReaderModal: React.FC<NotebookReaderModalProps> = ({
         {isLoadingImage ? (
           <div className="flex flex-col items-center gap-2 text-slate-400">
             <RefreshCw className="w-8 h-8 animate-spin text-amber-400" />
-            <span className="text-xs font-mono">Loading page from your Google Drive...</span>
+            <span className="text-xs font-mono">{t('notebook.loadingPageFromDrive', 'Loading page from your Google Drive...')}</span>
           </div>
         ) : loadError ? (
           <div className="p-6 rounded-2xl bg-rose-950/40 border border-rose-800 text-center max-w-sm space-y-2">

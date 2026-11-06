@@ -5,6 +5,7 @@ import {
   formatResultNicely,
 } from '../../../utils/calculator/mathEngine';
 import { Table, Play, Copy, Check, Info } from 'lucide-react';
+import { useI18n } from '../../../i18n';
 
 interface TableGeneratorViewProps {
   angleMode: AngleMode;
@@ -15,6 +16,7 @@ export const TableGeneratorView: React.FC<TableGeneratorViewProps> = ({
   angleMode,
   onClose,
 }) => {
+  const { t } = useI18n();
   const [funcExpr, setFuncExpr] = useState<string>('X^2 - 4*X + 3');
   const [startVal, setStartVal] = useState<string>('0');
   const [endVal, setEndVal] = useState<string>('5');
@@ -71,14 +73,14 @@ export const TableGeneratorView: React.FC<TableGeneratorViewProps> = ({
         <div className="flex items-center gap-2">
           <Table className="w-5 h-5 text-amber-400" />
           <h3 className="font-semibold text-base sm:text-lg">
-            Function Table Generator (MODE 8: TABLE)
+            {t('calc.tableTitle', 'Function Table Generator (MODE 8: TABLE)')}
           </h3>
         </div>
         <button
           onClick={onClose}
           className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded transition-colors"
         >
-          Exit to COMP
+          {t('calc.exitToComp', 'Exit to COMP')}
         </button>
       </div>
 
@@ -89,7 +91,7 @@ export const TableGeneratorView: React.FC<TableGeneratorViewProps> = ({
             f(X) =
           </label>
           <span className="text-[11px] text-slate-500 font-mono">
-            Use &quot;X&quot; as independent variable
+            {t('calc.useXVar', 'Use "X" as independent variable')}
           </span>
         </div>
         <div className="relative">
@@ -104,7 +106,7 @@ export const TableGeneratorView: React.FC<TableGeneratorViewProps> = ({
 
         {/* Quick Presets */}
         <div className="flex flex-wrap gap-1.5 pt-1">
-          <span className="text-[10px] text-slate-500 self-center">Presets:</span>
+          <span className="text-[10px] text-slate-500 self-center">{t('calc.presets', 'Presets:')}</span>
           {[
             'X^2 - 4*X + 3',
             '2*X + 1',
@@ -128,7 +130,7 @@ export const TableGeneratorView: React.FC<TableGeneratorViewProps> = ({
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
           <label className="text-[10px] font-mono text-slate-400 block mb-1">
-            Start?
+            {t('calc.startPrompt', 'Start?')}
           </label>
           <input
             type="number"
@@ -141,7 +143,7 @@ export const TableGeneratorView: React.FC<TableGeneratorViewProps> = ({
 
         <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
           <label className="text-[10px] font-mono text-slate-400 block mb-1">
-            End?
+            {t('calc.endPrompt', 'End?')}
           </label>
           <input
             type="number"
@@ -154,7 +156,7 @@ export const TableGeneratorView: React.FC<TableGeneratorViewProps> = ({
 
         <div className="bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
           <label className="text-[10px] font-mono text-slate-400 block mb-1">
-            Step?
+            {t('calc.stepPrompt', 'Step?')}
           </label>
           <input
             type="number"
@@ -173,7 +175,7 @@ export const TableGeneratorView: React.FC<TableGeneratorViewProps> = ({
         className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-lg shadow-md flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
       >
         <Play className="w-4 h-4 fill-current" />
-        <span>Generate Table</span>
+        <span>{t('calc.generateTable', 'Generate Table')}</span>
       </button>
 
       {/* Error Output */}
@@ -189,14 +191,14 @@ export const TableGeneratorView: React.FC<TableGeneratorViewProps> = ({
           <div className="flex items-center justify-between border-b border-slate-800 pb-2">
             <div className="text-xs font-mono text-amber-400">
               <span className="font-bold">f(X) = {funcExpr}</span>
-              <span className="text-slate-500 ml-2">({tableRows.length} values)</span>
+              <span className="text-slate-500 ml-2">{t('calc.valuesCount', '({count} values)', { count: tableRows.length })}</span>
             </div>
             <button
               onClick={copyTable}
               className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-amber-300 transition-colors"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied' : 'Copy'}</span>
+              <span>{copied ? t('common.copied', 'Copied') : t('common.copy', 'Copy')}</span>
             </button>
           </div>
 

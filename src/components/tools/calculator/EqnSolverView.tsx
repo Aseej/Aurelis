@@ -8,12 +8,14 @@ import {
   EqnSolution,
 } from '../../../utils/calculator/mathEngine';
 import { ArrowLeft, Play, RefreshCw } from 'lucide-react';
+import { useI18n } from '../../../i18n';
 
 interface EqnSolverViewProps {
   onBackToComp: () => void;
 }
 
 export const EqnSolverView: React.FC<EqnSolverViewProps> = ({ onBackToComp }) => {
+  const { t } = useI18n();
   const [eqnType, setEqnType] = useState<EqnType | null>(null);
 
   // Simultaneous 2-variable inputs: a1, b1, c1, a2, b2, c2
@@ -82,7 +84,7 @@ export const EqnSolverView: React.FC<EqnSolverViewProps> = ({ onBackToComp }) =>
             EQN MODE
           </span>
           <span className="text-xs text-[#858A93] dark:text-[#777F8C]">
-            {eqnType ? eqnType : 'Choose Equation Type'}
+            {eqnType ? eqnType : t('calc.chooseEqnType', 'Choose Equation Type')}
           </span>
         </div>
 
@@ -91,7 +93,7 @@ export const EqnSolverView: React.FC<EqnSolverViewProps> = ({ onBackToComp }) =>
           className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium text-[#686D77] dark:text-[#A7ABB5] hover:text-[#20232A] dark:hover:text-[#F6F3EC] hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          <span>Exit to COMP</span>
+          <span>{t('calc.exitToComp', 'Exit to COMP')}</span>
         </button>
       </div>
 
@@ -99,14 +101,14 @@ export const EqnSolverView: React.FC<EqnSolverViewProps> = ({ onBackToComp }) =>
         /* Equation Type Selection (fx-991ES standard 4 options) */
         <div className="space-y-2">
           <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-            Select Form:
+            {t('calc.selectForm', 'Select Form:')}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {[
-              { type: 'SIMUL_2', num: '1', label: 'anX + bnY = cn', desc: 'Simultaneous linear, 2 unknowns' },
-              { type: 'SIMUL_3', num: '2', label: 'anX + bnY + cnZ = dn', desc: 'Simultaneous linear, 3 unknowns' },
-              { type: 'POLY_2', num: '3', label: 'aX² + bX + c = 0', desc: 'Polynomial degree 2 (Quadratic)' },
-              { type: 'POLY_3', num: '4', label: 'aX³ + bX² + cX + d = 0', desc: 'Polynomial degree 3 (Cubic)' },
+              { type: 'SIMUL_2', num: '1', label: 'anX + bnY = cn', desc: t('calc.simul2Desc', 'Simultaneous linear, 2 unknowns') },
+              { type: 'SIMUL_3', num: '2', label: 'anX + bnY + cnZ = dn', desc: t('calc.simul3Desc', 'Simultaneous linear, 3 unknowns') },
+              { type: 'POLY_2', num: '3', label: 'aX² + bX + c = 0', desc: t('calc.poly2Desc', 'Polynomial degree 2 (Quadratic)') },
+              { type: 'POLY_3', num: '4', label: 'aX³ + bX² + cX + d = 0', desc: t('calc.poly3Desc', 'Polynomial degree 3 (Cubic)') },
             ].map((item) => (
               <button
                 key={item.type}
@@ -137,7 +139,7 @@ export const EqnSolverView: React.FC<EqnSolverViewProps> = ({ onBackToComp }) =>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-              Enter Coefficients:
+              {t('calc.enterCoeffs', 'Enter Coefficients:')}
             </span>
             <button
               onClick={() => {
@@ -146,7 +148,7 @@ export const EqnSolverView: React.FC<EqnSolverViewProps> = ({ onBackToComp }) =>
               }}
               className="text-[11px] text-[#A97B32] dark:text-[#E6C27A] hover:underline"
             >
-              Change Equation Type
+              {t('calc.changeEqnType', 'Change Equation Type')}
             </button>
           </div>
 
@@ -309,7 +311,7 @@ export const EqnSolverView: React.FC<EqnSolverViewProps> = ({ onBackToComp }) =>
             className="w-full btn-gold-primary py-2.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition"
           >
             <Play className="h-3.5 w-3.5 fill-current" />
-            <span>SOLVE EQUATION</span>
+            <span>{t('calc.solveEqn', 'SOLVE EQUATION')}</span>
           </button>
 
           {/* Results Output */}
@@ -322,7 +324,7 @@ export const EqnSolverView: React.FC<EqnSolverViewProps> = ({ onBackToComp }) =>
           {solution && (
             <div className="p-4 rounded-2xl bg-[#BACBB0] dark:bg-[#8F9E82] text-[#1E2718] dark:text-[#182213] border-2 border-[#6E7B64] font-mono shadow-inner space-y-2">
               <div className="text-[10px] uppercase font-bold tracking-wider text-[#4E5B44] border-b border-[#5B6651]/30 pb-1">
-                Solutions:
+                {t('calc.solutions', 'Solutions:')}
               </div>
               <div className="space-y-1.5">
                 {solution.results.map((res, i) => (

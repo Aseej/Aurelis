@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Topic } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../i18n';
-import { formatDisplayDate } from '../../utils/scheduler';
-import { getMasteryBadgeClass } from '../../utils/mastery';
+import { formatDisplayDate, getTranslatedStageName } from '../../utils/scheduler';
+import { getMasteryBadgeClass, getTranslatedMastery } from '../../utils/mastery';
 import { X, Calendar, Clock, Edit2, Trash2, Check, AlertCircle } from 'lucide-react';
 
 interface TopicDetailModalProps {
@@ -220,7 +220,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
                     {topic.title}
                   </h3>
                   <span className={`text-xs font-mono px-2 py-0.5 rounded-md border ${badgeClass}`}>
-                    {topic.mastery.toUpperCase()} ({topic.masteryScore}%)
+                    {getTranslatedMastery(topic.mastery, t).toUpperCase()} ({topic.masteryScore}%)
                   </span>
                 </div>
 
@@ -229,7 +229,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
                   <span aria-hidden="true">·</span>
                   <span>~{topic.estimatedDurationMinutes} min</span>
                   <span aria-hidden="true">·</span>
-                  <span className="capitalize">{topic.difficulty}</span>
+                  <span className="capitalize">{t(`common.diff${topic.difficulty.charAt(0).toUpperCase() + topic.difficulty.slice(1)}`, topic.difficulty)}</span>
                 </div>
               </div>
 
@@ -255,7 +255,7 @@ export const TopicDetailModal: React.FC<TopicDetailModalProps> = ({ topic, onClo
                           </span>
                           <div>
                             <div className="font-medium text-[#20232A] dark:text-[#F6F3EC]">
-                              {item.stageName}
+                              {getTranslatedStageName(item.stageName, t)}
                             </div>
                             <div className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
                               {formatDisplayDate(item.scheduledDate, false)}

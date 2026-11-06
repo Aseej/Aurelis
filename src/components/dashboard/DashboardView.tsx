@@ -4,8 +4,9 @@ import { useI18n } from '../../i18n';
 import {
   getTodayDateString,
   getDueReasonExplanation,
+  getTranslatedStageName,
 } from '../../utils/scheduler';
-import { getMasteryBadgeClass } from '../../utils/mastery';
+import { getMasteryBadgeClass, getTranslatedMastery } from '../../utils/mastery';
 import { StreakCard } from './StreakCard';
 import {
   Play,
@@ -217,7 +218,7 @@ export const DashboardView: React.FC = () => {
                 </span>
                 <span aria-hidden="true">·</span>
                 <span className="font-mono text-[#858A93] dark:text-[#777F8C]">
-                  {nextFeaturedReview.item.stageName} ({t('dashboard.stepOf', 'Step {current} of {total}', { current: nextFeaturedReview.item.stepIndex + 1, total: 7 })})
+                  {getTranslatedStageName(nextFeaturedReview.item.stageName, t)} ({t('dashboard.stepOf', 'Step {current} of {total}', { current: nextFeaturedReview.item.stepIndex + 1, total: 7 })})
                 </span>
               </div>
 
@@ -339,7 +340,7 @@ export const DashboardView: React.FC = () => {
                     <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
                       <div className="text-right hidden sm:block">
                         <div className="text-xs font-medium text-[#20232A] dark:text-[#F6F3EC]">
-                          {item.stageName}
+                          {getTranslatedStageName(item.stageName, t)}
                         </div>
                         <div className="text-[11px] text-[#858A93] dark:text-[#777F8C] font-mono">
                           {t('dashboard.stepOf', 'Step {current} of {total}', { current: item.stepIndex + 1, total: 7 })}
@@ -419,7 +420,7 @@ export const DashboardView: React.FC = () => {
                       {subj?.name}
                     </span>
                     <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md border ${badgeClass}`}>
-                      {topic.mastery.toUpperCase()}
+                      {getTranslatedMastery(topic.mastery, t).toUpperCase()}
                     </span>
                   </div>
                   <h4 className="text-sm font-semibold text-[#20232A] dark:text-[#F6F3EC] truncate group-hover:text-[#A97B32] dark:group-hover:text-[#E6C27A]">
@@ -458,7 +459,7 @@ export const DashboardView: React.FC = () => {
                   <span className="font-medium text-[#20232A] dark:text-[#F6F3EC] truncate">
                     {topic.title}
                   </span>
-                  <span className="text-[#858A93] dark:text-[#777F8C] ml-2">· {item.stageName}</span>
+                  <span className="text-[#858A93] dark:text-[#777F8C] ml-2">· {getTranslatedStageName(item.stageName, t)}</span>
                 </div>
                 <div className="text-[#858A93] dark:text-[#777F8C] font-mono text-[11px] shrink-0">
                   {t('dashboard.recallScore', 'Recall: {score}', { score: item.confidenceRating || t('common.completed', 'Completed') })}

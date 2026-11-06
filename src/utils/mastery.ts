@@ -126,3 +126,25 @@ export function getMasteryBadgeClass(level: MasteryLevel): string {
       return 'text-neutral-400 bg-neutral-400/10 border-neutral-400/20';
   }
 }
+
+export function getTranslatedMastery(
+  mastery: string,
+  t?: (key: string, fallback?: string) => string
+): string {
+  if (!t) return mastery;
+  switch (mastery.toLowerCase()) {
+    case 'mastered':
+      return t('status.mastered', 'Mastered');
+    case 'strong':
+      return t('status.strong', 'Strong');
+    case 'developing':
+      return t('status.developing', 'Developing');
+    case 'learning':
+      return t('status.learning', 'Learning');
+    case 'new':
+      return t('status.new', 'New');
+    default:
+      return mastery;
+  }
+}
+

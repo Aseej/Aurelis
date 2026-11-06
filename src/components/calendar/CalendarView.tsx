@@ -6,6 +6,7 @@ import {
   formatDate,
   getTodayDateString,
   formatDisplayDate,
+  getTranslatedStageName,
 } from '../../utils/scheduler';
 import {
   ChevronLeft,
@@ -366,7 +367,7 @@ export const CalendarView: React.FC = () => {
                   >
                     <div className="flex items-center justify-between text-[11px] text-[#858A93] dark:text-[#777F8C]">
                       <span className="font-medium text-[#686D77] dark:text-[#A7ABB5]">
-                        {step.stageName} ({t('dashboard.stepOf', 'Step {current} of {total}', { current: step.stepIndex + 1, total: 7 })})
+                        {getTranslatedStageName(step.stageName, t)} ({t('dashboard.stepOf', 'Step {current} of {total}', { current: step.stepIndex + 1, total: 7 })})
                       </span>
                       <span className="font-mono">~{topic.estimatedDurationMinutes}m</span>
                     </div>
@@ -390,7 +391,7 @@ export const CalendarView: React.FC = () => {
                         </button>
                       ) : (
                         <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-                          {t('common.done', 'Done')} ({step.confidenceRating || 'Logged'})
+                          {t('common.done', 'Done')} ({step.confidenceRating ? t('session.' + step.confidenceRating, step.confidenceRating) : t('common.logged', 'Logged')})
                         </span>
                       )}
                     </div>

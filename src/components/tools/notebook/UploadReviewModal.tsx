@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Cloud, X, ArrowUpRight, Check, AlertCircle, RefreshCw, Trash2, ArrowUp, ArrowDown, LogIn } from 'lucide-react';
 import { uploadNotebookImageFile } from '../../../services/captureNotebookService';
 import { connectGoogleDrive } from '../../../services/googleDriveService';
+import { useI18n } from '../../../i18n';
 
 interface UploadReviewModalProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
   startingPageNumber,
   onUploadSuccess,
 }) => {
+  const { t } = useI18n();
   const [files, setFiles] = useState<File[]>(initialFiles);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [currentUploadIndex, setCurrentUploadIndex] = useState<number>(0);
@@ -270,7 +272,7 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
                 onClick={onClose}
                 className="px-3.5 py-2 text-xs text-slate-400 hover:text-slate-200 transition-colors"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </button>
             )}
 
@@ -283,12 +285,12 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
               {isUploading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Saving to Drive...</span>
+                  <span>{t('notebook.uploading', 'Saving to Drive...')}</span>
                 </>
               ) : (
                 <>
                   <Cloud className="w-4 h-4" />
-                  <span>Save {files.length} Pages to Drive</span>
+                  <span>{t('notebook.startUpload', 'Save to Drive')}</span>
                 </>
               )}
             </button>

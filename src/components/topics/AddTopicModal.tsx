@@ -7,6 +7,7 @@ import {
   DEFAULT_REVISION_INTERVALS,
   STAGE_NAMES,
   formatDisplayDate,
+  getTranslatedStageName,
 } from '../../utils/scheduler';
 import { X, Calendar, Clock, BookOpen, Layers, Check, Plus } from 'lucide-react';
 
@@ -315,7 +316,7 @@ export const AddTopicModal: React.FC = () => {
           <div className="rounded-2xl glass-subtle p-4 space-y-2">
             <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
               <span>{t('landing.methodTitle', 'Automatic Spaced Repetition Timeline')}</span>
-              <span className="text-[11px] font-mono text-[#A97B32] dark:text-[#E6C27A]">7 Milestones</span>
+              <span className="text-[11px] font-mono text-[#A97B32] dark:text-[#E6C27A]">{t('addTopicModal.milestones', '7 Milestones')}</span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
@@ -325,7 +326,7 @@ export const AddTopicModal: React.FC = () => {
                   className="rounded-xl glass-subtle p-2.5 space-y-0.5"
                 >
                   <div className="text-[10px] font-medium text-[#858A93] dark:text-[#777F8C] truncate">
-                    {item.stageName} ({t('common.day', 'Day')} {item.offset + 1})
+                    {getTranslatedStageName(item.stageName, t)} ({t('common.day', 'Day')} {item.offset + 1})
                   </div>
                   <div className="text-xs font-semibold text-[#20232A] dark:text-[#F6F3EC] font-mono">
                     {formatDisplayDate(item.scheduledDate, false)}

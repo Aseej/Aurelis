@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../i18n';
 import { Topic, Subject } from '../../types';
 import { formatDisplayDate } from '../../utils/scheduler';
-import { getMasteryBadgeClass } from '../../utils/mastery';
+import { getMasteryBadgeClass, getTranslatedMastery } from '../../utils/mastery';
 import { TopicDetailModal } from '../topics/TopicDetailModal';
 import {
   ArrowLeft,
@@ -283,7 +283,7 @@ export const SubjectsView: React.FC = () => {
                                   {tItem.title}
                                 </span>
                                 <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md border ${badgeClass}`}>
-                                  {tItem.mastery.toUpperCase()}
+                                  {getTranslatedMastery(tItem.mastery, t).toUpperCase()}
                                 </span>
                               </div>
 

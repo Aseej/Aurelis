@@ -311,7 +311,7 @@ export const ErrorLogView: React.FC = () => {
                   >
                     <Sparkles className="h-3.5 w-3.5 text-[#E6C27A]" />
                     <span>
-                      {isDiagnosingThis ? t('common.loading', 'Diagnosing root cause...') : 'AI Cognitive Misconception Diagnosis'}
+                      {isDiagnosingThis ? t('common.loading', 'Diagnosing root cause...') : t('errors.aiDiagnosis', 'AI Cognitive Misconception Diagnosis')}
                     </span>
                   </button>
                 </div>
@@ -319,7 +319,7 @@ export const ErrorLogView: React.FC = () => {
                 {hasDiagnosis && (
                   <div className="rounded-2xl glass-subtle border border-[#E6C27A]/30 p-3.5 text-xs text-[#20232A] dark:text-[#F6F3EC] space-y-1 font-mono">
                     <span className="font-semibold text-[#A97B32] dark:text-[#E6C27A]">
-                      Cognitive Diagnosis:
+                      {t('errors.cognitiveDiagnosis', 'Cognitive Diagnosis:')}
                     </span>
                     <p>{diagnosisText}</p>
                   </div>

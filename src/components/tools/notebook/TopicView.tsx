@@ -22,6 +22,7 @@ import {
   RefreshCw,
   Eye,
 } from 'lucide-react';
+import { useI18n } from '../../../i18n';
 
 interface TopicViewProps {
   subject: NotebookSubject;
@@ -44,6 +45,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
   onDeletePage,
   onDeleteMultiplePages,
 }) => {
+  const { t } = useI18n();
   // Modals state
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isUploadReviewOpen, setIsUploadReviewOpen] = useState(false);
@@ -173,7 +175,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
             </button>
           </div>
           <span className="text-xs font-mono text-[#858A93] dark:text-[#777F8C]">
-            {sortedPages.length} {sortedPages.length === 1 ? 'page' : 'pages'} digitized in Google Drive
+            {sortedPages.length} {sortedPages.length === 1 ? t('notebook.page', 'page') : t('notebook.pages', 'pages')} {t('notebook.digitizedInDrive', 'digitized in Google Drive')}
           </span>
         </div>
 
@@ -191,7 +193,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
                   : 'bg-black/[0.04] dark:bg-white/[0.06] border-black/[0.06] dark:border-white/[0.08] text-[#6E737D] dark:text-[#A0A5B0]'
               }`}
             >
-              {isSelectMode ? 'Cancel Selection' : 'Select'}
+              {isSelectMode ? t('common.cancelSelection', 'Cancel Selection') : t('common.select', 'Select')}
             </button>
           )}
 
@@ -200,7 +202,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold rounded-xl shadow-xs transition-colors"
           >
             <Camera className="w-3.5 h-3.5" />
-            <span>Take Picture</span>
+            <span>{t('notebook.takePhoto', 'Take Picture')}</span>
           </button>
 
           <button
@@ -208,7 +210,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 bg-black/[0.06] dark:bg-white/[0.08] hover:bg-amber-500 hover:text-black text-[#20232A] dark:text-[#F6F3EC] text-xs font-semibold rounded-xl transition-colors border border-black/[0.06] dark:border-white/[0.08]"
           >
             <Upload className="w-3.5 h-3.5" />
-            <span>Upload Images</span>
+            <span>{t('notebook.uploadPages', 'Upload Images')}</span>
           </button>
 
           <input
@@ -235,10 +237,10 @@ export const TopicView: React.FC<TopicViewProps> = ({
               ) : (
                 <Square className="w-4 h-4" />
               )}
-              <span>Select All</span>
+              <span>{t('common.selectAll', 'Select All')}</span>
             </button>
             <span className="text-[#858A93] dark:text-[#A0A5B0]">
-              {selectedPageIds.size} of {sortedPages.length} selected
+              {t('notebook.selectedCount', '{count} of {total} selected', { count: selectedPageIds.size, total: sortedPages.length })}
             </span>
           </div>
 
@@ -248,7 +250,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-semibold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            <span>Delete Selected</span>
+            <span>{t('notebook.deleteSelected', 'Delete Selected')}</span>
           </button>
         </div>
       )}
@@ -261,7 +263,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
           </div>
           <div>
             <h3 className="font-serif font-bold text-base text-[#20232A] dark:text-[#F6F3EC]">
-              No Pages in this Topic Yet
+              {t('notebook.noPages', 'No Pages in this Topic Yet')}
             </h3>
             <p className="text-xs text-[#858A93] dark:text-[#A0A5B0] mt-1">
               Capture or upload handwritten notes to start building your digital notebook for {topic.name}.
@@ -273,14 +275,14 @@ export const TopicView: React.FC<TopicViewProps> = ({
               className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold rounded-xl inline-flex items-center gap-1.5 transition-colors shadow-xs"
             >
               <Camera className="w-4 h-4" />
-              <span>Take Picture</span>
+              <span>{t('notebook.takePhoto', 'Take Picture')}</span>
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
               className="px-4 py-2 bg-black/[0.04] dark:bg-white/[0.06] hover:bg-black/[0.08] text-[#20232A] dark:text-[#F6F3EC] text-xs font-semibold rounded-xl inline-flex items-center gap-1.5 transition-colors border border-black/[0.06] dark:border-white/[0.08]"
             >
               <Upload className="w-4 h-4" />
-              <span>Upload</span>
+              <span>{t('notebook.uploadPages', 'Upload')}</span>
             </button>
           </div>
         </div>
@@ -407,12 +409,12 @@ export const TopicView: React.FC<TopicViewProps> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
           <div className="w-full max-w-sm rounded-3xl glass-premium border border-black/[0.08] dark:border-white/[0.12] p-5 shadow-2xl space-y-4">
             <h3 className="font-serif font-bold text-base text-[#20232A] dark:text-[#F6F3EC]">
-              Edit Topic
+              {t('notebook.editTopic', 'Edit Topic')}
             </h3>
 
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-[#858A93] dark:text-[#A0A5B0]">
-                Topic Name
+                {t('notebook.topicName', 'Topic Name')}
               </label>
               <input
                 type="text"
@@ -429,7 +431,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
                 className="text-xs text-rose-500 hover:text-rose-400 font-semibold flex items-center gap-1"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>Delete Topic</span>
+                <span>{t('notebook.deleteTopic', 'Delete Topic')}</span>
               </button>
 
               <div className="flex gap-2">
@@ -438,7 +440,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
                   onClick={() => setIsEditModalOpen(false)}
                   className="px-3 py-1.5 text-xs text-[#858A93] hover:text-[#20232A] dark:hover:text-[#F6F3EC]"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
                 <button
                   type="button"
@@ -446,7 +448,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
                   onClick={handleSaveRename}
                   className="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold rounded-xl transition-colors disabled:opacity-40"
                 >
-                  Save
+                  {t('common.save', 'Save')}
                 </button>
               </div>
             </div>
@@ -460,13 +462,13 @@ export const TopicView: React.FC<TopicViewProps> = ({
           <div className="w-full max-w-sm rounded-3xl bg-slate-900 border border-slate-800 p-5 shadow-2xl space-y-4 text-slate-100">
             <div className="flex items-center gap-2.5 text-rose-400">
               <AlertTriangle className="w-5 h-5 shrink-0" />
-              <h3 className="font-semibold text-sm">Delete Topic & Captured Pages?</h3>
+              <h3 className="font-semibold text-sm">{t('notebook.deleteTopicTitle', 'Delete Topic & Captured Pages?')}</h3>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
               Deleting <strong className="text-white">&ldquo;{topic.name}&rdquo;</strong> will permanently remove it along with all <strong className="text-amber-400">{sortedPages.length} captured pages</strong> from your Google Drive.
             </p>
             <p className="text-[11px] text-slate-400">
-              This action cannot be undone. Its parent subject will not be deleted.
+              {t('notebook.cannotUndo', 'This action cannot be undone.')}
             </p>
             <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
               <button
@@ -475,7 +477,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
                 onClick={() => setIsConfirmDeleteOpen(false)}
                 className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </button>
               <button
                 type="button"
@@ -484,7 +486,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
                 className="px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors disabled:opacity-40"
               >
                 {isProcessing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                <span>Delete Topic</span>
+                <span>{t('notebook.deleteTopic', 'Delete Topic')}</span>
               </button>
             </div>
           </div>
@@ -497,7 +499,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
           <div className="w-full max-w-sm rounded-3xl bg-slate-900 border border-slate-800 p-5 shadow-2xl space-y-4 text-slate-100">
             <div className="flex items-center gap-2.5 text-rose-400">
               <AlertTriangle className="w-5 h-5 shrink-0" />
-              <h3 className="font-semibold text-sm">Delete Selected Pages?</h3>
+              <h3 className="font-semibold text-sm">{t('notebook.deleteSelectedPagesTitle', 'Delete Selected Pages?')}</h3>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
               Permanently delete <strong className="text-amber-400">{selectedPageIds.size} selected pages</strong> from your Google Drive?
@@ -509,7 +511,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
                 onClick={() => setIsConfirmMultiDeleteOpen(false)}
                 className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </button>
               <button
                 type="button"
@@ -518,7 +520,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
                 className="px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors disabled:opacity-40"
               >
                 {isProcessing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                <span>Delete {selectedPageIds.size} Pages</span>
+                <span>{t('notebook.deleteSelected', 'Delete Selected')}</span>
               </button>
             </div>
           </div>

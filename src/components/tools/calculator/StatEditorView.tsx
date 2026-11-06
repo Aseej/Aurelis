@@ -11,12 +11,14 @@ import {
   formatResultNicely,
 } from '../../../utils/calculator/mathEngine';
 import { BarChart2, Plus, Trash2, RotateCcw, Copy, Check } from 'lucide-react';
+import { useI18n } from '../../../i18n';
 
 interface StatEditorViewProps {
   onClose: () => void;
 }
 
 export const StatEditorView: React.FC<StatEditorViewProps> = ({ onClose }) => {
+  const { t } = useI18n();
   const [statType, setStatType] = useState<StatType>('1-VAR');
   const [rows, setRows] = useState<StatRow[]>([
     { x: 10, y: 15, freq: 1 },
@@ -97,14 +99,14 @@ export const StatEditorView: React.FC<StatEditorViewProps> = ({ onClose }) => {
         <div className="flex items-center gap-2">
           <BarChart2 className="w-5 h-5 text-amber-400" />
           <h3 className="font-semibold text-base sm:text-lg">
-            Statistics & Regression (MODE 3)
+            {t('calc.statTitle', 'Statistics & Regression (MODE 3)')}
           </h3>
         </div>
         <button
           onClick={onClose}
           className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded transition-colors"
         >
-          Exit to COMP
+          {t('calc.exitToComp', 'Exit to COMP')}
         </button>
       </div>
 
@@ -118,7 +120,7 @@ export const StatEditorView: React.FC<StatEditorViewProps> = ({ onClose }) => {
               : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-slate-200'
           }`}
         >
-          1: 1-VAR (Single Variable)
+          {t('calc.stat1Var', '1: 1-VAR (Single Variable)')}
         </button>
         <button
           onClick={() => setStatType('A+BX')}
@@ -128,7 +130,7 @@ export const StatEditorView: React.FC<StatEditorViewProps> = ({ onClose }) => {
               : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-slate-200'
           }`}
         >
-          2: A+BX (Linear Regression)
+          {t('calc.statLinear', '2: A+BX (Linear Regression)')}
         </button>
       </div>
 
@@ -136,7 +138,7 @@ export const StatEditorView: React.FC<StatEditorViewProps> = ({ onClose }) => {
       <div className="bg-slate-950/70 rounded-lg border border-slate-800 p-3 space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono text-slate-400 uppercase tracking-wide">
-            Data Matrix ({rows.length} rows)
+            {t('calc.dataMatrix', 'Data Matrix ({count} rows)', { count: rows.length })}
           </span>
           <div className="flex gap-2">
             <button

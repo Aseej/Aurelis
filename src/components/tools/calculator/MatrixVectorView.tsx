@@ -21,6 +21,7 @@ import {
   formatResultNicely,
 } from '../../../utils/calculator/mathEngine';
 import { Layers, ArrowRight, RotateCcw, Copy, Check } from 'lucide-react';
+import { useI18n } from '../../../i18n';
 
 interface MatrixVectorViewProps {
   type: 'MATRIX' | 'VECTOR';
@@ -33,6 +34,7 @@ export const MatrixVectorView: React.FC<MatrixVectorViewProps> = ({
   angleMode,
   onClose,
 }) => {
+  const { t } = useI18n();
   // Matrices state (MatA, MatB, MatC)
   const [selectedSlot, setSelectedSlot] = useState<'A' | 'B' | 'C'>('A');
   const [copied, setCopied] = useState(false);
@@ -219,20 +221,20 @@ export const MatrixVectorView: React.FC<MatrixVectorViewProps> = ({
         <div className="flex items-center gap-2">
           <Layers className="w-5 h-5 text-amber-400" />
           <h3 className="font-semibold text-base sm:text-lg">
-            {type === 'MATRIX' ? 'Matrix Operations (fx-991ES MODE 6)' : 'Vector Operations (fx-991ES MODE 7)'}
+            {type === 'MATRIX' ? t('calc.matrixOps', 'Matrix Operations (fx-991ES MODE 6)') : t('calc.vectorOps', 'Vector Operations (fx-991ES MODE 7)')}
           </h3>
         </div>
         <button
           onClick={onClose}
           className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded transition-colors"
         >
-          Exit to COMP
+          {t('calc.exitToComp', 'Exit to COMP')}
         </button>
       </div>
 
       {/* Target Selector (A, B, C) */}
       <div className="flex items-center justify-between bg-slate-800/60 p-2 rounded-lg">
-        <span className="text-xs font-mono text-slate-400 uppercase">Select Target:</span>
+        <span className="text-xs font-mono text-slate-400 uppercase">{t('calc.selectTarget', 'Select Target:')}</span>
         <div className="flex gap-2">
           {(['A', 'B', 'C'] as const).map((slot) => (
             <button

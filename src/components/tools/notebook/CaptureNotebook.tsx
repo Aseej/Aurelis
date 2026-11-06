@@ -17,6 +17,7 @@ import {
 } from '../../../services/googleDriveService';
 import { SubjectView } from './SubjectView';
 import { TopicView } from './TopicView';
+import { useI18n } from '../../../i18n';
 import {
   Cloud,
   ShieldCheck,
@@ -35,6 +36,7 @@ import {
 } from 'lucide-react';
 
 export const CaptureNotebook: React.FC = () => {
+  const { t } = useI18n();
   // Cloud Connection State
   const [cloudInfo, setCloudInfo] = useState<CloudConnectionInfo>({
     state: 'initializing',
@@ -305,10 +307,13 @@ export const CaptureNotebook: React.FC = () => {
 
           <div className="space-y-2">
             <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#20232A] dark:text-[#F6F3EC]">
-              Connect Google Drive
+              {t('notebook.connectDrive', 'Connect Google Drive')}
             </h2>
             <p className="text-xs sm:text-sm text-[#858A93] dark:text-[#A0A5B0] max-w-md mx-auto leading-relaxed">
-              Your personal digital notebook library lives in your Google Drive. Connect your account to capture, organize and access your handwritten notes securely across your devices.
+              {t(
+                'notebook.privateDriveNotice',
+                'Your personal digital notebook library lives in your Google Drive. Connect your account to capture, organize and access your handwritten notes securely across your devices.'
+              )}
             </p>
           </div>
 
@@ -317,30 +322,30 @@ export const CaptureNotebook: React.FC = () => {
             <div className="p-3 rounded-2xl bg-black/[0.02] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.06] space-y-1">
               <div className="text-[11px] font-semibold text-amber-500 flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>100% Private</span>
+                <span>{t('tools.notebookPrivate', '100% Private')}</span>
               </div>
               <p className="text-[10px] text-[#858A93] dark:text-[#777F8C]">
-                Saved exclusively in your own private Google Drive storage.
+                {t('notebook.propPrivate', 'Saved exclusively in your own private Google Drive storage.')}
               </p>
             </div>
 
             <div className="p-3 rounded-2xl bg-black/[0.02] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.06] space-y-1">
               <div className="text-[11px] font-semibold text-amber-500 flex items-center gap-1">
                 <Cloud className="w-3.5 h-3.5" />
-                <span>Device Sync</span>
+                <span>{t('tools.notebookCloud', 'Device Sync')}</span>
               </div>
               <p className="text-[10px] text-[#858A93] dark:text-[#777F8C]">
-                Access handwritten notes on your phone, tablet, and laptop.
+                {t('notebook.propSync', 'Access handwritten notes on your phone, tablet, and laptop.')}
               </p>
             </div>
 
             <div className="p-3 rounded-2xl bg-black/[0.02] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.06] space-y-1">
               <div className="text-[11px] font-semibold text-amber-500 flex items-center gap-1">
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>Organized Library</span>
+                <span>{t('notebook.title', 'Organized Library')}</span>
               </div>
               <p className="text-[10px] text-[#858A93] dark:text-[#777F8C]">
-                Subject and topic folders keep your syllabus orderly.
+                {t('notebook.propFolders', 'Subject and topic folders keep your syllabus orderly.')}
               </p>
             </div>
           </div>
@@ -362,12 +367,12 @@ export const CaptureNotebook: React.FC = () => {
               {isConnectingDrive ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Connecting to Google Drive...</span>
+                  <span>{t('notebook.connecting', 'Connecting to Google Drive...')}</span>
                 </>
               ) : (
                 <>
                   <Cloud className="w-4 h-4" />
-                  <span>Connect Google Drive</span>
+                  <span>{t('notebook.connectDrive', 'Connect Google Drive')}</span>
                 </>
               )}
             </button>
@@ -395,7 +400,7 @@ export const CaptureNotebook: React.FC = () => {
               !selectedSubjectId ? 'text-amber-500 font-bold' : 'text-[#858A93] dark:text-[#A0A5B0]'
             }`}
           >
-            Capture Notebook
+            {t('tools.captureNotebook', 'Capture Notebook')}
           </button>
 
           {activeSubject && (
@@ -427,7 +432,7 @@ export const CaptureNotebook: React.FC = () => {
           {isLoadingIndex && (
             <span className="flex items-center gap-1 text-[11px] font-mono text-amber-500">
               <RefreshCw className="w-3 h-3 animate-spin" />
-              <span>Syncing...</span>
+              <span>{t('notebook.syncing', 'Syncing...')}</span>
             </span>
           )}
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.06] dark:border-white/[0.08] text-[11px] font-mono text-[#858A93] dark:text-[#A0A5B0]">
@@ -445,7 +450,7 @@ export const CaptureNotebook: React.FC = () => {
             onClick={() => fetchIndexFromDrive(cloudInfo.email)}
             className="text-[11px] font-semibold underline ml-2"
           >
-            Retry Sync
+            {t('notebook.retrySync', 'Retry Sync')}
           </button>
         </div>
       )}
@@ -487,7 +492,7 @@ export const CaptureNotebook: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search notebook subjects and topics..."
+                placeholder={t('notebook.searchPlaceholder', 'Search notebook subjects and topics...')}
                 className="w-full pl-10 pr-4 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.06] dark:border-white/[0.08] rounded-xl text-xs sm:text-sm text-[#20232A] dark:text-[#F6F3EC] focus:outline-none focus:ring-1 focus:ring-amber-500"
               />
             </div>
@@ -497,7 +502,7 @@ export const CaptureNotebook: React.FC = () => {
               className="self-start sm:self-auto flex items-center gap-1.5 px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold rounded-xl shadow-xs transition-colors"
             >
               <Plus className="w-4 h-4" />
-              <span>New Subject</span>
+              <span>{t('notebook.newSubject', 'New Subject')}</span>
             </button>
           </div>
 
@@ -509,10 +514,10 @@ export const CaptureNotebook: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-serif font-bold text-base text-[#20232A] dark:text-[#F6F3EC]">
-                  Your Digital Notebook Library is Empty
+                  {t('notebook.noSubjects', 'Your Digital Notebook Library is Empty')}
                 </h3>
                 <p className="text-xs text-[#858A93] dark:text-[#A0A5B0] mt-1">
-                  Create your first subject (e.g. Physics, Chemistry, Biology, or History) to begin digitizing your handwritten notes.
+                  {t('notebook.firstSubjectDesc', 'Create your first subject (e.g. Physics, Chemistry, Biology, or History) to begin digitizing your handwritten notes.')}
                 </p>
               </div>
               <button
@@ -520,7 +525,7 @@ export const CaptureNotebook: React.FC = () => {
                 className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold rounded-xl inline-flex items-center gap-1.5 transition-colors shadow-xs"
               >
                 <Plus className="w-4 h-4" />
-                <span>Create Subject</span>
+                <span>{t('notebook.createSubject', 'Create Subject')}</span>
               </button>
             </div>
           ) : (
@@ -542,7 +547,7 @@ export const CaptureNotebook: React.FC = () => {
                           <BookOpen className="w-6 h-6" />
                         </div>
                         <span className="text-[11px] font-mono text-amber-500 font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
-                          {subPages.length} {subPages.length === 1 ? 'page' : 'pages'}
+                          {subPages.length} {subPages.length === 1 ? t('notebook.page', 'page') : t('notebook.pages', 'pages')}
                         </span>
                       </div>
 
@@ -551,14 +556,14 @@ export const CaptureNotebook: React.FC = () => {
                           {sub.name}
                         </h3>
                         <span className="text-xs font-mono text-[#858A93] dark:text-[#777F8C]">
-                          {subTopics.length} {subTopics.length === 1 ? 'topic' : 'topics'}
+                          {subTopics.length} {subTopics.length === 1 ? t('notebook.topic', 'topic') : t('notebook.topics', 'topics')}
                         </span>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between text-xs pt-2 border-t border-black/[0.04] dark:border-white/[0.06]">
                       <span className="text-[11px] font-semibold text-[#858A93] dark:text-[#777F8C]">
-                        Open Subject
+                        {t('notebook.openSubject', 'Open Subject')}
                       </span>
                       <ArrowRight className="w-4 h-4 text-amber-500 group-hover:translate-x-1 transition-transform" />
                     </div>
@@ -575,13 +580,13 @@ export const CaptureNotebook: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
           <div className="w-full max-w-sm rounded-3xl glass-premium border border-black/[0.08] dark:border-white/[0.12] p-5 shadow-2xl space-y-4">
             <h3 className="font-serif font-bold text-base text-[#20232A] dark:text-[#F6F3EC]">
-              Create New Subject
+              {t('notebook.createSubject', 'Create New Subject')}
             </h3>
 
             <form onSubmit={handleAddSubject} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#858A93] dark:text-[#A0A5B0]">
-                  Subject Name
+                  {t('notebook.subjectName', 'Subject Name')}
                 </label>
                 <input
                   type="text"
@@ -600,14 +605,14 @@ export const CaptureNotebook: React.FC = () => {
                   onClick={() => setIsAddSubjectOpen(false)}
                   className="px-3 py-1.5 text-xs text-[#858A93] hover:text-[#20232A] dark:hover:text-[#F6F3EC]"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isProcessing || !newSubjectName.trim()}
                   className="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold rounded-xl transition-colors disabled:opacity-40"
                 >
-                  {isProcessing ? 'Creating...' : 'Create Subject'}
+                  {isProcessing ? 'Creating...' : t('notebook.createSubject', 'Create Subject')}
                 </button>
               </div>
             </form>

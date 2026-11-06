@@ -1,4 +1,5 @@
 import React from 'react';
+import { useI18n } from '../../../i18n';
 import { CalculatorMode, AngleMode } from '../../../utils/calculator/types';
 import { X, Check } from 'lucide-react';
 
@@ -21,6 +22,7 @@ export const ModeSelectorModal: React.FC<ModeSelectorModalProps> = ({
   onSelectAngleMode,
   onClose,
 }) => {
+  const { t } = useI18n();
   if (!isOpen) return null;
 
   return (
@@ -41,7 +43,7 @@ export const ModeSelectorModal: React.FC<ModeSelectorModalProps> = ({
               {isSetup ? 'SETUP' : 'MODE'}
             </span>
             <h3 className="font-semibold text-sm text-[#20232A] dark:text-[#F6F3EC]">
-              {isSetup ? 'Calculator Setup' : 'Select Calculation Mode'}
+              {isSetup ? t('calc.setup', 'Calculator Setup') : t('calc.selectMode', 'Select Calculation Mode')}
             </h3>
           </div>
           <button
@@ -57,7 +59,7 @@ export const ModeSelectorModal: React.FC<ModeSelectorModalProps> = ({
           /* SETUP: Angle Modes & Display Formats */
           <div className="space-y-3">
             <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C]">
-              Angle Mode
+              {t('calc.angleMode', 'Angle Mode')}
             </div>
             <div className="grid grid-cols-3 gap-2">
               {(['DEG', 'RAD', 'GRA'] as AngleMode[]).map((ang, idx) => (
@@ -74,32 +76,32 @@ export const ModeSelectorModal: React.FC<ModeSelectorModalProps> = ({
                   }`}
                 >
                   <span className="text-[10px] text-[#858A93] font-mono mb-0.5">{idx + 1}</span>
-                  <span>{ang === 'DEG' ? 'Degree' : ang === 'RAD' ? 'Radian' : 'Gradian'}</span>
+                  <span>{ang === 'DEG' ? t('calc.degree', 'Degree') : ang === 'RAD' ? t('calc.radian', 'Radian') : t('calc.gradian', 'Gradian')}</span>
                   <span className="text-[10px] opacity-70">({ang})</span>
                 </button>
               ))}
             </div>
 
             <div className="p-3 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] text-[11px] text-[#686D77] dark:text-[#A7ABB5] border border-black/[0.04] dark:border-white/[0.05]">
-              💡 Tap or press number <kbd className="font-mono font-bold">1</kbd>, <kbd className="font-mono font-bold">2</kbd>, or <kbd className="font-mono font-bold">3</kbd> to change angle units.
+              💡 {t('calc.angleHelp', 'Tap or press number 1, 2, or 3 to change angle units.')}
             </div>
           </div>
         ) : (
           /* MODES: fx-991ES PLUS 8 Modes */
           <div className="space-y-2">
             <div className="text-[11px] font-semibold uppercase tracking-wider text-[#858A93] dark:text-[#777F8C] mb-1">
-              fx-991ES PLUS Modes
+              {t('calc.modesTitle', 'fx-991ES PLUS Modes')}
             </div>
             <div className="grid grid-cols-2 gap-2 text-xs">
               {[
-                { mode: 'COMP', num: '1', name: 'COMP', desc: 'General arithmetic' },
-                { mode: 'CMPLX', num: '2', name: 'CMPLX', desc: 'Complex numbers' },
-                { mode: 'STAT', num: '3', name: 'STAT', desc: 'Statistics & Reg' },
-                { mode: 'BASE-N', num: '4', name: 'BASE-N', desc: 'Dec, Hex, Bin, Oct' },
-                { mode: 'EQN', num: '5', name: 'EQN', desc: 'Equation solver' },
-                { mode: 'MATRIX', num: '6', name: 'MATRIX', desc: 'Matrix operations' },
-                { mode: 'VECTOR', num: '7', name: 'VECTOR', desc: 'Vector operations' },
-                { mode: 'TABLE', num: '8', name: 'TABLE', desc: 'f(x) value tables' },
+                { mode: 'COMP', num: '1', name: 'COMP', desc: t('calc.descComp', 'General arithmetic') },
+                { mode: 'CMPLX', num: '2', name: 'CMPLX', desc: t('calc.descCmplx', 'Complex numbers') },
+                { mode: 'STAT', num: '3', name: 'STAT', desc: t('calc.descStat', 'Statistics & Reg') },
+                { mode: 'BASE-N', num: '4', name: 'BASE-N', desc: t('calc.descBaseN', 'Dec, Hex, Bin, Oct') },
+                { mode: 'EQN', num: '5', name: 'EQN', desc: t('calc.descEqn', 'Equation solver') },
+                { mode: 'MATRIX', num: '6', name: 'MATRIX', desc: t('calc.descMatrix', 'Matrix operations') },
+                { mode: 'VECTOR', num: '7', name: 'VECTOR', desc: t('calc.descVector', 'Vector operations') },
+                { mode: 'TABLE', num: '8', name: 'TABLE', desc: t('calc.descTable', 'f(x) value tables') },
               ].map((item) => {
                 const isSelected = currentMode === item.mode;
                 return (

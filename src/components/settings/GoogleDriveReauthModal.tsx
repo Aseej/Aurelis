@@ -9,6 +9,7 @@ import {
 } from '../../services/googleDriveService';
 import { cloudBackupManager } from '../../services/cloudBackupManager';
 import { Cloud, ShieldCheck, RefreshCw, X, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useI18n } from '../../i18n';
 
 export const GoogleDriveReauthModal: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,6 +20,7 @@ export const GoogleDriveReauthModal: React.FC = () => {
 
   // Ref guard to prevent double-trigger during initial sync or StrictMode
   const evaluatedRef = useRef(false);
+  const { t } = useI18n();
 
   useEffect(() => {
     const unsubscribe = subscribeToCloudConnection((info) => {
@@ -149,14 +151,16 @@ export const GoogleDriveReauthModal: React.FC = () => {
               id="drive-reauth-title"
               className="text-lg font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]"
             >
-              Reconnect your Google Drive
+              {t('drive.reauthReminderTitle', 'Reconnect your Google Drive')}
             </h3>
             <p
               id="drive-reauth-description"
               className="text-xs text-[#686D77] dark:text-[#A7ABB5] leading-relaxed max-w-xs mx-auto"
             >
-              Your previous Google Drive authorization may have expired. Reauthorize to continue
-              backing up your learning data securely.
+              {t(
+                'drive.reauthReminderSubtitle',
+                'Your previous Google Drive authorization may have expired. Reauthorize to continue backing up your learning data securely.'
+              )}
             </p>
           </div>
         </div>
@@ -172,7 +176,7 @@ export const GoogleDriveReauthModal: React.FC = () => {
         {/* Reassuring Safety Guarantee Message */}
         <div className="flex items-center gap-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-2.5 text-xs text-emerald-700 dark:text-emerald-300">
           <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-          <span className="font-medium">Your local study data is safe.</span>
+          <span className="font-medium">{t('drive.localDataSafe', 'Your local study data is safe.')}</span>
         </div>
 
         {/* Error Feedback if authorization fails */}
@@ -187,7 +191,7 @@ export const GoogleDriveReauthModal: React.FC = () => {
         {authSuccess && (
           <div className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 p-3 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
             <CheckCircle2 className="h-4 w-4 shrink-0" />
-            <span>Google Drive reconnected successfully!</span>
+            <span>{t('drive.authSuccess', 'Google Drive reconnected successfully!')}</span>
           </div>
         )}
 
@@ -202,12 +206,12 @@ export const GoogleDriveReauthModal: React.FC = () => {
             {isAuthorizing ? (
               <>
                 <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                <span>Connecting...</span>
+                <span>{t('notebook.connecting', 'Connecting...')}</span>
               </>
             ) : (
               <>
                 <Cloud className="h-3.5 w-3.5" />
-                <span>Reauthorize Google Drive</span>
+                <span>{t('drive.reauthorizeNow', 'Reauthorize Google Drive')}</span>
               </>
             )}
           </button>
@@ -218,7 +222,7 @@ export const GoogleDriveReauthModal: React.FC = () => {
             disabled={isAuthorizing}
             className="btn-glass-secondary rounded-xl px-4 py-2.5 text-xs font-medium text-[#686D77] dark:text-[#A7ABB5] hover:text-[#20232A] dark:hover:text-[#F6F3EC] transition cursor-pointer"
           >
-            Cancel
+            {t('common.cancel', 'Cancel')}
           </button>
         </div>
       </div>

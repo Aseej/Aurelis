@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useI18n } from '../../i18n';
 import { ScientificCalculator } from './calculator/ScientificCalculator';
 import { CaptureNotebook } from './notebook/CaptureNotebook';
 import {
@@ -15,6 +16,7 @@ import {
 export type ToolsTab = 'overview' | 'calculator' | 'notebook';
 
 export const ToolsView: React.FC = () => {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<ToolsTab>('overview');
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
@@ -25,7 +27,7 @@ export const ToolsView: React.FC = () => {
         <div className="space-y-4 border-b border-black/[0.06] dark:border-white/[0.08] pb-4">
           <div className="flex items-center justify-between gap-3">
             <h1 className="text-xl sm:text-2xl font-serif font-bold text-[#20232A] dark:text-[#F6F3EC]">
-              Tools
+              {t('tools.title', 'Tools')}
             </h1>
 
             {/* Breadcrumb back button when inside a specific tool */}
@@ -35,7 +37,7 @@ export const ToolsView: React.FC = () => {
                 className="flex items-center gap-1.5 text-xs font-semibold text-amber-500 hover:text-amber-400 bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/20 px-3 py-1.5 rounded-xl transition-all"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Back to Tools</span>
+                <span>{t('tools.backToTools', 'Back to Tools')}</span>
               </button>
             )}
           </div>
@@ -51,7 +53,7 @@ export const ToolsView: React.FC = () => {
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
-              <span>All Tools</span>
+              <span>{t('tools.allTools', 'All Tools')}</span>
             </button>
 
             <button
@@ -63,7 +65,7 @@ export const ToolsView: React.FC = () => {
               }`}
             >
               <Calculator className="w-3.5 h-3.5" />
-              <span>Scientific Calculator</span>
+              <span>{t('tools.scientificCalc', 'Scientific Calculator')}</span>
               <span className="text-[10px] uppercase font-mono px-1.5 py-0.2 rounded bg-black/15 dark:bg-white/15">
                 fx-991ES
               </span>
@@ -78,7 +80,7 @@ export const ToolsView: React.FC = () => {
               }`}
             >
               <Camera className="w-3.5 h-3.5" />
-              <span>Capture Notebook</span>
+              <span>{t('tools.captureNotebook', 'Capture Notebook')}</span>
             </button>
           </div>
         </div>
@@ -99,18 +101,18 @@ export const ToolsView: React.FC = () => {
                     <Calculator className="w-6 h-6" />
                   </div>
                   <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                    Active
+                    {t('tools.active', 'Active')}
                   </span>
                 </div>
 
                 <div>
                   <h3 className="font-serif font-bold text-base sm:text-lg text-[#20232A] dark:text-[#F6F3EC] group-hover:text-amber-500 transition-colors">
-                    Scientific Calculator
+                    {t('tools.scientificCalc', 'Scientific Calculator')}
                   </h3>
                 </div>
 
                 <div className="flex flex-wrap gap-1.5">
-                  {['fx-991ES PLUS', 'Natural Display', '8 Modes'].map((tag) => (
+                  {['fx-991ES PLUS', t('tools.tagNaturalDisplay', 'Natural Display'), t('tools.tag8Modes', '8 Modes')].map((tag) => (
                     <span
                       key={tag}
                       className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-black/[0.04] dark:bg-white/[0.06] text-[#6E737D] dark:text-[#A0A5B0]"
@@ -129,7 +131,7 @@ export const ToolsView: React.FC = () => {
                 }}
                 className="w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-black font-semibold text-xs rounded-xl flex items-center justify-center gap-2 transition-colors shadow-xs"
               >
-                <span>Open Calculator</span>
+                <span>{t('tools.openCalculator', 'Open Calculator')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -145,18 +147,18 @@ export const ToolsView: React.FC = () => {
                     <BookOpen className="w-6 h-6" />
                   </div>
                   <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                    Active
+                    {t('tools.active', 'Active')}
                   </span>
                 </div>
 
                 <div>
                   <h3 className="font-serif font-bold text-base sm:text-lg text-[#20232A] dark:text-[#F6F3EC] group-hover:text-amber-500 transition-colors">
-                    Capture Notebook
+                    {t('tools.captureNotebook', 'Capture Notebook')}
                   </h3>
                 </div>
 
                 <div className="flex flex-wrap gap-1.5">
-                  {['Google Drive Sync', 'Handwritten Notes', 'Camera Capture', 'Reader'].map((tag) => (
+                  {[t('tools.tagDriveSync', 'Google Drive Sync'), t('tools.tagHandwritten', 'Handwritten Notes'), t('tools.tagCamera', 'Camera Capture'), t('tools.tagReader', 'Reader')].map((tag) => (
                     <span
                       key={tag}
                       className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-black/[0.04] dark:bg-white/[0.06] text-[#6E737D] dark:text-[#A0A5B0]"
@@ -175,7 +177,7 @@ export const ToolsView: React.FC = () => {
                 }}
                 className="w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-black font-semibold text-xs rounded-xl flex items-center justify-center gap-2 transition-colors shadow-xs"
               >
-                <span>Open Capture Notebook</span>
+                <span>{t('tools.openNotebook', 'Open Capture Notebook')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -190,17 +192,17 @@ export const ToolsView: React.FC = () => {
             <button
               onClick={() => setIsFocused((prev) => !prev)}
               className="flex items-center gap-1.5 text-xs text-[#858A93] hover:text-[#20232A] dark:hover:text-[#F6F3EC] px-2.5 py-1.5 rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.06] transition-colors"
-              title={isFocused ? 'Exit Focus View' : 'Focus View'}
+              title={isFocused ? t('tools.exitFocus', 'Exit Focus') : t('tools.focusView', 'Focus View')}
             >
               {isFocused ? (
                 <>
                   <Minimize2 className="w-3.5 h-3.5" />
-                  <span>Exit Focus</span>
+                  <span>{t('tools.exitFocus', 'Exit Focus')}</span>
                 </>
               ) : (
                 <>
                   <Maximize2 className="w-3.5 h-3.5" />
-                  <span>Focus View</span>
+                  <span>{t('tools.focusView', 'Focus View')}</span>
                 </>
               )}
             </button>

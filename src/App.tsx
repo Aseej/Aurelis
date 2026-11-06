@@ -28,7 +28,7 @@ import { GoogleDriveReauthModal } from './components/settings/GoogleDriveReauthM
 import { I18nProvider } from './i18n';
 
 const AppContent: React.FC = () => {
-  const { activeView, state, updateSettings } = useApp();
+  const { activeView, state, updateSettings, isCameraMode } = useApp();
 
   return (
     <div className="relative min-h-screen flex flex-col bg-[#F4F1EA] dark:bg-[#090B10] text-[#20232A] dark:text-[#F6F3EC] selection:bg-[#E6C27A]/25 selection:text-[#B88A43] dark:selection:text-[#FFE6AD] overflow-x-hidden">
@@ -42,8 +42,8 @@ const AppContent: React.FC = () => {
         <div className="absolute -bottom-[80px] right-[15%] h-[420px] w-[420px] rounded-full bg-gradient-to-t from-[#B88A43]/5 to-transparent blur-[110px] dark:from-[#B88A43]/8" />
       </div>
 
-      {/* Top Bar following Top Bar Contract (hidden on public landing page) */}
-      {activeView !== 'landing' && (
+      {/* Top Bar following Top Bar Contract (hidden on public landing page and camera mode) */}
+      {activeView !== 'landing' && !isCameraMode && (
         <div className="relative z-30">
           <Navbar />
         </div>
@@ -72,8 +72,8 @@ const AppContent: React.FC = () => {
         </div>
       )}
 
-      {/* Floating Bottom Navigation Dock (hidden in landing view) */}
-      {activeView !== 'landing' && <MobileNav />}
+      {/* Floating Bottom Navigation Dock (hidden in landing view and during full-screen camera mode) */}
+      {activeView !== 'landing' && !isCameraMode && <MobileNav />}
 
       {/* Global Modals - single consistent tree with keys */}
       <AddTopicModal key="modal-add-topic" />

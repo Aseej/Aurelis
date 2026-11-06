@@ -22,6 +22,24 @@ export const STAGE_NAMES = [
 ];
 
 /**
+ * Localizes the 7 canonical stage names according to the active language.
+ */
+export function getTranslatedStageName(
+  stageName: string,
+  t?: (key: string, fallback?: string, params?: Record<string, string | number>) => string
+): string {
+  if (!t) return stageName;
+  if (stageName === 'Learn') return t('stage.learn', 'Learn');
+  if (stageName === 'Revision 1') return t('stage.rev1', 'Revision 1');
+  if (stageName === 'Revision 2') return t('stage.rev2', 'Revision 2');
+  if (stageName === 'Weekly Test') return t('stage.test', 'Weekly Test');
+  if (stageName === 'Review 1') return t('stage.review1', 'Review 1');
+  if (stageName === 'Review 2') return t('stage.review2', 'Review 2');
+  if (stageName === 'Review 3') return t('stage.review3', 'Review 3');
+  return stageName;
+}
+
+/**
  * Parses YYYY-MM-DD string into explicit calendar components [year, monthIndex, day].
  * monthIndex is 0-indexed (0 = Jan, 11 = Dec).
  */
@@ -231,7 +249,8 @@ export function getDueReasonExplanation(
       return 'Initial learning session logged for today.';
     }
     if (t) {
-      return t('scheduler.dueTodayInterval', `Due today (${item.stageName}) based on your ${item.intervalDaysFromStart}-day interval.`, { stage: item.stageName, interval: item.intervalDaysFromStart });
+      const localizedStage = getTranslatedStageName(item.stageName, t);
+      return t('scheduler.dueTodayInterval', `Due today (${localizedStage}) based on your ${item.intervalDaysFromStart}-day interval.`, { stage: localizedStage, interval: item.intervalDaysFromStart });
     }
     return `Due today (${item.stageName}) based on your ${item.intervalDaysFromStart}-day interval.`;
   }

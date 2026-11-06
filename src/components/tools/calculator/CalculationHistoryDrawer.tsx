@@ -1,6 +1,7 @@
 import React from 'react';
 import { CalculationHistoryItem } from '../../../utils/calculator/types';
 import { History, Trash2, ArrowUpLeft, X, Clock } from 'lucide-react';
+import { useI18n } from '../../../i18n';
 
 interface CalculationHistoryDrawerProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export const CalculationHistoryDrawer: React.FC<CalculationHistoryDrawerProps> =
   onSelectResult,
   onClearHistory,
 }) => {
+  const { t } = useI18n();
   if (!isOpen) return null;
 
   return (
@@ -28,7 +30,7 @@ export const CalculationHistoryDrawer: React.FC<CalculationHistoryDrawerProps> =
         <div className="flex items-center justify-between p-4 border-b border-slate-800">
           <div className="flex items-center gap-2">
             <History className="w-4 h-4 text-amber-400" />
-            <h3 className="font-semibold text-slate-100 text-sm">Calculation History</h3>
+            <h3 className="font-semibold text-slate-100 text-sm">{t('calc.historyTitle', 'Calculation History')}</h3>
             <span className="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono">
               {history.length}
             </span>
@@ -38,7 +40,7 @@ export const CalculationHistoryDrawer: React.FC<CalculationHistoryDrawerProps> =
               <button
                 onClick={onClearHistory}
                 className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 p-1 hover:bg-slate-800 rounded transition-colors"
-                title="Clear all history"
+                title={t('calc.clearHistory', 'Clear all history')}
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -57,9 +59,9 @@ export const CalculationHistoryDrawer: React.FC<CalculationHistoryDrawerProps> =
           {history.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500 space-y-2">
               <Clock className="w-10 h-10 stroke-[1.5] text-slate-600 mb-1" />
-              <p className="text-sm font-medium text-slate-400">No calculations yet</p>
+              <p className="text-sm font-medium text-slate-400">{t('calc.noHistory', 'No calculations yet')}</p>
               <p className="text-xs text-slate-500 max-w-[200px]">
-                Your calculation expressions and results will be saved here for easy recall.
+                {t('calc.historyEmptyDesc', 'Your calculation expressions and results will be saved here for easy recall.')}
               </p>
             </div>
           ) : (
@@ -85,7 +87,7 @@ export const CalculationHistoryDrawer: React.FC<CalculationHistoryDrawerProps> =
                     onClose();
                   }}
                   className="font-mono text-xs text-slate-300 hover:text-amber-300 cursor-pointer break-all p-1 hover:bg-slate-900 rounded transition-colors"
-                  title="Click to recall expression"
+                  title={t('calc.recallExpr', 'Click to recall expression')}
                 >
                   {item.expression}
                 </div>
@@ -103,7 +105,7 @@ export const CalculationHistoryDrawer: React.FC<CalculationHistoryDrawerProps> =
                         onClose();
                       }}
                       className="text-[10px] flex items-center gap-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded font-mono transition-colors"
-                      title="Use this result in calculator"
+                      title={t('calc.useResult', 'Use this result in calculator')}
                     >
                       <ArrowUpLeft className="w-3 h-3" />
                       <span>Ans</span>
@@ -118,7 +120,7 @@ export const CalculationHistoryDrawer: React.FC<CalculationHistoryDrawerProps> =
         {/* Footer info */}
         <div className="p-3 bg-slate-950/80 border-t border-slate-800 text-center">
           <p className="text-[11px] text-slate-500 font-mono">
-            Press ▲ / ▼ on D-pad to step through past expressions
+            {t('calc.historyDpadHint', 'Press ▲ / ▼ on D-pad to step through past expressions')}
           </p>
         </div>
       </div>

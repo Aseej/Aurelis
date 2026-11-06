@@ -24,11 +24,13 @@ import { StatEditorView } from './StatEditorView';
 import { TableGeneratorView } from './TableGeneratorView';
 import { CalculationHistoryDrawer } from './CalculationHistoryDrawer';
 import { History, Sparkles, HelpCircle } from 'lucide-react';
+import { useI18n } from '../../../i18n';
 
 const STORAGE_KEY_HISTORY = 'aurelis_scientific_calc_history';
 const MAX_HISTORY = 50;
 
 export const ScientificCalculator: React.FC = () => {
+  const { t } = useI18n();
   // Modes & Settings
   const [mode, setMode] = useState<CalculatorMode>('COMP');
   const [angleMode, setAngleMode] = useState<AngleMode>('DEG');
@@ -566,7 +568,7 @@ export const ScientificCalculator: React.FC = () => {
               {/* Solar Cell Mockup */}
               <div
                 className="w-16 sm:w-20 h-4 sm:h-5 rounded bg-gradient-to-r from-[#2B1B15] via-[#432318] to-[#2B1B15] border border-[#6D3F28]/60 shadow-inner grid grid-cols-4 gap-0.5 p-0.5 opacity-80"
-                title="TWO WAY POWER (Solar & Battery)"
+                title={t('calc.twoWayPower', 'TWO WAY POWER (Solar & Battery)')}
               >
                 <div className="border-r border-[#6D3F28]/40" />
                 <div className="border-r border-[#6D3F28]/40" />
@@ -579,7 +581,7 @@ export const ScientificCalculator: React.FC = () => {
                 type="button"
                 onClick={() => setIsHistoryOpen(true)}
                 className="p-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-amber-300 transition-colors"
-                title="View Calculation History"
+                title={t('calc.viewHistory', 'View Calculation History')}
               >
                 <History className="w-4 h-4" />
               </button>
@@ -589,7 +591,7 @@ export const ScientificCalculator: React.FC = () => {
                 type="button"
                 onClick={() => setShowHelpGuide((prev) => !prev)}
                 className="p-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-amber-300 transition-colors"
-                title="Calculator Guide & Shortcuts"
+                title={t('calc.guideAndShortcuts', 'Calculator Guide & Shortcuts')}
               >
                 <HelpCircle className="w-4 h-4" />
               </button>
@@ -600,20 +602,20 @@ export const ScientificCalculator: React.FC = () => {
           {showHelpGuide && (
             <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-3 text-xs text-slate-300 space-y-2 animate-fadeIn">
               <div className="flex items-center justify-between font-semibold text-amber-300 text-xs">
-                <span>fx-991ES PLUS Features</span>
+                <span>{t('calc.featuresTitle', 'fx-991ES PLUS Features')}</span>
                 <button
                   onClick={() => setShowHelpGuide(false)}
                   className="text-slate-500 hover:text-slate-300 text-[10px]"
                 >
-                  Close
+                  {t('common.close', 'Close')}
                 </button>
               </div>
               <ul className="list-disc list-inside space-y-1 text-[11px] text-slate-400">
-                <li><b className="text-slate-200">SHIFT + MODE:</b> Open SETUP to switch DEG / RAD / GRA.</li>
-                <li><b className="text-slate-200">MODE:</b> Switch to CMPLX, STAT, BASE-N, EQN, MATRIX, VECTOR, TABLE.</li>
-                <li><b className="text-slate-200">S⇔D:</b> Toggle between exact fractions (e.g. 3/4) and decimal.</li>
-                <li><b className="text-slate-200">D-pad ▲ / ▼:</b> Recall previous calculations from history.</li>
-                <li><b className="text-slate-200">D-pad ◄ / ►:</b> Move cursor to edit anywhere in expression.</li>
+                <li><b className="text-slate-200">SHIFT + MODE:</b> {t('calc.helpShiftMode', 'Open SETUP to switch DEG / RAD / GRA.')}</li>
+                <li><b className="text-slate-200">MODE:</b> {t('calc.helpMode', 'Switch to CMPLX, STAT, BASE-N, EQN, MATRIX, VECTOR, TABLE.')}</li>
+                <li><b className="text-slate-200">S⇔D:</b> {t('calc.helpSd', 'Toggle between exact fractions (e.g. 3/4) and decimal.')}</li>
+                <li><b className="text-slate-200">D-pad ▲ / ▼:</b> {t('calc.helpDpadRecall', 'Recall previous calculations from history.')}</li>
+                <li><b className="text-slate-200">D-pad ◄ / ►:</b> {t('calc.helpDpadCursor', 'Move cursor to edit anywhere in expression.')}</li>
               </ul>
             </div>
           )}
@@ -644,12 +646,12 @@ export const ScientificCalculator: React.FC = () => {
               <div className="flex items-center justify-between text-[11px]">
                 <div className="flex items-center gap-1.5 font-semibold text-amber-300">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="uppercase tracking-wider text-[10px] text-slate-300">Active Base:</span>
+                  <span className="uppercase tracking-wider text-[10px] text-slate-300">{t('calc.activeBase', 'Active Base:')}</span>
                   <span className="font-mono font-bold text-amber-200">
-                    {radix} ({radix === 'DEC' ? 'Decimal · Base 10' : radix === 'HEX' ? 'Hexadecimal · Base 16' : radix === 'BIN' ? 'Binary · Base 2' : 'Octal · Base 8'})
+                    {radix} ({radix === 'DEC' ? t('calc.baseDec', 'Decimal · Base 10') : radix === 'HEX' ? t('calc.baseHex', 'Hexadecimal · Base 16') : radix === 'BIN' ? t('calc.baseBin', 'Binary · Base 2') : t('calc.baseOct', 'Octal · Base 8')})
                   </span>
                 </div>
-                <span className="text-[10px] text-slate-400">Tap to convert</span>
+                <span className="text-[10px] text-slate-400">{t('calc.tapToConvert', 'Tap to convert')}</span>
               </div>
 
               {/* 4 Interactive Quick Conversion Buttons */}
@@ -671,11 +673,11 @@ export const ScientificCalculator: React.FC = () => {
                           ? 'bg-gradient-to-b from-[#F3D798] to-[#E6C27A] text-black shadow-md ring-2 ring-amber-400 scale-[1.02]'
                           : 'bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-white/10 hover:border-amber-400/50 active:scale-95'
                       }`}
-                      title={`Convert to ${b.name} (Base ${b.base})`}
+                      title={t('calc.convertToBase', 'Convert to {name} (Base {base})', { name: b.name, base: b.base })}
                     >
                       <span className="text-xs sm:text-sm font-extrabold">{b.name}</span>
                       <span className={`text-[9px] ${isActive ? 'text-black/80 font-bold' : 'text-slate-400'}`}>
-                        Base {b.base} [{b.suffix}]
+                        {t('calc.baseLabel', 'Base {base}', { base: b.base })} [{b.suffix}]
                       </span>
                     </button>
                   );
@@ -686,8 +688,8 @@ export const ScientificCalculator: React.FC = () => {
               {radix === 'HEX' && (
                 <div className="pt-1.5 border-t border-white/10 space-y-1">
                   <div className="flex items-center justify-between text-[10px] text-red-300 font-semibold uppercase tracking-wider">
-                    <span>Hexadecimal Digits (A–F)</span>
-                    <span className="text-[9px] text-slate-400 font-normal">Tap to insert digit</span>
+                    <span>{t('calc.hexDigits', 'Hexadecimal Digits (A–F)')}</span>
+                    <span className="text-[9px] text-slate-400 font-normal">{t('calc.tapToInsert', 'Tap to insert digit')}</span>
                   </div>
                   <div className="grid grid-cols-6 gap-1">
                     {['A', 'B', 'C', 'D', 'E', 'F'].map((hexChar) => (

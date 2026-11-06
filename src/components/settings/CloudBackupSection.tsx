@@ -420,39 +420,39 @@ export const CloudBackupSection: React.FC = () => {
                 {connectionInfo.state === 'initializing' && (
                   <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                     <RefreshCw className="h-2.5 w-2.5 animate-spin" />
-                    Checking Google Drive...
+                    {t('drive.checking', 'Checking Google Drive...')}
                   </span>
                 )}
 
                 {connectionInfo.state === 'connected' && (
                   <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Connected
+                    {t('drive.connected', 'Connected')}
                   </span>
                 )}
 
                 {connectionInfo.state === 'reauth_required' && (
                   <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                     <AlertCircle className="h-2.5 w-2.5" />
-                    Authorization Required
+                    {t('drive.authRequired', 'Authorization Required')}
                   </span>
                 )}
 
                 {connectionInfo.state === 'signed_out' && (
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border border-zinc-500/20">
-                    Not connected
+                    {t('drive.notConnected', 'Not connected')}
                   </span>
                 )}
 
                 {connectionInfo.state === 'error' && (
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-                    Connection error
+                    {t('drive.connError', 'Connection error')}
                   </span>
                 )}
               </div>
 
               <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] mt-0.5 font-medium">
-                {connectionInfo.email || 'Sign in with Google to sync study data across your devices'}
+                {connectionInfo.email || t('drive.signInPrompt', 'Sign in with Google to sync study data across your devices')}
               </p>
             </div>
           </div>
@@ -464,7 +464,7 @@ export const CloudBackupSection: React.FC = () => {
                 onClick={handleDisconnect}
                 className="btn-glass-secondary rounded-xl px-3.5 py-1.5 text-xs text-[#858A93] hover:text-rose-500 hover:border-rose-500/30 transition"
               >
-                Disconnect
+                {t('drive.disconnect', 'Disconnect')}
               </button>
             ) : connectionInfo.state === 'reauth_required' ? (
               <button
@@ -472,7 +472,7 @@ export const CloudBackupSection: React.FC = () => {
                 className="btn-gold-primary rounded-xl px-4 py-2 text-xs font-semibold flex items-center gap-2 shadow-xs transition"
               >
                 <Cloud className="h-3.5 w-3.5" />
-                <span>Reauthorize Google Drive</span>
+                <span>{t('drive.reauthorize', 'Reauthorize Google Drive')}</span>
               </button>
             ) : (
               <button
@@ -481,7 +481,7 @@ export const CloudBackupSection: React.FC = () => {
                 className="btn-gold-primary rounded-xl px-4 py-2 text-xs font-semibold flex items-center gap-2 shadow-xs transition"
               >
                 <Cloud className="h-3.5 w-3.5" />
-                <span>Connect Google Drive</span>
+                <span>{t('drive.connect', 'Connect Google Drive')}</span>
               </button>
             )}
           </div>

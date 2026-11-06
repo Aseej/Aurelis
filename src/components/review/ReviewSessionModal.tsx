@@ -6,6 +6,7 @@ import {
   fetchAIConceptExplanation,
 } from '../../services/geminiService';
 import { Topic } from '../../types';
+import { getTranslatedStageName } from '../../utils/scheduler';
 import {
   X,
   Eye,
@@ -93,7 +94,7 @@ const ReviewSessionDialog: React.FC<ReviewSessionDialogProps> = ({ reviewingTopi
 
           <div className="flex items-center gap-3">
             <span className="text-xs font-semibold text-[#A97B32] dark:text-[#E6C27A]">
-              {currentStep?.stageName || `Revision ${stepIndex}`} ({t('queue.stageBadge', 'Step')} {stepIndex + 1}/7)
+              {getTranslatedStageName(currentStep?.stageName || `Revision ${stepIndex}`, t)} ({t('queue.stageBadge', 'Step')} {stepIndex + 1}/7)
             </span>
             <button
               onClick={closeReviewSession}

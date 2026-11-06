@@ -60,6 +60,9 @@ interface AppContextType {
   setSelectedSubjectId: (id: string | null) => void;
   selectedCalendarDate: string;
   setSelectedCalendarDate: (dateStr: string) => void;
+  // Fullscreen Camera Mode state
+  isCameraMode: boolean;
+  setIsCameraMode: (active: boolean) => void;
   // Active / Archived Subject Queries
   activeSubjects: Subject[];
   archivedSubjects: Subject[];
@@ -134,6 +137,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [reviewingTopic, setReviewingTopic] = useState<{ topic: Topic; stepIndex: number } | null>(null);
   const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(null);
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<string>(getTodayDateString());
+  const [isCameraMode, setIsCameraMode] = useState<boolean>(false);
 
   // Synchronize HTML theme class and colorScheme
   useEffect(() => {
@@ -282,6 +286,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Delete topic
   const deleteTopic = useCallback((id: string) => {
+    setReviewingTopic((prev) => (prev?.topic.id === id ? null : prev));
     setState((prev) => ({
       ...prev,
       topics: prev.topics.filter((t) => t.id !== id),
@@ -516,6 +521,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const deleteSubject = useCallback((id: string) => {
+    setSelectedSubjectId((prev) => (prev === id ? null : prev));
+    setReviewingTopic((prev) => (prev?.topic.subjectId === id ? null : prev));
     setState((prev) => ({
       ...prev,
       subjects: prev.subjects.filter((s) => s.id !== id),
@@ -759,6 +766,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSelectedSubjectId,
     selectedCalendarDate,
     setSelectedCalendarDate,
+    isCameraMode,
+    setIsCameraMode,
     activeSubjects,
     archivedSubjects,
     archiveSubject,

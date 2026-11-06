@@ -245,7 +245,7 @@ export const SettingsModal: React.FC = () => {
                           value={lang.code}
                           className="dark:bg-[#16181D] text-[#20232A] dark:text-[#F6F3EC]"
                         >
-                          {lang.nativeName} ({lang.name})
+                          {lang.nativeName} ({lang.name}){lang.region ? ` — ${lang.region}` : ''}
                         </option>
                       ))}
                     </select>
@@ -284,7 +284,7 @@ export const SettingsModal: React.FC = () => {
 
                 <div className="rounded-2xl glass-subtle p-3.5 text-[11px] text-[#686D77] dark:text-[#A7ABB5]">
                   <span className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                    Active Configuration Rhythm:
+                    {t('settings.activeRhythm', 'Active Configuration Rhythm:')}
                   </span>
                   <div className="mt-1 font-mono">
                     Day 1 (Learn) → Day 3 (Rev 1) → Day 5 (Rev 2) → Day 7 (Test) → Day 14 (Rev) → Day 21 (Rev) → Day 28 (Rev)
@@ -297,7 +297,7 @@ export const SettingsModal: React.FC = () => {
                     onClick={() => setIntervalsStr(DEFAULT_REVISION_INTERVALS.join(', '))}
                     className="btn-glass-secondary rounded-xl px-3.5 py-2 font-medium"
                   >
-                    Reset to Default
+                    {t('settings.resetDefault', 'Reset to Default')}
                   </button>
                   <button
                     type="submit"
@@ -397,12 +397,12 @@ export const SettingsModal: React.FC = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl glass-subtle border border-black/[0.06] dark:border-white/[0.08] p-4">
                       <div>
                         <h4 className="font-semibold text-xs text-[#20232A] dark:text-[#F6F3EC]">
-                          Demo Syllabus Data
+                          {t('settings.demoDataTitle', 'Demo Syllabus Data')}
                         </h4>
                         <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] mt-0.5">
                           {state.isDemoData
-                            ? 'Currently viewing sample academic dataset. Reset to begin your personal revision notebook.'
-                            : 'Load realistic sample physics, chemistry, and math syllabus records.'}
+                            ? t('settings.demoDataActive', 'Currently viewing sample academic dataset. Reset to begin your personal revision notebook.')
+                            : t('settings.demoDataInactive', 'Load realistic sample physics, chemistry, and math syllabus records.')}
                         </p>
                       </div>
                       {state.isDemoData ? (
@@ -417,7 +417,7 @@ export const SettingsModal: React.FC = () => {
                           onClick={loadDemoData}
                           className="btn-glass-secondary rounded-xl px-3.5 py-2 font-medium text-xs shrink-0"
                         >
-                          Load Demo Data
+                          {t('settings.loadDemo', 'Load Demo Data')}
                         </button>
                       )}
                     </div>
@@ -429,7 +429,7 @@ export const SettingsModal: React.FC = () => {
                           {t('settings.clearAllData', 'Delete All Study Data')}
                         </h4>
                         <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] mt-0.5">
-                          Permanently delete all subjects, topics, and mistake logs in this browser session.
+                          {t('settings.clearAllDataSub', 'Permanently delete all subjects, topics, and mistake logs in this browser session.')}
                         </p>
                       </div>
                       <button
