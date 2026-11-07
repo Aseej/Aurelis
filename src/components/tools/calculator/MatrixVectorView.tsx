@@ -259,7 +259,7 @@ export const MatrixVectorView: React.FC<MatrixVectorViewProps> = ({
       {/* Dimension Selector */}
       {type === 'MATRIX' ? (
         <div className="flex items-center justify-between bg-slate-800/40 p-2 rounded-lg text-xs">
-          <span className="text-slate-400 font-mono">Dimensions of Mat{selectedSlot}:</span>
+          <span className="text-slate-400 font-mono">{t('calc.dimensionsOfMat', 'Dimensions of Mat{slot}:', { slot: selectedSlot })}</span>
           <div className="flex gap-1.5">
             {[
               { r: 2, c: 2, label: '2×2' },
@@ -285,7 +285,7 @@ export const MatrixVectorView: React.FC<MatrixVectorViewProps> = ({
         </div>
       ) : (
         <div className="flex items-center justify-between bg-slate-800/40 p-2 rounded-lg text-xs">
-          <span className="text-slate-400 font-mono">Dimension of Vct{selectedSlot}:</span>
+          <span className="text-slate-400 font-mono">{t('calc.dimensionOfVct', 'Dimension of Vct{slot}:', { slot: selectedSlot })}</span>
           <div className="flex gap-2">
             {[2, 3].map((dim) => (
               <button
@@ -297,7 +297,7 @@ export const MatrixVectorView: React.FC<MatrixVectorViewProps> = ({
                     : 'bg-slate-800 text-slate-400 hover:text-slate-200'
                 }`}
               >
-                {dim}D Vector
+                {t('calc.nDVector', '{dim}D Vector', { dim })}
               </button>
             ))}
           </div>
@@ -307,8 +307,8 @@ export const MatrixVectorView: React.FC<MatrixVectorViewProps> = ({
       {/* Matrix / Vector Data Grid Editor */}
       <div className="bg-slate-950/70 p-3 rounded-lg border border-slate-800">
         <div className="text-xs font-mono text-amber-400 mb-2 flex items-center justify-between">
-          <span>Editing {type === 'MATRIX' ? `Mat${selectedSlot}` : `Vct${selectedSlot}`}:</span>
-          <span className="text-slate-500 text-[10px]">Tap cells to input values</span>
+          <span>{t('calc.editingTarget', 'Editing {target}:', { target: type === 'MATRIX' ? `Mat${selectedSlot}` : `Vct${selectedSlot}` })}</span>
+          <span className="text-slate-500 text-[10px]">{t('calc.tapCellsToInput', 'Tap cells to input values')}</span>
         </div>
 
         {type === 'MATRIX' ? (
@@ -362,7 +362,7 @@ export const MatrixVectorView: React.FC<MatrixVectorViewProps> = ({
 
       {/* Operation Selection */}
       <div className="space-y-2">
-        <label className="text-xs font-mono text-slate-400">Operation:</label>
+        <label className="text-xs font-mono text-slate-400">{t('calc.operationLabel', 'Operation:')}</label>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
           {type === 'MATRIX' ? (
             <>
@@ -505,7 +505,7 @@ export const MatrixVectorView: React.FC<MatrixVectorViewProps> = ({
 
         {operation === 'SCALAR' && type === 'MATRIX' && (
           <div className="flex items-center gap-2 pt-1">
-            <span className="text-xs font-mono text-slate-400">Scalar multiplier k:</span>
+            <span className="text-xs font-mono text-slate-400">{t('calc.scalarMultiplierK', 'Scalar multiplier k:')}</span>
             <input
               type="number"
               step="any"
@@ -522,7 +522,7 @@ export const MatrixVectorView: React.FC<MatrixVectorViewProps> = ({
         onClick={type === 'MATRIX' ? runMatrixOperation : runVectorOperation}
         className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-lg shadow-md flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
       >
-        <span>Calculate</span>
+        <span>{t('calc.calculateBtn', 'Calculate')}</span>
         <ArrowRight className="w-4 h-4" />
       </button>
 
@@ -543,7 +543,7 @@ export const MatrixVectorView: React.FC<MatrixVectorViewProps> = ({
               className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-amber-300 transition-colors"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied' : 'Copy'}</span>
+              <span>{copied ? t('common.copied', 'Copied') : t('common.copy', 'Copy')}</span>
             </button>
           </div>
 

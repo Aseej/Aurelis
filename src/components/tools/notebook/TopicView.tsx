@@ -465,7 +465,10 @@ export const TopicView: React.FC<TopicViewProps> = ({
               <h3 className="font-semibold text-sm">{t('notebook.deleteTopicTitle', 'Delete Topic & Captured Pages?')}</h3>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Deleting <strong className="text-white">&ldquo;{topic.name}&rdquo;</strong> will permanently remove it along with all <strong className="text-amber-400">{sortedPages.length} captured pages</strong> from your Google Drive.
+              {t('notebook.confirmDeleteTopicNoticeDetailed', 'Deleting "{name}" will permanently remove it along with all {pages} captured pages from your Google Drive.', {
+                name: topic.name,
+                pages: sortedPages.length,
+              })}
             </p>
             <p className="text-[11px] text-slate-400">
               {t('notebook.cannotUndo', 'This action cannot be undone.')}
@@ -502,7 +505,9 @@ export const TopicView: React.FC<TopicViewProps> = ({
               <h3 className="font-semibold text-sm">{t('notebook.deleteSelectedPagesTitle', 'Delete Selected Pages?')}</h3>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Permanently delete <strong className="text-amber-400">{selectedPageIds.size} selected pages</strong> from your Google Drive?
+              {t('notebook.confirmDeleteSelectedNotice', 'Permanently delete {count} selected pages from your Google Drive?', {
+                count: selectedPageIds.size,
+              })}
             </p>
             <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
               <button

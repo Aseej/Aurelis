@@ -138,10 +138,10 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
           <div>
             <h3 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
               <Cloud className="w-4 h-4 text-amber-400" />
-              <span>Review Pages before Saving</span>
+              <span>{t('notebook.reviewPagesBeforeSaving', 'Review Pages before Saving')}</span>
             </h3>
             <p className="text-[11px] text-slate-400 mt-0.5">
-              Topic: <span className="text-amber-400 font-medium">{topicName}</span>
+              {t('notebook.topicLabel', 'Topic:')} <span className="text-amber-400 font-medium">{topicName}</span>
             </p>
           </div>
           {!isUploading && (
@@ -160,7 +160,7 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
             <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-800/80 text-rose-200 text-xs flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
               <div className="flex-1 space-y-2">
-                <p className="font-semibold">Upload Notice</p>
+                <p className="font-semibold">{t('notebook.uploadNotice', 'Upload Notice')}</p>
                 <p className="text-[11px] text-rose-300">{uploadError}</p>
                 {uploadError.includes('AUTH_REQUIRED') && (
                   <button
@@ -169,7 +169,7 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
                     className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-lg inline-flex items-center gap-1.5 text-xs transition-colors"
                   >
                     {isReconnecting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <LogIn className="w-3.5 h-3.5" />}
-                    <span>Reconnect Google Drive</span>
+                    <span>{t('drive.reconnectGoogleDrive', 'Reconnect Google Drive')}</span>
                   </button>
                 )}
               </div>
@@ -179,7 +179,7 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
           {isUploading && (
             <div className="p-4 bg-slate-950 rounded-2xl border border-amber-500/30 space-y-2 text-center animate-pulse">
               <span className="text-xs font-mono text-amber-400 font-semibold">
-                Uploading page {currentUploadIndex} of {files.length} to Google Drive...
+                {t('notebook.uploadingProgress', 'Uploading page {current} of {total} to Google Drive...', { current: currentUploadIndex, total: files.length })}
               </span>
               <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
                 <div
@@ -188,7 +188,7 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
                 />
               </div>
               <p className="text-[10px] text-slate-500">
-                Storing securely in your Google Drive appDataFolder
+                {t('notebook.storingSecurely', 'Storing securely in your Google Drive appDataFolder')}
               </p>
             </div>
           )}
@@ -209,7 +209,7 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute top-1.5 left-1.5 bg-black/75 backdrop-blur-xs text-[10px] font-mono px-1.5 py-0.5 rounded text-amber-300 font-bold border border-white/10">
-                      Page {targetPageNum}
+                      {t('notebook.pageNumber', 'Page {number}', { number: targetPageNum })}
                     </div>
 
                     {!isUploading && (
@@ -218,7 +218,7 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
                           type="button"
                           onClick={() => removeFile(idx)}
                           className="p-1 rounded bg-black/80 hover:bg-rose-600 text-white transition-colors"
-                          title="Remove this page"
+                          title={t('notebook.removePage', 'Remove this page')}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -237,7 +237,7 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
                           disabled={idx === 0}
                           onClick={() => moveFile(idx, 'UP')}
                           className="p-1 text-slate-400 hover:text-slate-100 disabled:opacity-20"
-                          title="Move Earlier"
+                          title={t('notebook.moveEarlier', 'Move Earlier')}
                         >
                           <ArrowUp className="w-3 h-3" />
                         </button>
@@ -246,7 +246,7 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
                           disabled={idx === files.length - 1}
                           onClick={() => moveFile(idx, 'DOWN')}
                           className="p-1 text-slate-400 hover:text-slate-100 disabled:opacity-20"
-                          title="Move Later"
+                          title={t('notebook.moveLater', 'Move Later')}
                         >
                           <ArrowDown className="w-3 h-3" />
                         </button>
@@ -262,7 +262,7 @@ export const UploadReviewModal: React.FC<UploadReviewModalProps> = ({
         {/* Footer */}
         <div className="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between gap-3">
           <span className="text-xs font-mono text-slate-400">
-            {files.length} {files.length === 1 ? 'page' : 'pages'} selected
+            {t('notebook.pagesSelected', '{count} pages selected', { count: files.length })}
           </span>
 
           <div className="flex items-center gap-2">

@@ -146,12 +146,12 @@ export const StatEditorView: React.FC<StatEditorViewProps> = ({ onClose }) => {
               className="flex items-center gap-1 text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 px-2.5 py-1 rounded border border-amber-500/40 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Add Row</span>
+              <span>{t('calc.addRow', 'Add Row')}</span>
             </button>
             <button
               onClick={resetData}
               className="flex items-center gap-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-400 px-2.5 py-1 rounded transition-colors"
-              title="Reset Table"
+              title={t('calc.resetTable', 'Reset Table')}
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
@@ -170,8 +170,8 @@ export const StatEditorView: React.FC<StatEditorViewProps> = ({ onClose }) => {
               X
             </div>
             {statType === 'A+BX' && <div className="col-span-3 text-center">Y</div>}
-            <div className="col-span-2 text-center">Freq</div>
-            <div className="col-span-1 text-center">Del</div>
+            <div className="col-span-2 text-center">{t('calc.freq', 'Freq')}</div>
+            <div className="col-span-1 text-center">{t('calc.del', 'Del')}</div>
           </div>
 
           {/* Data Rows */}
@@ -225,61 +225,61 @@ export const StatEditorView: React.FC<StatEditorViewProps> = ({ onClose }) => {
       <div className="bg-slate-950 rounded-lg border border-amber-500/40 p-3 space-y-3">
         <div className="flex items-center justify-between border-b border-slate-800 pb-2">
           <span className="text-xs font-mono font-semibold text-amber-400">
-            {statType === '1-VAR' ? '1-Variable Statistics Summary' : 'Linear Regression (y = a + bx)'}
+            {statType === '1-VAR' ? t('calc.stat1VarSummary', '1-Variable Statistics Summary') : t('calc.statRegSummary', 'Linear Regression (y = a + bx)')}
           </span>
           <button
             onClick={copyStats}
             className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-amber-300 transition-colors"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? 'Copied' : 'Copy'}</span>
+            <span>{copied ? t('common.copied', 'Copied') : t('common.copy', 'Copy')}</span>
           </button>
         </div>
 
         {statType === '1-VAR' && stats1Var && (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-mono">
             <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">n (Sample Size)</span>
+              <span className="text-slate-400 block text-[10px]">{t('calc.sampleSize', 'n (Sample Size)')}</span>
               <span className="text-amber-300 font-bold">{stats1Var.n}</span>
             </div>
             <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">x̄ (Mean)</span>
+              <span className="text-slate-400 block text-[10px]">{t('calc.mean', 'x̄ (Mean)')}</span>
               <span className="text-amber-300 font-bold">{formatResultNicely(stats1Var.mean)}</span>
             </div>
             <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">Σx (Sum of X)</span>
+              <span className="text-slate-400 block text-[10px]">{t('calc.sumX', 'Σx (Sum of X)')}</span>
               <span className="text-slate-200">{formatResultNicely(stats1Var.sumX)}</span>
             </div>
             <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">Σx² (Sum of X²)</span>
+              <span className="text-slate-400 block text-[10px]">{t('calc.sumX2', 'Σx² (Sum of X²)')}</span>
               <span className="text-slate-200">{formatResultNicely(stats1Var.sumX2)}</span>
             </div>
             <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">sx (Sample Std Dev)</span>
+              <span className="text-slate-400 block text-[10px]">{t('calc.sampleStdDev', 'sx (Sample Std Dev)')}</span>
               <span className="text-emerald-400 font-bold">{formatResultNicely(stats1Var.sX)}</span>
             </div>
             <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">σx (Population Std Dev)</span>
+              <span className="text-slate-400 block text-[10px]">{t('calc.popStdDev', 'σx (Population Std Dev)')}</span>
               <span className="text-emerald-400">{formatResultNicely(stats1Var.sigmaX)}</span>
             </div>
             <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">minX</span>
+              <span className="text-slate-400 block text-[10px]">{t('calc.minX', 'minX')}</span>
               <span className="text-slate-200">{formatResultNicely(stats1Var.minX)}</span>
             </div>
             <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">Q1 (1st Quartile)</span>
+              <span className="text-slate-400 block text-[10px]">{t('calc.q1', 'Q1 (1st Quartile)')}</span>
               <span className="text-slate-200">{formatResultNicely(stats1Var.q1)}</span>
             </div>
             <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">Med (Median)</span>
+              <span className="text-slate-400 block text-[10px]">{t('calc.median', 'Med (Median)')}</span>
               <span className="text-amber-300 font-bold">{formatResultNicely(stats1Var.med)}</span>
             </div>
             <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">Q3 (3rd Quartile)</span>
+              <span className="text-slate-400 block text-[10px]">{t('calc.q3', 'Q3 (3rd Quartile)')}</span>
               <span className="text-slate-200">{formatResultNicely(stats1Var.q3)}</span>
             </div>
             <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-              <span className="text-slate-400 block text-[10px]">maxX</span>
+              <span className="text-slate-400 block text-[10px]">{t('calc.maxX', 'maxX')}</span>
               <span className="text-slate-200">{formatResultNicely(stats1Var.maxX)}</span>
             </div>
           </div>
@@ -289,7 +289,7 @@ export const StatEditorView: React.FC<StatEditorViewProps> = ({ onClose }) => {
           <div className="space-y-3 font-mono text-xs">
             {/* Fitted Equation */}
             <div className="p-2.5 bg-slate-900 rounded border border-amber-500/30 text-center">
-              <span className="text-slate-400 block text-[10px] mb-1">Fitted Linear Model</span>
+              <span className="text-slate-400 block text-[10px] mb-1">{t('calc.fittedLinearModel', 'Fitted Linear Model')}</span>
               <span className="text-base font-bold text-amber-300">
                 y = {formatResultNicely(statsReg.a)} + ({formatResultNicely(statsReg.b)})·x
               </span>
@@ -297,27 +297,27 @@ export const StatEditorView: React.FC<StatEditorViewProps> = ({ onClose }) => {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-                <span className="text-slate-400 block text-[10px]">a (Y-Intercept)</span>
+                <span className="text-slate-400 block text-[10px]">{t('calc.yIntercept', 'a (Y-Intercept)')}</span>
                 <span className="text-amber-300 font-bold">{formatResultNicely(statsReg.a)}</span>
               </div>
               <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-                <span className="text-slate-400 block text-[10px]">b (Slope)</span>
+                <span className="text-slate-400 block text-[10px]">{t('calc.slope', 'b (Slope)')}</span>
                 <span className="text-amber-300 font-bold">{formatResultNicely(statsReg.b)}</span>
               </div>
               <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-                <span className="text-slate-400 block text-[10px]">r (Correlation)</span>
+                <span className="text-slate-400 block text-[10px]">{t('calc.correlation', 'r (Correlation)')}</span>
                 <span className="text-emerald-400 font-bold">{formatResultNicely(statsReg.r)}</span>
               </div>
               <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-                <span className="text-slate-400 block text-[10px]">r² (Coeff of Determ)</span>
+                <span className="text-slate-400 block text-[10px]">{t('calc.coeffOfDeterm', 'r² (Coeff of Determ)')}</span>
                 <span className="text-emerald-400">{formatResultNicely(statsReg.r * statsReg.r)}</span>
               </div>
               <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-                <span className="text-slate-400 block text-[10px]">x̄ (Mean X)</span>
+                <span className="text-slate-400 block text-[10px]">{t('calc.meanX', 'x̄ (Mean X)')}</span>
                 <span className="text-slate-200">{formatResultNicely(statsReg.meanX)}</span>
               </div>
               <div className="bg-slate-900/80 p-2 rounded border border-slate-800">
-                <span className="text-slate-400 block text-[10px]">ȳ (Mean Y)</span>
+                <span className="text-slate-400 block text-[10px]">{t('calc.meanY', 'ȳ (Mean Y)')}</span>
                 <span className="text-slate-200">{formatResultNicely(statsReg.meanY)}</span>
               </div>
             </div>

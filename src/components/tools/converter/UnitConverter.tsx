@@ -1,87 +1,96 @@
 import React, { useState } from 'react';
 import { ArrowRightLeft, Copy, Check, RotateCcw } from 'lucide-react';
+import { useI18n } from '../../../i18n';
 
 type UnitCategory = 'length' | 'mass' | 'temperature' | 'pressure' | 'energy' | 'speed';
 
 interface UnitDef {
   id: string;
-  name: string;
+  nameKey: string;
+  defaultName: string;
   symbol: string;
   toBase: (val: number) => number;
   fromBase: (baseVal: number) => number;
 }
 
-const UNIT_DATA: Record<UnitCategory, { name: string; units: UnitDef[] }> = {
+const UNIT_DATA: Record<UnitCategory, { nameKey: string; defaultName: string; units: UnitDef[] }> = {
   length: {
-    name: 'Length',
+    nameKey: 'converter.categories.length',
+    defaultName: 'Length',
     units: [
-      { id: 'm', name: 'Meter', symbol: 'm', toBase: (v) => v, fromBase: (b) => b },
-      { id: 'km', name: 'Kilometer', symbol: 'km', toBase: (v) => v * 1000, fromBase: (b) => b / 1000 },
-      { id: 'cm', name: 'Centimeter', symbol: 'cm', toBase: (v) => v * 0.01, fromBase: (b) => b * 100 },
-      { id: 'mm', name: 'Millimeter', symbol: 'mm', toBase: (v) => v * 0.001, fromBase: (b) => b * 1000 },
-      { id: 'in', name: 'Inch', symbol: 'in', toBase: (v) => v * 0.0254, fromBase: (b) => b / 0.0254 },
-      { id: 'ft', name: 'Foot', symbol: 'ft', toBase: (v) => v * 0.3048, fromBase: (b) => b / 0.3048 },
-      { id: 'yd', name: 'Yard', symbol: 'yd', toBase: (v) => v * 0.9144, fromBase: (b) => b / 0.9144 },
-      { id: 'mi', name: 'Mile', symbol: 'mi', toBase: (v) => v * 1609.344, fromBase: (b) => b / 1609.344 },
-      { id: 'nm', name: 'Nanometer', symbol: 'nm', toBase: (v) => v * 1e-9, fromBase: (b) => b * 1e9 },
-      { id: 'angstrom', name: 'Ångström', symbol: 'Å', toBase: (v) => v * 1e-10, fromBase: (b) => b * 1e10 },
+      { id: 'm', nameKey: 'converter.units.meter', defaultName: 'Meter', symbol: 'm', toBase: (v) => v, fromBase: (b) => b },
+      { id: 'km', nameKey: 'converter.units.kilometer', defaultName: 'Kilometer', symbol: 'km', toBase: (v) => v * 1000, fromBase: (b) => b / 1000 },
+      { id: 'cm', nameKey: 'converter.units.centimeter', defaultName: 'Centimeter', symbol: 'cm', toBase: (v) => v * 0.01, fromBase: (b) => b * 100 },
+      { id: 'mm', nameKey: 'converter.units.millimeter', defaultName: 'Millimeter', symbol: 'mm', toBase: (v) => v * 0.001, fromBase: (b) => b * 1000 },
+      { id: 'in', nameKey: 'converter.units.inch', defaultName: 'Inch', symbol: 'in', toBase: (v) => v * 0.0254, fromBase: (b) => b / 0.0254 },
+      { id: 'ft', nameKey: 'converter.units.foot', defaultName: 'Foot', symbol: 'ft', toBase: (v) => v * 0.3048, fromBase: (b) => b / 0.3048 },
+      { id: 'yd', nameKey: 'converter.units.yard', defaultName: 'Yard', symbol: 'yd', toBase: (v) => v * 0.9144, fromBase: (b) => b / 0.9144 },
+      { id: 'mi', nameKey: 'converter.units.mile', defaultName: 'Mile', symbol: 'mi', toBase: (v) => v * 1609.344, fromBase: (b) => b / 1609.344 },
+      { id: 'nm', nameKey: 'converter.units.nanometer', defaultName: 'Nanometer', symbol: 'nm', toBase: (v) => v * 1e-9, fromBase: (b) => b * 1e9 },
+      { id: 'angstrom', nameKey: 'converter.units.angstrom', defaultName: 'Ångström', symbol: 'Å', toBase: (v) => v * 1e-10, fromBase: (b) => b * 1e10 },
     ],
   },
   mass: {
-    name: 'Mass & Weight',
+    nameKey: 'converter.categories.mass',
+    defaultName: 'Mass & Weight',
     units: [
-      { id: 'kg', name: 'Kilogram', symbol: 'kg', toBase: (v) => v, fromBase: (b) => b },
-      { id: 'g', name: 'Gram', symbol: 'g', toBase: (v) => v * 0.001, fromBase: (b) => b * 1000 },
-      { id: 'mg', name: 'Milligram', symbol: 'mg', toBase: (v) => v * 1e-6, fromBase: (b) => b * 1e6 },
-      { id: 'lb', name: 'Pound', symbol: 'lb', toBase: (v) => v * 0.45359237, fromBase: (b) => b / 0.45359237 },
-      { id: 'oz', name: 'Ounce', symbol: 'oz', toBase: (v) => v * 0.028349523, fromBase: (b) => b / 0.028349523 },
-      { id: 'ton', name: 'Metric Ton', symbol: 't', toBase: (v) => v * 1000, fromBase: (b) => b / 1000 },
-      { id: 'amu', name: 'Atomic Mass Unit', symbol: 'u', toBase: (v) => v * 1.6605390666e-27, fromBase: (b) => b / 1.6605390666e-27 },
+      { id: 'kg', nameKey: 'converter.units.kilogram', defaultName: 'Kilogram', symbol: 'kg', toBase: (v) => v, fromBase: (b) => b },
+      { id: 'g', nameKey: 'converter.units.gram', defaultName: 'Gram', symbol: 'g', toBase: (v) => v * 0.001, fromBase: (b) => b * 1000 },
+      { id: 'mg', nameKey: 'converter.units.milligram', defaultName: 'Milligram', symbol: 'mg', toBase: (v) => v * 1e-6, fromBase: (b) => b * 1e6 },
+      { id: 'lb', nameKey: 'converter.units.pound', defaultName: 'Pound', symbol: 'lb', toBase: (v) => v * 0.45359237, fromBase: (b) => b / 0.45359237 },
+      { id: 'oz', nameKey: 'converter.units.ounce', defaultName: 'Ounce', symbol: 'oz', toBase: (v) => v * 0.028349523, fromBase: (b) => b / 0.028349523 },
+      { id: 'ton', nameKey: 'converter.units.ton', defaultName: 'Metric Ton', symbol: 't', toBase: (v) => v * 1000, fromBase: (b) => b / 1000 },
+      { id: 'amu', nameKey: 'converter.units.amu', defaultName: 'Atomic Mass Unit', symbol: 'u', toBase: (v) => v * 1.6605390666e-27, fromBase: (b) => b / 1.6605390666e-27 },
     ],
   },
   temperature: {
-    name: 'Temperature',
+    nameKey: 'converter.categories.temperature',
+    defaultName: 'Temperature',
     units: [
-      { id: 'c', name: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (b) => b },
-      { id: 'f', name: 'Fahrenheit', symbol: '°F', toBase: (v) => ((v - 32) * 5) / 9, fromBase: (b) => (b * 9) / 5 + 32 },
-      { id: 'k', name: 'Kelvin', symbol: 'K', toBase: (v) => v - 273.15, fromBase: (b) => b + 273.15 },
+      { id: 'c', nameKey: 'converter.units.celsius', defaultName: 'Celsius', symbol: '°C', toBase: (v) => v, fromBase: (b) => b },
+      { id: 'f', nameKey: 'converter.units.fahrenheit', defaultName: 'Fahrenheit', symbol: '°F', toBase: (v) => ((v - 32) * 5) / 9, fromBase: (b) => (b * 9) / 5 + 32 },
+      { id: 'k', nameKey: 'converter.units.kelvin', defaultName: 'Kelvin', symbol: 'K', toBase: (v) => v - 273.15, fromBase: (b) => b + 273.15 },
     ],
   },
   pressure: {
-    name: 'Pressure',
+    nameKey: 'converter.categories.pressure',
+    defaultName: 'Pressure',
     units: [
-      { id: 'pa', name: 'Pascal', symbol: 'Pa', toBase: (v) => v, fromBase: (b) => b },
-      { id: 'kpa', name: 'Kilopascal', symbol: 'kPa', toBase: (v) => v * 1000, fromBase: (b) => b / 1000 },
-      { id: 'bar', name: 'Bar', symbol: 'bar', toBase: (v) => v * 100000, fromBase: (b) => b / 100000 },
-      { id: 'atm', name: 'Atmosphere (std)', symbol: 'atm', toBase: (v) => v * 101325, fromBase: (b) => b / 101325 },
-      { id: 'torr', name: 'Torr / mmHg', symbol: 'Torr', toBase: (v) => v * 133.322368, fromBase: (b) => b / 133.322368 },
-      { id: 'psi', name: 'Pound / sq inch', symbol: 'psi', toBase: (v) => v * 6894.757, fromBase: (b) => b / 6894.757 },
+      { id: 'pa', nameKey: 'converter.units.pascal', defaultName: 'Pascal', symbol: 'Pa', toBase: (v) => v, fromBase: (b) => b },
+      { id: 'kpa', nameKey: 'converter.units.kilopascal', defaultName: 'Kilopascal', symbol: 'kPa', toBase: (v) => v * 1000, fromBase: (b) => b / 1000 },
+      { id: 'bar', nameKey: 'converter.units.bar', defaultName: 'Bar', symbol: 'bar', toBase: (v) => v * 100000, fromBase: (b) => b / 100000 },
+      { id: 'atm', nameKey: 'converter.units.atmosphere', defaultName: 'Atmosphere (std)', symbol: 'atm', toBase: (v) => v * 101325, fromBase: (b) => b / 101325 },
+      { id: 'torr', nameKey: 'converter.units.torr', defaultName: 'Torr / mmHg', symbol: 'Torr', toBase: (v) => v * 133.322368, fromBase: (b) => b / 133.322368 },
+      { id: 'psi', nameKey: 'converter.units.psi', defaultName: 'Pound / sq inch', symbol: 'psi', toBase: (v) => v * 6894.757, fromBase: (b) => b / 6894.757 },
     ],
   },
   energy: {
-    name: 'Energy & Work',
+    nameKey: 'converter.categories.energy',
+    defaultName: 'Energy & Work',
     units: [
-      { id: 'j', name: 'Joule', symbol: 'J', toBase: (v) => v, fromBase: (b) => b },
-      { id: 'kj', name: 'Kilojoule', symbol: 'kJ', toBase: (v) => v * 1000, fromBase: (b) => b / 1000 },
-      { id: 'cal', name: 'Calorie', symbol: 'cal', toBase: (v) => v * 4.184, fromBase: (b) => b / 4.184 },
-      { id: 'kcal', name: 'Kilocalorie', symbol: 'kcal', toBase: (v) => v * 4184, fromBase: (b) => b / 4184 },
-      { id: 'ev', name: 'Electronvolt', symbol: 'eV', toBase: (v) => v * 1.602176634e-19, fromBase: (b) => b / 1.602176634e-19 },
-      { id: 'kwh', name: 'Kilowatt-hour', symbol: 'kWh', toBase: (v) => v * 3.6e6, fromBase: (b) => b / 3.6e6 },
+      { id: 'j', nameKey: 'converter.units.joule', defaultName: 'Joule', symbol: 'J', toBase: (v) => v, fromBase: (b) => b },
+      { id: 'kj', nameKey: 'converter.units.kilojoule', defaultName: 'Kilojoule', symbol: 'kJ', toBase: (v) => v * 1000, fromBase: (b) => b / 1000 },
+      { id: 'cal', nameKey: 'converter.units.calorie', defaultName: 'Calorie', symbol: 'cal', toBase: (v) => v * 4.184, fromBase: (b) => b / 4.184 },
+      { id: 'kcal', nameKey: 'converter.units.kilocalorie', defaultName: 'Kilocalorie', symbol: 'kcal', toBase: (v) => v * 4184, fromBase: (b) => b / 4184 },
+      { id: 'ev', nameKey: 'converter.units.electronvolt', defaultName: 'Electronvolt', symbol: 'eV', toBase: (v) => v * 1.602176634e-19, fromBase: (b) => b / 1.602176634e-19 },
+      { id: 'kwh', nameKey: 'converter.units.kilowatthour', defaultName: 'Kilowatt-hour', symbol: 'kWh', toBase: (v) => v * 3.6e6, fromBase: (b) => b / 3.6e6 },
     ],
   },
   speed: {
-    name: 'Speed & Velocity',
+    nameKey: 'converter.categories.speed',
+    defaultName: 'Speed & Velocity',
     units: [
-      { id: 'mps', name: 'Meter / second', symbol: 'm/s', toBase: (v) => v, fromBase: (b) => b },
-      { id: 'kmh', name: 'Kilometer / hour', symbol: 'km/h', toBase: (v) => v / 3.6, fromBase: (b) => b * 3.6 },
-      { id: 'mph', name: 'Mile / hour', symbol: 'mph', toBase: (v) => v * 0.44704, fromBase: (b) => b / 0.44704 },
-      { id: 'knot', name: 'Knot', symbol: 'kn', toBase: (v) => v * 0.514444, fromBase: (b) => b / 0.514444 },
-      { id: 'c', name: 'Speed of Light', symbol: 'c', toBase: (v) => v * 299792458, fromBase: (b) => b / 299792458 },
+      { id: 'mps', nameKey: 'converter.units.mps', defaultName: 'Meter / second', symbol: 'm/s', toBase: (v) => v, fromBase: (b) => b },
+      { id: 'kmh', nameKey: 'converter.units.kmh', defaultName: 'Kilometer / hour', symbol: 'km/h', toBase: (v) => v / 3.6, fromBase: (b) => b * 3.6 },
+      { id: 'mph', nameKey: 'converter.units.mph', defaultName: 'Mile / hour', symbol: 'mph', toBase: (v) => v * 0.44704, fromBase: (b) => b / 0.44704 },
+      { id: 'knot', nameKey: 'converter.units.knot', defaultName: 'Knot', symbol: 'kn', toBase: (v) => v * 0.514444, fromBase: (b) => b / 0.514444 },
+      { id: 'c', nameKey: 'converter.units.c', defaultName: 'Speed of Light', symbol: 'c', toBase: (v) => v * 299792458, fromBase: (b) => b / 299792458 },
     ],
   },
 };
 
 export const UnitConverter: React.FC = () => {
+  const { t } = useI18n();
   const [category, setCategory] = useState<UnitCategory>('length');
   const [inputValue, setInputValue] = useState<string>('1');
   const [fromUnitId, setFromUnitId] = useState<string>(UNIT_DATA.length.units[0].id);
@@ -143,7 +152,7 @@ export const UnitConverter: React.FC = () => {
                 : 'bg-black/[0.04] dark:bg-white/[0.06] text-[#6E737D] dark:text-[#A0A5B0] hover:text-[#20232A] dark:hover:text-[#F6F3EC]'
             }`}
           >
-            {UNIT_DATA[cat].name}
+            {t(UNIT_DATA[cat].nameKey, UNIT_DATA[cat].defaultName)}
           </button>
         ))}
       </div>
@@ -153,7 +162,7 @@ export const UnitConverter: React.FC = () => {
         {/* From Input */}
         <div className="bg-black/[0.03] dark:bg-white/[0.04] p-4 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] space-y-2">
           <div className="flex items-center justify-between text-xs text-[#858A93] dark:text-[#A0A5B0]">
-            <span>From</span>
+            <span>{t('converter.from', 'From')}</span>
             <span className="font-mono">{fromUnit.symbol}</span>
           </div>
           <div className="flex items-center gap-3">
@@ -172,7 +181,7 @@ export const UnitConverter: React.FC = () => {
             >
               {currentUnits.map((u) => (
                 <option key={u.id} value={u.id} className="bg-slate-900 text-white">
-                  {u.name} ({u.symbol})
+                  {t(u.nameKey, u.defaultName)} ({u.symbol})
                 </option>
               ))}
             </select>
@@ -184,7 +193,7 @@ export const UnitConverter: React.FC = () => {
           <button
             onClick={swapUnits}
             className="p-2.5 rounded-full bg-amber-500 hover:bg-amber-400 text-black shadow-md transition-transform active:scale-95"
-            title="Swap Units"
+            title={t('converter.swapUnits', 'Swap Units')}
           >
             <ArrowRightLeft className="w-4 h-4" />
           </button>
@@ -193,7 +202,7 @@ export const UnitConverter: React.FC = () => {
         {/* To Output */}
         <div className="bg-black/[0.03] dark:bg-white/[0.04] p-4 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] space-y-2">
           <div className="flex items-center justify-between text-xs text-[#858A93] dark:text-[#A0A5B0]">
-            <span>To (Result)</span>
+            <span>{t('converter.toResult', 'To (Result)')}</span>
             <span className="font-mono">{toUnit.symbol}</span>
           </div>
           <div className="flex items-center justify-between gap-3">
@@ -207,7 +216,7 @@ export const UnitConverter: React.FC = () => {
             >
               {currentUnits.map((u) => (
                 <option key={u.id} value={u.id} className="bg-slate-900 text-white">
-                  {u.name} ({u.symbol})
+                  {t(u.nameKey, u.defaultName)} ({u.symbol})
                 </option>
               ))}
             </select>
@@ -225,7 +234,7 @@ export const UnitConverter: React.FC = () => {
           className="flex items-center gap-1.5 text-xs text-amber-500 hover:text-amber-400 font-semibold px-3 py-1.5 rounded-xl hover:bg-amber-500/10 transition-colors"
         >
           {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-          <span>{copied ? 'Copied' : 'Copy'}</span>
+          <span>{copied ? t('common.copied', 'Copied') : t('common.copy', 'Copy')}</span>
         </button>
       </div>
     </div>

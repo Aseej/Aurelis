@@ -96,8 +96,8 @@ export const GoogleDriveReauthModal: React.FC = () => {
       console.warn('Reauthorization failed:', err);
       // Show user-friendly error inside modal without closing or re-prompting
       const msg = err?.message?.includes('popup-closed-by-user')
-        ? 'Authorization was cancelled. You can reconnect anytime in Settings.'
-        : err?.message || 'Failed to authenticate with Google Drive. Please try again.';
+        ? t('drive.authCancelled', 'Authorization was cancelled. You can reconnect anytime in Settings.')
+        : err?.message || t('drive.authFailed', 'Failed to authenticate with Google Drive. Please try again.');
       setAuthError(msg);
     } finally {
       setIsAuthorizing(false);

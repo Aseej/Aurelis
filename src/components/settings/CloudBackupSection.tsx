@@ -118,7 +118,7 @@ export const CloudBackupSection: React.FC = () => {
 
   // Format date nicely
   const formatDate = (isoString?: string) => {
-    if (!isoString) return 'Never';
+    if (!isoString) return t('drive.noBackupYet', 'Never');
     try {
       const d = new Date(isoString);
       return (
@@ -128,6 +128,29 @@ export const CloudBackupSection: React.FC = () => {
       );
     } catch {
       return isoString;
+    }
+  };
+
+  // Localized sync messages
+  const getLocalizedSyncMessage = (status: AutoBackupSyncStatus) => {
+    switch (status) {
+      case 'uploading':
+        return t('drive.syncUploading', 'Syncing changes to Google Drive...');
+      case 'offline':
+        return t('drive.syncOffline', 'Offline. Changes queued for cloud backup when internet reconnects.');
+      case 'reauth_required':
+        return t('drive.syncReauth', 'Google Drive authorization required to resume cloud backup.');
+      case 'success':
+        return t('drive.syncSuccess', 'All changes safely backed up to Google Drive.');
+      case 'preparing':
+        return t('drive.syncPreparing', 'Preparing changes for cloud sync...');
+      case 'pending':
+        return t('drive.syncPending', 'Changes pending cloud backup.');
+      case 'error':
+        return t('drive.syncFailed', 'Automatic cloud sync failed. Retrying shortly.');
+      case 'idle':
+      default:
+        return t('drive.syncIdle', 'All changes saved locally.');
     }
   };
 
@@ -142,14 +165,14 @@ export const CloudBackupSection: React.FC = () => {
         email: user.email || 'Google Account',
         hasValidToken: true,
       });
-      setOperationSuccess('Google Drive connected successfully.');
+      setOperationSuccess(t('drive.connectSuccess', 'Google Drive connected successfully.'));
       setTimeout(() => setOperationSuccess(null), 3500);
 
       // Trigger any pending changes
       cloudBackupManager.triggerPendingBackup();
     } catch (err: any) {
       console.error('Google Drive connection failed:', err);
-      setOperationError(err.message || 'Failed to authenticate with Google Drive.');
+      setOperationError(err.message || t('drive.connectFailed', 'Failed to authenticate with Google Drive.'));
     }
   };
 
@@ -165,11 +188,11 @@ export const CloudBackupSection: React.FC = () => {
       });
       setBackups([]);
       setIsHistoryOpen(false);
-      setOperationSuccess('Google Drive disconnected.');
+      setOperationSuccess(t('drive.disconnectSuccess', 'Google Drive disconnected.'));
       setTimeout(() => setOperationSuccess(null), 2500);
     } catch (err: any) {
       console.error('Failed to disconnect Google Drive:', err);
-      setOperationError(err.message || 'Failed to disconnect.');
+      setOperationError(err.message || t('drive.disconnectFailed', 'Failed to disconnect.'));
     }
   };
 
@@ -200,12 +223,12 @@ export const CloudBackupSection: React.FC = () => {
       const success = await cloudBackupManager.executeBackup(state, streakInfo.currentStreak, true);
 
       if (success) {
-        setOperationSuccess('Backup completed and verified on Google Drive.');
+        setOperationSuccess(t('drive.backupSuccessVerified', 'Backup completed and verified on Google Drive.'));
         setTimeout(() => setOperationSuccess(null), 3500);
         loadHistory();
       }
     } catch (err: any) {
-      setOperationError(err.message || 'Backup failed.');
+      setOperationError(err.message || t('drive.backupFailed', 'Backup failed.'));
     } finally {
       setIsManualBackingUp(false);
     }
@@ -226,7 +249,7 @@ export const CloudBackupSection: React.FC = () => {
       setBackups(list);
 
       if (list.length === 0) {
-        setOperationError('No cloud backups found on Google Drive. Create a backup first.');
+        setOperationError(t('drive.noBackupsToRestore', 'No cloud backups found on Google Drive. Create a backup first.'));
         return;
       }
 
@@ -238,7 +261,7 @@ export const CloudBackupSection: React.FC = () => {
       // Pre-download and verify the selected candidate
       await fetchCandidateDetails(latest.id);
     } catch (err: any) {
-      setOperationError(err.message || 'Failed to retrieve backups from Google Drive.');
+      setOperationError(err.message || t('drive.restoreRetrieveFailed', 'Failed to retrieve backups from Google Drive.'));
     } finally {
       setIsLoadingBackups(false);
     }
@@ -251,7 +274,7 @@ export const CloudBackupSection: React.FC = () => {
       const result = await downloadBackupFromDrive(fileId);
       setDownloadedBackup(result);
     } catch (err: any) {
-      setOperationError(`Could not inspect backup: ${err.message || 'Download error'}`);
+      setOperationError(err.message || t('drive.restoreRetrieveFailed', 'Could not inspect backup from Google Drive.'));
       setDownloadedBackup(null);
     } finally {
       setIsDownloadingCandidate(false);
@@ -282,15 +305,15 @@ export const CloudBackupSection: React.FC = () => {
       const success = restoreAppState(downloadedBackup.backup.data);
 
       if (success) {
-        setOperationSuccess('Study data restored successfully from Google Drive!');
+        setOperationSuccess(t('drive.restoreSuccess', 'Study data restored successfully from Google Drive!'));
         setIsRestoreModalOpen(false);
         setDownloadedBackup(null);
         setTimeout(() => setOperationSuccess(null), 4000);
       } else {
-        throw new Error('Failed to parse and apply study records.');
+        throw new Error(t('drive.restoreFailed', 'Failed to parse and apply study records.'));
       }
     } catch (err: any) {
-      alert(`Restoration failed: ${err.message || 'Unknown error'}`);
+      alert(`${t('drive.restoreFailed', 'Restoration cancelled or failed.')} ${err.message || ''}`);
     } finally {
       setIsRestoring(false);
     }
@@ -301,15 +324,16 @@ export const CloudBackupSection: React.FC = () => {
     if (!existingSnapshot) return;
     if (
       window.confirm(
-        `Revert to the safety snapshot from ${formatDate(
-          existingSnapshot.timestamp
-        )}? This will restore your study records to the state immediately before your cloud restoration.`
+        t(
+          'drive.confirmRevertSnapshot',
+          'Revert to the safety snapshot? This will restore your study records to the state immediately before your cloud restoration.'
+        )
       )
     ) {
       restoreAppState(existingSnapshot.state);
       clearSafetySnapshot();
       setExistingSnapshot(null);
-      setOperationSuccess('Reverted successfully to pre-restore study state.');
+      setOperationSuccess(t('drive.revertSuccess', 'Reverted successfully to pre-restore study state.'));
       setTimeout(() => setOperationSuccess(null), 3500);
     }
   };
@@ -318,10 +342,10 @@ export const CloudBackupSection: React.FC = () => {
   const handleDeleteBackup = async (fileId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (backups.length <= 1) {
-      alert('Safety policy requires preserving at least one valid backup on Google Drive.');
+      alert(t('drive.safetyPolicyOneBackup', 'Safety policy requires preserving at least one valid backup on Google Drive.'));
       return;
     }
-    if (!window.confirm('Delete this backup from your Google Drive?')) return;
+    if (!window.confirm(t('drive.confirmDeleteBackup', 'Delete this backup from your Google Drive?'))) return;
 
     try {
       await deleteBackupFromDrive(fileId);
@@ -335,7 +359,7 @@ export const CloudBackupSection: React.FC = () => {
         }
       }
     } catch (err: any) {
-      alert(`Could not delete backup: ${err.message || 'Unknown error'}`);
+      alert(err.message || t('drive.deleteFailed', 'Failed to delete backup.'));
     }
   };
 
@@ -375,10 +399,10 @@ export const CloudBackupSection: React.FC = () => {
             <RotateCcw className="h-4 w-4 text-[#A97B32] dark:text-[#E6C27A] shrink-0" />
             <div>
               <div className="font-semibold text-xs text-[#20232A] dark:text-[#F6F3EC]">
-                Pre-Restore Safety Snapshot Available
+                {t('drive.revertSnapshot', 'Pre-Restore Safety Snapshot Available')}
               </div>
               <div className="text-[11px] text-[#686D77] dark:text-[#A7ABB5]">
-                Saved automatically on {formatDate(existingSnapshot.timestamp)}
+                {t('drive.savedAutomaticallyOn', 'Saved automatically on {time}', { time: formatDate(existingSnapshot.timestamp) })}
               </div>
             </div>
           </div>
@@ -387,7 +411,7 @@ export const CloudBackupSection: React.FC = () => {
               onClick={handleRevertSnapshot}
               className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#E6C27A] text-black hover:bg-[#d4ae65] transition shadow-xs"
             >
-              Revert to Pre-Restore
+              {t('drive.revertSnapshot', 'Revert to Pre-Restore')}
             </button>
             <button
               onClick={() => {
@@ -395,7 +419,7 @@ export const CloudBackupSection: React.FC = () => {
                 setExistingSnapshot(null);
               }}
               className="p-1.5 text-[#858A93] hover:text-[#20232A] dark:hover:text-white rounded-lg"
-              title="Dismiss snapshot"
+              title={t('drive.dismissSnapshot', 'Dismiss snapshot')}
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -489,12 +513,13 @@ export const CloudBackupSection: React.FC = () => {
 
         {/* Informative Note for reauth_required */}
         {connectionInfo.state === 'reauth_required' && (
-          <div className="mt-3 rounded-xl bg-amber-500/10 border border-amber-500/20 p-2.5 text-[11px] text-amber-700 dark:text-amber-300 flex items-start gap-2">
+          <div className="mt-3 rounded-xl bg-amber-500/10 border border-amber-500/20 p-2.5 text-xs text-amber-700 dark:text-amber-300 flex items-start gap-2">
             <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
             <span>
-              Google Drive access authorization requires refreshing for security. Your previous cloud
-              backups remain completely safe in your account. Click &quot;Reauthorize Google Drive&quot;
-              above to resume automatic syncing.
+              {t(
+                'drive.reauthRequiredNotice',
+                'Google Drive access authorization requires refreshing for security. Your previous cloud backups remain completely safe in your account. Click "Reauthorize Google Drive" above to resume automatic syncing.'
+              )}
             </span>
           </div>
         )}
@@ -503,11 +528,10 @@ export const CloudBackupSection: React.FC = () => {
         <div className="mt-3 pt-3 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center gap-2 text-[10.5px] text-[#686D77] dark:text-[#858A93]">
           <Lock className="h-3.5 w-3.5 text-[#A97B32] dark:text-[#E6C27A] shrink-0" />
           <span>
-            Backups are stored inside Google Drive&apos;s private{' '}
-            <strong className="font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-              appDataFolder
-            </strong>
-            . Hidden from normal Google Drive folders to prevent accidental deletion.
+            {t(
+              'drive.privateFolderNotice',
+              "Backups are stored inside Google Drive's private appDataFolder. Hidden from normal Google Drive folders to prevent accidental deletion."
+            )}
           </span>
         </div>
       </div>
@@ -519,19 +543,19 @@ export const CloudBackupSection: React.FC = () => {
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-[#A97B32] dark:text-[#E6C27A]" />
             <span className="font-semibold text-xs text-[#20232A] dark:text-[#F6F3EC]">
-              Cloud Backup Status & Sync
+              {t('drive.cloudBackupStatusSync', 'Cloud Backup Status & Sync')}
             </span>
           </div>
 
           {/* Toggle */}
           <div className="flex items-center gap-2.5">
             <span className="text-[11px] text-[#858A93] dark:text-[#777F8C] hidden sm:inline">
-              Auto-Backup After Changes
+              {t('drive.autoBackupAfterChanges', 'Auto-Backup After Changes')}
             </span>
             <button
               type="button"
               onClick={toggleAutoBackup}
-              title="Toggle automatic cloud backup after study changes"
+              title={t('drive.autoBackupToggleTitle', 'Toggle automatic cloud backup after study changes')}
               className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                 state.settings.autoCloudBackupEnabled
                   ? 'bg-[#A97B32] dark:bg-[#E6C27A]'
@@ -564,12 +588,12 @@ export const CloudBackupSection: React.FC = () => {
           )}
 
           <div className="flex-1 truncate">
-            <span className="font-medium text-[#20232A] dark:text-[#F6F3EC]">{syncMessage}</span>
+            <span className="font-medium text-[#20232A] dark:text-[#F6F3EC]">{getLocalizedSyncMessage(syncStatus)}</span>
           </div>
 
           {cloudBackupManager.hasPendingBackup() && (
             <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 shrink-0">
-              Pending Sync
+              {t('drive.pendingSyncBadge', 'Pending Sync')}
             </span>
           )}
         </div>
@@ -579,7 +603,7 @@ export const CloudBackupSection: React.FC = () => {
           {/* Metric 1: Last Successful Backup */}
           <div className="rounded-xl bg-white/40 dark:bg-black/25 p-3 border border-black/[0.04] dark:border-white/[0.05]">
             <div className="text-[10px] text-[#858A93] dark:text-[#777F8C] uppercase tracking-wider font-semibold">
-              Last Cloud Backup
+              {t('drive.lastCloudBackup', 'Last Cloud Backup')}
             </div>
             <div className="mt-1 font-medium text-xs text-[#20232A] dark:text-[#F6F3EC] flex items-center gap-1.5 truncate">
               <Clock className="h-3.5 w-3.5 text-[#A97B32] dark:text-[#E6C27A] shrink-0" />
@@ -590,23 +614,23 @@ export const CloudBackupSection: React.FC = () => {
           {/* Metric 2: Result & Verification */}
           <div className="rounded-xl bg-white/40 dark:bg-black/25 p-3 border border-black/[0.04] dark:border-white/[0.05]">
             <div className="text-[10px] text-[#858A93] dark:text-[#777F8C] uppercase tracking-wider font-semibold">
-              Integrity & Verification
+              {t('drive.integrityVerification', 'Integrity & Verification')}
             </div>
             <div className="mt-1 font-medium text-xs flex items-center gap-1.5 truncate">
               {state.settings.lastCloudBackupStatus === 'success' && (
                 <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 truncate">
                   <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">Verified (SHA-256)</span>
+                  <span className="truncate">{t('drive.verifiedSha256', 'Verified (SHA-256)')}</span>
                 </span>
               )}
               {state.settings.lastCloudBackupStatus === 'failed' && (
                 <span className="text-rose-500 flex items-center gap-1 truncate">
                   <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">Failed</span>
+                  <span className="truncate">{t('drive.statusFailed', 'Failed')}</span>
                 </span>
               )}
               {!state.settings.lastCloudBackupStatus && (
-                <span className="text-[#858A93] dark:text-[#777F8C] truncate">No backup yet</span>
+                <span className="text-[#858A93] dark:text-[#777F8C] truncate">{t('drive.noBackupYet', 'No backup yet')}</span>
               )}
             </div>
           </div>
@@ -614,13 +638,13 @@ export const CloudBackupSection: React.FC = () => {
           {/* Metric 3: Size & Restore Check */}
           <div className="rounded-xl bg-white/40 dark:bg-black/25 p-3 border border-black/[0.04] dark:border-white/[0.05]">
             <div className="text-[10px] text-[#858A93] dark:text-[#777F8C] uppercase tracking-wider font-semibold">
-              Latest Size & Mode
+              {t('drive.latestSizeMode', 'Latest Size & Mode')}
             </div>
             <div className="mt-1 font-medium text-xs text-[#20232A] dark:text-[#F6F3EC] flex items-center gap-1.5 truncate">
               <HardDrive className="h-3.5 w-3.5 text-[#A97B32] dark:text-[#E6C27A] shrink-0" />
               <span className="font-mono">{formatBytes(state.settings.lastCloudBackupSize)}</span>
               <span className="text-[10px] text-[#858A93] dark:text-[#777F8C] truncate">
-                • {state.settings.autoCloudBackupEnabled ? 'Auto-Sync' : 'Manual'}
+                • {state.settings.autoCloudBackupEnabled ? t('drive.modeAutoSync', 'Auto-Sync') : t('drive.modeManual', 'Manual')}
               </span>
             </div>
           </div>
@@ -641,17 +665,17 @@ export const CloudBackupSection: React.FC = () => {
             {isManualBackingUp ? (
               <>
                 <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                <span>Backing up...</span>
+                <span>{t('drive.backingUp', 'Backing up...')}</span>
               </>
             ) : (
               <>
                 <CloudUpload className="h-3.5 w-3.5" />
-                <span>Back Up Now</span>
+                <span>{t('drive.backUpNow', 'Back Up Now')}</span>
               </>
             )}
           </button>
 
-          {/* Button 2: Restore Now (Directly beside Back Up Now with consistent hierarchy) */}
+          {/* Button 2: Restore Now */}
           <button
             onClick={handleRestoreNowClick}
             disabled={
@@ -665,12 +689,12 @@ export const CloudBackupSection: React.FC = () => {
             {isLoadingBackups ? (
               <>
                 <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                <span>Retrieving Backups...</span>
+                <span>{t('drive.retrievingBackups', 'Retrieving Backups...')}</span>
               </>
             ) : (
               <>
                 <RotateCcw className="h-3.5 w-3.5 text-[#A97B32] dark:text-[#E6C27A]" />
-                <span>Restore Now</span>
+                <span>{t('drive.restoreNow', 'Restore Now')}</span>
               </>
             )}
           </button>
@@ -686,7 +710,7 @@ export const CloudBackupSection: React.FC = () => {
             className="btn-glass-secondary rounded-xl px-3.5 py-2.5 font-medium text-xs flex items-center justify-center gap-1.5 transition sm:ml-auto"
           >
             <History className="h-3.5 w-3.5" />
-            <span>{isHistoryOpen ? 'Hide History' : 'Backup History'}</span>
+            <span>{isHistoryOpen ? t('drive.hideHistory', 'Hide History') : t('drive.backupHistory', 'Backup History')}</span>
             {isHistoryOpen ? (
               <ChevronUp className="h-3.5 w-3.5" />
             ) : (
@@ -703,33 +727,37 @@ export const CloudBackupSection: React.FC = () => {
             <div className="flex items-center gap-2">
               <History className="h-4 w-4 text-[#A97B32] dark:text-[#E6C27A]" />
               <span className="font-semibold text-xs text-[#20232A] dark:text-[#F6F3EC]">
-                Cloud Snapshot History ({backups.length})
+                {t('drive.snapshotHistory', 'Cloud Snapshot History')} ({backups.length})
               </span>
             </div>
             <button
               onClick={loadHistory}
               disabled={isLoadingHistory}
               className="p-1 rounded-lg text-[#858A93] hover:text-[#20232A] dark:hover:text-white transition"
-              title="Refresh history"
+              title={t('drive.refreshHistory', 'Refresh history')}
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isLoadingHistory ? 'animate-spin' : ''}`} />
             </button>
           </div>
 
           <p className="text-[11px] text-[#858A93] dark:text-[#777F8C]">
-            Up to 5 recent snapshots are retained automatically on Google Drive with verified SHA-256
-            integrity checksums.
+            {t(
+              'drive.snapshotRetentionNotice',
+              'Up to 5 recent snapshots are retained automatically on Google Drive with verified SHA-256 integrity checksums.'
+            )}
           </p>
 
           {isLoadingHistory ? (
             <div className="py-8 text-center text-xs text-[#858A93]">
               <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2 text-[#A97B32] dark:text-[#E6C27A]" />
-              Fetching backups from Google Drive...
+              {t('drive.fetchingBackups', 'Fetching backups from Google Drive...')}
             </div>
           ) : backups.length === 0 ? (
             <div className="py-6 text-center text-xs text-[#858A93] dark:text-[#777F8C]">
-              No cloud backups found on Google Drive yet. Tap &quot;Back Up Now&quot; to create your
-              first cloud snapshot.
+              {t(
+                'drive.noBackupsYetDescription',
+                'No cloud backups found on Google Drive yet. Tap "Back Up Now" to create your first cloud snapshot.'
+              )}
             </div>
           ) : (
             <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
@@ -745,20 +773,20 @@ export const CloudBackupSection: React.FC = () => {
                       </span>
                       {idx === 0 && (
                         <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-[#E6C27A]/20 text-[#A97B32] dark:text-[#FFE6AD]">
-                          Latest
+                          {t('drive.latest', 'Latest')}
                         </span>
                       )}
                       <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-600 dark:text-emerald-400 font-mono">
                         <FileCheck2 className="h-3 w-3" />
-                        SHA-256 OK
+                        SHA-256 {t('drive.checksumOk', 'OK')}
                       </span>
                     </div>
                     <div className="text-[10px] text-[#858A93] dark:text-[#777F8C] flex items-center gap-3 mt-1 font-mono">
                       <span>{formatBytes(b.size)}</span>
                       {b.metadata && (
                         <span>
-                          {b.metadata.topicsCount} topics • {b.metadata.subjectsCount} subjects •{' '}
-                          {b.metadata.streakDays}d streak
+                          {b.metadata.topicsCount} {t('drive.topicsCount', 'topics')} • {b.metadata.subjectsCount} {t('drive.subjectsCount', 'subjects')} •{' '}
+                          {b.metadata.streakDays}d {t('drive.streakCount', 'streak')}
                         </span>
                       )}
                     </div>
@@ -774,13 +802,13 @@ export const CloudBackupSection: React.FC = () => {
                       className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-[#E6C27A] text-black hover:bg-[#d4ae65] transition flex items-center gap-1 shadow-xs"
                     >
                       <RotateCcw className="h-3 w-3" />
-                      <span>Restore</span>
+                      <span>{t('drive.restore', 'Restore')}</span>
                     </button>
                     {backups.length > 1 && (
                       <button
                         onClick={(e) => handleDeleteBackup(b.id, e)}
                         className="p-1.5 rounded-lg text-[#858A93] hover:text-rose-500 hover:bg-rose-500/10 transition"
-                        title="Delete this backup"
+                        title={t('drive.deleteBackup', 'Delete this backup')}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -802,7 +830,7 @@ export const CloudBackupSection: React.FC = () => {
               <div className="flex items-center gap-2">
                 <RotateCcw className="h-5 w-5 text-[#A97B32] dark:text-[#E6C27A]" />
                 <h3 className="font-semibold text-sm text-[#20232A] dark:text-[#F6F3EC]">
-                  Restore Study Data
+                  {t('drive.restoreStudyData', 'Restore Study Data')}
                 </h3>
               </div>
               <button
@@ -821,7 +849,7 @@ export const CloudBackupSection: React.FC = () => {
               {backups.length > 1 && (
                 <div>
                   <label className="text-[11px] font-semibold text-[#20232A] dark:text-[#F6F3EC] block mb-1">
-                    Select Restore Point:
+                    {t('drive.selectRestorePoint', 'Select Restore Point:')}
                   </label>
                   <select
                     value={selectedBackupId || ''}
@@ -830,7 +858,7 @@ export const CloudBackupSection: React.FC = () => {
                   >
                     {backups.map((b, idx) => (
                       <option key={b.id} value={b.id}>
-                        {formatDate(b.createdTime)} {idx === 0 ? '(Latest)' : ''} —{' '}
+                        {formatDate(b.createdTime)} {idx === 0 ? `(${t('drive.latest', 'Latest')})` : ''} —{' '}
                         {formatBytes(b.size)}
                       </option>
                     ))}
@@ -842,13 +870,15 @@ export const CloudBackupSection: React.FC = () => {
               {isDownloadingCandidate ? (
                 <div className="py-6 text-center text-xs text-[#858A93]">
                   <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2 text-[#A97B32] dark:text-[#E6C27A]" />
-                  Retrieving and verifying backup data from Google Drive...
+                  {t('drive.retrievingCandidate', 'Retrieving and verifying backup data from Google Drive...')}
                 </div>
               ) : downloadedBackup ? (
                 <>
                   <p className="text-xs text-[#858A93] dark:text-[#777F8C]">
-                    Review the side-by-side comparison below. Restoring will apply this cloud
-                    snapshot to your study workspace.
+                    {t(
+                      'drive.restoreComparisonIntro',
+                      'Review the side-by-side comparison below. Restoring will apply this cloud snapshot to your study workspace.'
+                    )}
                   </p>
 
                   {/* Comparison Grid */}
@@ -856,24 +886,24 @@ export const CloudBackupSection: React.FC = () => {
                     {/* Current Local Data */}
                     <div className="rounded-2xl bg-white/40 dark:bg-black/30 p-3.5 border border-black/[0.06] dark:border-white/[0.08]">
                       <div className="text-[10px] uppercase font-semibold text-[#858A93] dark:text-[#777F8C]">
-                        Current Local Data
+                        {t('drive.currentLocalData', 'Current Local Data')}
                       </div>
                       <div className="mt-2 space-y-1 font-mono text-[11px] text-[#20232A] dark:text-[#F6F3EC]">
-                        <div>{state.topics.length} topics</div>
-                        <div>{state.subjects.length} subjects</div>
-                        <div>{state.weeklyTests.length} tests</div>
-                        <div>{state.errorLogs.length} error logs</div>
-                        <div>{streakInfo.currentStreak}d streak</div>
+                        <div>{state.topics.length} {t('drive.topicsCount', 'topics')}</div>
+                        <div>{state.subjects.length} {t('drive.subjectsCount', 'subjects')}</div>
+                        <div>{state.weeklyTests.length} {t('drive.testsCount', 'tests')}</div>
+                        <div>{state.errorLogs.length} {t('drive.errorLogsCount', 'error logs')}</div>
+                        <div>{streakInfo.currentStreak}d {t('drive.streakCount', 'streak')}</div>
                       </div>
                     </div>
 
                     {/* Cloud Backup To Restore */}
                     <div className="rounded-2xl bg-[#E6C27A]/10 border border-[#E6C27A]/30 p-3.5">
                       <div className="text-[10px] uppercase font-semibold text-[#A97B32] dark:text-[#FFE6AD] flex items-center justify-between">
-                        <span>Selected Cloud Backup</span>
+                        <span>{t('drive.selectedCloudBackup', 'Selected Cloud Backup')}</span>
                         {downloadedBackup.verified && (
                           <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-mono">
-                            ✓ SHA-256 OK
+                            ✓ SHA-256 {t('drive.checksumOk', 'OK')}
                           </span>
                         )}
                       </div>
@@ -882,28 +912,28 @@ export const CloudBackupSection: React.FC = () => {
                           {downloadedBackup.backup.metadata?.topicsCount ??
                             downloadedBackup.backup.data?.topics?.length ??
                             0}{' '}
-                          topics
+                          {t('drive.topicsCount', 'topics')}
                         </div>
                         <div>
                           {downloadedBackup.backup.metadata?.subjectsCount ??
                             downloadedBackup.backup.data?.subjects?.length ??
                             0}{' '}
-                          subjects
+                          {t('drive.subjectsCount', 'subjects')}
                         </div>
                         <div>
                           {downloadedBackup.backup.metadata?.weeklyTestsCount ??
                             downloadedBackup.backup.data?.weeklyTests?.length ??
                             0}{' '}
-                          tests
+                          {t('drive.testsCount', 'tests')}
                         </div>
                         <div>
                           {downloadedBackup.backup.metadata?.errorLogsCount ??
                             downloadedBackup.backup.data?.errorLogs?.length ??
                             0}{' '}
-                          error logs
+                          {t('drive.errorLogsCount', 'error logs')}
                         </div>
                         <div>
-                          {downloadedBackup.backup.metadata?.streakDays ?? 0}d streak
+                          {downloadedBackup.backup.metadata?.streakDays ?? 0}d {t('drive.streakCount', 'streak')}
                         </div>
                       </div>
                     </div>
@@ -913,9 +943,11 @@ export const CloudBackupSection: React.FC = () => {
                   <div className="flex items-start gap-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 p-3 text-[11px] text-blue-600 dark:text-blue-400">
                     <ShieldCheck className="h-4 w-4 mt-0.5 shrink-0" />
                     <span>
-                      <strong>Safety Snapshot Guarantee:</strong> A rollback copy of your current
-                      local study state will be created automatically before applying this backup.
-                      You can undo this restoration at any time with one click.
+                      <strong>{t('drive.safetySnapshotGuaranteeTitle', 'Safety Snapshot Guarantee:')}</strong>{' '}
+                      {t(
+                        'drive.safetySnapshotGuaranteeDesc',
+                        'A rollback copy of your current local study state will be created automatically before applying this backup. You can undo this restoration at any time with one click.'
+                      )}
                     </span>
                   </div>
                 </>
@@ -932,7 +964,7 @@ export const CloudBackupSection: React.FC = () => {
                 disabled={isRestoring}
                 className="btn-glass-secondary rounded-xl px-4 py-2 text-xs font-medium"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </button>
               <button
                 onClick={handleConfirmRestore}
@@ -942,12 +974,12 @@ export const CloudBackupSection: React.FC = () => {
                 {isRestoring ? (
                   <>
                     <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                    <span>Restoring Workspace...</span>
+                    <span>{t('drive.restoringWorkspace', 'Restoring Workspace...')}</span>
                   </>
                 ) : (
                   <>
                     <RotateCcw className="h-3.5 w-3.5" />
-                    <span>Confirm & Restore Now</span>
+                    <span>{t('drive.confirmAndRestoreNow', 'Confirm & Restore Now')}</span>
                   </>
                 )}
               </button>

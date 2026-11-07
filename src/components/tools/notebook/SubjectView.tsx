@@ -144,7 +144,7 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
             </button>
           </div>
           <span className="text-xs font-mono text-[#858A93] dark:text-[#777F8C]">
-            {subjectTopics.length} {subjectTopics.length === 1 ? 'topic' : 'topics'} · {subjectPages.length} {subjectPages.length === 1 ? 'page' : 'pages'} total
+            {subjectTopics.length} {subjectTopics.length === 1 ? t('notebook.topic', 'topic') : t('notebook.topics', 'topics')} · {subjectPages.length} {subjectPages.length === 1 ? t('notebook.page', 'page') : t('notebook.pages', 'pages')} {t('notebook.total', 'total')}
           </span>
         </div>
 
@@ -331,7 +331,11 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
               <h3 className="font-semibold text-sm">{t('notebook.deleteSubjectTitle', 'Delete Subject & All Notes?')}</h3>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Deleting <strong className="text-white">&ldquo;{subject.name}&rdquo;</strong> will permanently remove it along with its <strong className="text-amber-400">{subjectTopics.length} topics</strong> and all <strong className="text-amber-400">{subjectPages.length} captured notebook pages</strong> from your Google Drive.
+              {t('notebook.confirmDeleteSubjectNotice', 'Deleting "{name}" will permanently remove it along with its {topics} topics and all {pages} captured notebook pages from your Google Drive.', {
+                name: subject.name,
+                topics: subjectTopics.length,
+                pages: subjectPages.length,
+              })}
             </p>
             <p className="text-[11px] text-slate-400">
               {t('notebook.cannotUndo', 'This action cannot be undone.')}
@@ -420,7 +424,9 @@ export const SubjectView: React.FC<SubjectViewProps> = ({
               <h3 className="font-semibold text-sm">{t('notebook.deleteTopicTitle', 'Delete Topic?')}</h3>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Deleting <strong className="text-white">&ldquo;{editingTopic.name}&rdquo;</strong> will permanently remove it and all of its captured pages from your Google Drive.
+              {t('notebook.confirmDeleteTopicNotice', 'Deleting "{name}" will permanently remove it and all of its captured pages from your Google Drive.', {
+                name: editingTopic.name,
+              })}
             </p>
             <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
               <button
