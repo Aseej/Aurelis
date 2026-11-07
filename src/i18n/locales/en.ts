@@ -489,6 +489,7 @@ export const en: TranslationMap = {
   "nav.errors": "Error Notebook",
   "nav.landing": "Public Overview",
   "nav.menu": "Menu",
+  "nav.more": "More",
   "nav.resetDemo": "Reset Demo Data",
   "nav.review": "Revision Queue",
   "nav.search": "Search",

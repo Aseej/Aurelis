@@ -489,6 +489,7 @@ export const hi: TranslationMap = {
   "nav.errors": "त्रुटि नोटबुक",
   "nav.landing": "सार्वजनिक अवलोकन",
   "nav.menu": "मेनू",
+  "nav.more": "अधिक",
   "nav.resetDemo": "डेमो डेटा रीसेट करें",
   "nav.review": "रिवीजन कतार",
   "nav.search": "खोजें",

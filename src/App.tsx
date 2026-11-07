@@ -42,33 +42,32 @@ const AppContent: React.FC = () => {
         <div className="absolute -bottom-[80px] right-[15%] h-[420px] w-[420px] rounded-full bg-gradient-to-t from-[#B88A43]/5 to-transparent blur-[110px] dark:from-[#B88A43]/8" />
       </div>
 
-      {/* Top Bar following Top Bar Contract (hidden on public landing page and camera mode) */}
-      {activeView !== 'landing' && !isCameraMode && (
-        <div className="relative z-30">
-          <Navbar />
-        </div>
-      )}
-
       {activeView === 'landing' ? (
         <div className="relative z-10 w-full min-h-screen">
           <LandingPage />
         </div>
       ) : (
-        <div className="relative z-10 flex-1 flex overflow-hidden">
-          {/* Desktop Collapsible Sidebar */}
-          <Sidebar />
+        <div className="relative z-10 flex w-full min-h-screen">
+          {/* Desktop Left Sidebar (hidden on mobile, and hidden during full-screen camera mode) */}
+          {!isCameraMode && <Sidebar />}
 
-          {/* Primary Content Viewport */}
-          <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl w-full mx-auto pb-28 lg:pb-14">
-            {activeView === 'dashboard' && <DashboardView />}
-            {activeView === 'review' && <RevisionQueueView />}
-            {activeView === 'calendar' && <CalendarView />}
-            {activeView === 'subjects' && <SubjectsView />}
-            {activeView === 'tests' && <WeeklyTestsView />}
-            {activeView === 'errors' && <ErrorLogView />}
-            {activeView === 'analytics' && <AnalyticsView />}
-            {activeView === 'tools' && <ToolsView />}
-          </main>
+          {/* Right Column: Top Bar + Primary Content */}
+          <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+            {/* Top Bar (hidden during full-screen camera mode) */}
+            {!isCameraMode && <Navbar />}
+
+            {/* Primary Content Viewport */}
+            <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl w-full mx-auto pb-28 md:pb-12">
+              {activeView === 'dashboard' && <DashboardView />}
+              {activeView === 'review' && <RevisionQueueView />}
+              {activeView === 'calendar' && <CalendarView />}
+              {activeView === 'subjects' && <SubjectsView />}
+              {activeView === 'tests' && <WeeklyTestsView />}
+              {activeView === 'errors' && <ErrorLogView />}
+              {activeView === 'analytics' && <AnalyticsView />}
+              {activeView === 'tools' && <ToolsView />}
+            </main>
+          </div>
         </div>
       )}
 

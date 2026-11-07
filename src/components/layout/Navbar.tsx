@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../i18n';
-import { Search, Plus, Moon, Sun, Flame } from 'lucide-react';
+import { Search, Plus, Moon, Sun, Flame, Settings } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const {
@@ -11,6 +11,7 @@ export const Navbar: React.FC = () => {
     toggleTheme,
     setIsAddTopicOpen,
     setIsSearchOpen,
+    setIsSettingsOpen,
     state,
     streakInfo,
     purgeDemoData,
@@ -18,39 +19,62 @@ export const Navbar: React.FC = () => {
 
   const { t } = useI18n();
 
+  // Contextual page titles based on active view
+  const viewTitles: Record<string, string> = {
+    dashboard: t('nav.dashboard', "Today's Focus"),
+    review: t('nav.review', 'Revision Queue'),
+    calendar: t('nav.calendar', 'Calendar'),
+    subjects: t('nav.subjects', 'Subjects'),
+    tests: t('nav.tests', 'Weekly Tests'),
+    errors: t('nav.errors', 'Error Notebook'),
+    analytics: t('nav.analytics', 'Analytics'),
+    tools: t('nav.tools', 'Tools'),
+    landing: t('nav.landing', 'Public Overview'),
+  };
+
+  const currentTitle = viewTitles[activeView] || t('nav.dashboard', "Today's Focus");
+
   return (
-    <header className="sticky top-0 z-30 w-full border-b border-black/[0.06] bg-[#F4F1EA]/80 backdrop-blur-xl dark:border-white/[0.09] dark:bg-[#090B10]/80 transition-colors">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Zone 1: Single text element brand wordmark */}
+    <header className="sticky top-0 z-20 w-full border-b border-black/[0.06] bg-[#F4F1EA]/85 backdrop-blur-xl dark:border-white/[0.08] dark:bg-[#090B10]/85 transition-colors">
+      <div className="flex h-14 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Left Section: Mobile Brand wordmark OR Desktop Page Title */}
         <div className="flex items-center gap-3">
+          {/* Mobile Only: Brand Logo & Title */}
           <button
             onClick={() => setActiveView('dashboard')}
-            className="group flex items-center gap-2.5 text-left focus:outline-none"
+            className="flex md:hidden items-center gap-2.5 text-left focus:outline-none"
             aria-label="AURELIS Home"
           >
             <div className="relative flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#1E2430] to-[#0E1118] text-xs font-semibold tracking-wider text-[#E6C27A] shadow-xs border border-white/10 dark:from-[#1E2430] dark:to-[#090B10] dark:border-[#E6C27A]/30">
               <span className="font-serif">A</span>
-              {/* Subtle top edge specular highlight */}
               <div className="absolute inset-x-0 top-0 h-[1px] bg-white/20 rounded-t-lg" />
             </div>
 
             <div className="flex flex-col">
-              <span className="font-serif text-sm sm:text-base font-semibold tracking-wider text-[#20232A] transition-colors group-hover:text-[#A97B32] dark:text-[#F6F3EC] dark:group-hover:text-[#E6C27A]">
+              <span className="font-serif text-sm font-semibold tracking-wider text-[#20232A] dark:text-[#F6F3EC]">
                 AURELIS
               </span>
-              <span className="hidden sm:block text-[9px] uppercase tracking-widest text-[#858A93] dark:text-[#777F8C] -mt-0.5">
+              <span className="text-[9px] uppercase tracking-widest text-[#858A93] dark:text-[#777F8C] -mt-0.5">
                 {t('app.brandTagline', 'Remember what matters')}
               </span>
             </div>
           </button>
 
+          {/* Desktop Only: Active Page Title */}
+          <div className="hidden md:flex items-center gap-2.5">
+            <h1 className="font-serif text-base lg:text-lg font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
+              {currentTitle}
+            </h1>
+          </div>
+
+          {/* Reset Demo Data Pill if active */}
           {state.isDemoData && (
             <button
               onClick={() => purgeDemoData()}
               title="Reset all demo data and start with an empty slate"
-              className="hidden items-center gap-1.5 text-xs text-[#858A93] dark:text-[#777F8C] sm:inline-flex hover:text-[#A97B32] dark:hover:text-[#E6C27A] transition-colors ml-1"
+              className="inline-flex items-center gap-1.5 text-xs text-[#858A93] dark:text-[#777F8C] hover:text-[#A97B32] dark:hover:text-[#E6C27A] transition-colors ml-1"
             >
-              <span aria-hidden="true">·</span>
+              <span aria-hidden="true" className="hidden sm:inline">·</span>
               <span className="text-[#A97B32] dark:text-[#E6C27A]/90 hover:underline">
                 {t('nav.resetDemo', 'Reset Demo Data')}
               </span>
@@ -58,94 +82,7 @@ export const Navbar: React.FC = () => {
           )}
         </div>
 
-        {/* Zone 2: Clean text navigation links (Hidden on mobile, prominent on tablet/desktop) */}
-        <nav
-          className="hidden md:flex items-center gap-6 text-xs font-medium tracking-wide uppercase text-[#686D77] dark:text-[#A7ABB5]"
-          aria-label="Main Navigation"
-        >
-          <button
-            onClick={() => setActiveView('dashboard')}
-            className={`transition-colors hover:text-[#20232A] dark:hover:text-[#F6F3EC] ${
-              activeView === 'dashboard'
-                ? 'text-[#20232A] font-semibold border-b-2 border-[#A97B32] pb-0.5 dark:text-[#F6F3EC] dark:border-[#E6C27A]'
-                : ''
-            }`}
-          >
-            {t('nav.dashboard', "Today's Focus")}
-          </button>
-          <button
-            onClick={() => setActiveView('review')}
-            className={`transition-colors hover:text-[#20232A] dark:hover:text-[#F6F3EC] ${
-              activeView === 'review'
-                ? 'text-[#20232A] font-semibold border-b-2 border-[#A97B32] pb-0.5 dark:text-[#F6F3EC] dark:border-[#E6C27A]'
-                : ''
-            }`}
-          >
-            {t('nav.review', 'Revision Queue')}
-          </button>
-          <button
-            onClick={() => setActiveView('calendar')}
-            className={`transition-colors hover:text-[#20232A] dark:hover:text-[#F6F3EC] ${
-              activeView === 'calendar'
-                ? 'text-[#20232A] font-semibold border-b-2 border-[#A97B32] pb-0.5 dark:text-[#F6F3EC] dark:border-[#E6C27A]'
-                : ''
-            }`}
-          >
-            {t('nav.calendar', 'Calendar')}
-          </button>
-          <button
-            onClick={() => setActiveView('subjects')}
-            className={`transition-colors hover:text-[#20232A] dark:hover:text-[#F6F3EC] ${
-              activeView === 'subjects'
-                ? 'text-[#20232A] font-semibold border-b-2 border-[#A97B32] pb-0.5 dark:text-[#F6F3EC] dark:border-[#E6C27A]'
-                : ''
-            }`}
-          >
-            {t('nav.subjects', 'Subjects')}
-          </button>
-          <button
-            onClick={() => setActiveView('tests')}
-            className={`transition-colors hover:text-[#20232A] dark:hover:text-[#F6F3EC] ${
-              activeView === 'tests'
-                ? 'text-[#20232A] font-semibold border-b-2 border-[#A97B32] pb-0.5 dark:text-[#F6F3EC] dark:border-[#E6C27A]'
-                : ''
-            }`}
-          >
-            {t('nav.tests', 'Weekly Tests')}
-          </button>
-          <button
-            onClick={() => setActiveView('errors')}
-            className={`transition-colors hover:text-[#20232A] dark:hover:text-[#F6F3EC] ${
-              activeView === 'errors'
-                ? 'text-[#20232A] font-semibold border-b-2 border-[#A97B32] pb-0.5 dark:text-[#F6F3EC] dark:border-[#E6C27A]'
-                : ''
-            }`}
-          >
-            {t('nav.errors', 'Error Log')}
-          </button>
-          <button
-            onClick={() => setActiveView('analytics')}
-            className={`transition-colors hover:text-[#20232A] dark:hover:text-[#F6F3EC] ${
-              activeView === 'analytics'
-                ? 'text-[#20232A] font-semibold border-b-2 border-[#A97B32] pb-0.5 dark:text-[#F6F3EC] dark:border-[#E6C27A]'
-                : ''
-            }`}
-          >
-            {t('nav.analytics', 'Analytics')}
-          </button>
-          <button
-            onClick={() => setActiveView('tools')}
-            className={`transition-colors hover:text-[#20232A] dark:hover:text-[#F6F3EC] ${
-              activeView === 'tools'
-                ? 'text-[#20232A] font-semibold border-b-2 border-[#A97B32] pb-0.5 dark:text-[#F6F3EC] dark:border-[#E6C27A]'
-                : ''
-            }`}
-          >
-            {t('nav.tools', 'Tools')}
-          </button>
-        </nav>
-
-        {/* Zone 3: 1-2 primary actions */}
+        {/* Right Section: Global Actions (Search, Streak, Theme, Settings, Add Topic) */}
         <div className="flex items-center gap-2 sm:gap-2.5">
           {streakInfo.currentStreak > 0 && (
             <button
@@ -177,6 +114,15 @@ export const Navbar: React.FC = () => {
             aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           >
             {theme === 'dark' ? <Sun className="h-3.5 w-3.5 text-[#E6C27A]" /> : <Moon className="h-3.5 w-3.5 text-[#A97B32]" />}
+          </button>
+
+          <button
+            onClick={() => setIsSettingsOpen(true)}
+            className="hidden sm:flex h-8 w-8 items-center justify-center rounded-lg border border-black/[0.08] text-[#686D77] transition-colors hover:bg-white/70 hover:text-[#20232A] dark:border-white/[0.08] dark:text-[#A7ABB5] dark:hover:bg-white/[0.08] dark:hover:text-[#F6F3EC]"
+            aria-label={t('nav.settings', 'Settings & Backup')}
+            title={t('nav.settings', 'Settings & Backup')}
+          >
+            <Settings className="h-3.5 w-3.5" />
           </button>
 
           <button

@@ -14,10 +14,18 @@ import {
   Settings as SettingsIcon,
   Compass,
   X,
+  RotateCcw,
 } from 'lucide-react';
 
 export const MobileNav: React.FC = () => {
-  const { activeView, setActiveView, todayReviewsDue, setIsSettingsOpen } = useApp();
+  const {
+    activeView,
+    setActiveView,
+    todayReviewsDue,
+    setIsSettingsOpen,
+    state,
+    purgeDemoData,
+  } = useApp();
   const { t } = useI18n();
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
@@ -134,6 +142,19 @@ export const MobileNav: React.FC = () => {
                 <SettingsIcon className="h-4 w-4 shrink-0 text-[#858A93] dark:text-[#777F8C]" />
                 <span className="font-medium">{t('nav.settings', 'Settings & Data Backup')}</span>
               </button>
+
+              {state.isDemoData && (
+                <button
+                  onClick={() => {
+                    purgeDemoData();
+                    setIsMoreMenuOpen(false);
+                  }}
+                  className="col-span-2 flex items-center gap-2.5 rounded-xl p-3 text-left text-rose-500 hover:bg-rose-500/10 border border-rose-500/20 mt-1 transition-colors"
+                >
+                  <RotateCcw className="h-4 w-4 shrink-0 text-rose-500" />
+                  <span className="font-medium">{t('nav.resetDemo', 'Reset Demo Data')}</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -233,14 +254,14 @@ export const MobileNav: React.FC = () => {
             <button
               onClick={() => setIsMoreMenuOpen((prev) => !prev)}
               className={`relative flex min-h-[46px] flex-col items-center justify-center rounded-xl transition-all ${
-                isMoreMenuOpen || ['tests', 'errors', 'analytics'].includes(activeView)
+                isMoreMenuOpen || ['tests', 'errors', 'analytics', 'tools'].includes(activeView)
                   ? 'text-[#8C6221] dark:text-[#FFE6AD] font-semibold'
                   : 'text-[#686D77] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]'
               }`}
             >
               <MoreHorizontal className="h-4.5 w-4.5" />
-              <span className="mt-1 text-[10px] tracking-tight">{t('nav.menu', 'More')}</span>
-              {['tests', 'errors', 'analytics'].includes(activeView) && (
+              <span className="mt-1 text-[10px] tracking-tight">{t('nav.more', 'More')}</span>
+              {['tests', 'errors', 'analytics', 'tools'].includes(activeView) && (
                 <span className="absolute bottom-1 h-0.5 w-3 rounded-full bg-[#E6C27A]" />
               )}
             </button>

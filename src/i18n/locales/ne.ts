@@ -489,6 +489,7 @@ export const ne: TranslationMap = {
   "nav.errors": "गल्ती पुस्तिका",
   "nav.landing": "सार्वजनिक अवलोकन",
   "nav.menu": "मेनु",
+  "nav.more": "थप",
   "nav.resetDemo": "डेमो डेटा रिसेट गर्नुहोस्",
   "nav.review": "पुनरावलोकन लाम",
   "nav.search": "खोज्नुहोस्",

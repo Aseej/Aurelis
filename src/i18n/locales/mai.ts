@@ -489,6 +489,7 @@ export const mai: TranslationMap = {
   "nav.errors": "त्रुटि पोथी",
   "nav.landing": "सार्वजनिक अवलोकन",
   "nav.menu": "मेनु",
+  "nav.more": "आरू",
   "nav.resetDemo": "डेमो डेटा रिसेट करू",
   "nav.review": "पुनरावलोकन सूची",
   "nav.search": "खोजू",
