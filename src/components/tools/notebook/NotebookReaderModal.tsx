@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { NotebookPage, getNotebookPageImageUrl } from '../../../services/captureNotebookService';
 import { useI18n } from '../../../i18n';
-import { AurelisSplashLoader } from '../../brand/AurelisLogo';
 
 interface NotebookReaderModalProps {
   isOpen: boolean;
@@ -278,10 +277,10 @@ export const NotebookReaderModal: React.FC<NotebookReaderModalProps> = ({
         }`}
       >
         {isLoadingImage ? (
-          <AurelisSplashLoader
-            size={72}
-            message={t('notebook.loadingPageFromDrive', 'Loading page from your Google Drive...')}
-          />
+          <div className="flex flex-col items-center gap-2 text-slate-400">
+            <RefreshCw className="w-8 h-8 animate-spin text-amber-400" />
+            <span className="text-xs font-mono">{t('notebook.loadingPageFromDrive', 'Loading page from your Google Drive...')}</span>
+          </div>
         ) : loadError ? (
           <div className="p-6 rounded-2xl bg-rose-950/40 border border-rose-800 text-center max-w-sm space-y-2">
             <AlertCircle className="w-8 h-8 text-rose-400 mx-auto" />

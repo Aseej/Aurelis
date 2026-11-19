@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../i18n';
-import { AurelisLogo } from '../brand/AurelisLogo';
-import { PWAInstallButton } from '../brand/PWAInstallButton';
 import {
   ArrowRight,
   CheckCircle2,
@@ -179,17 +177,14 @@ export const LandingPage: React.FC = () => {
             className="flex items-center gap-3 text-left focus:outline-none group"
             aria-label="AURELIS Overview"
           >
-            <AurelisLogo
-              variant="emblem"
-              size={34}
-              priority
-              className="transition-transform duration-200 group-hover:scale-105 shadow-md"
-            />
+            <div className="relative flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-lg bg-gradient-to-br from-[#1E2430] to-[#0E1118] text-xs font-semibold tracking-wider text-[#E6C27A] shadow-xs border border-white/10 dark:from-[#1E2430] dark:to-[#090B10] dark:border-[#E6C27A]/30">
+              <span className="font-serif text-sm leading-none">A</span>
+            </div>
             <div className="flex flex-col">
-              <span className="font-serif text-base sm:text-lg font-semibold tracking-[0.16em] uppercase text-[#20232A] group-hover:text-[#A97B32] dark:text-[#F6F3EC] dark:group-hover:text-[#E6C27A] transition-colors">
+              <span className="font-serif text-base sm:text-lg font-semibold tracking-wider text-[#20232A] group-hover:text-[#A97B32] dark:text-[#F6F3EC] dark:group-hover:text-[#E6C27A] transition-colors">
                 AURELIS
               </span>
-              <span className="hidden sm:block text-[9px] uppercase tracking-[0.14em] text-[#858A93] dark:text-[#777F8C] -mt-0.5">
+              <span className="hidden sm:block text-[9px] uppercase tracking-widest text-[#858A93] dark:text-[#777F8C] -mt-0.5">
                 {t('app.brandTagline', 'Remember what matters')}
               </span>
             </div>
@@ -340,11 +335,6 @@ export const LandingPage: React.FC = () => {
 
         {/* Hero Content Container */}
         <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
-          {/* Tagline */}
-          <p className="text-[11px] sm:text-xs font-serif tracking-[0.18em] uppercase text-[#996E25] dark:text-[#E6C27A]">
-            {t('app.brandConcept', 'Where knowledge meets the light of discovery.')}
-          </p>
-
           {/* Eyebrow */}
           <div className="inline-flex items-center gap-2 rounded-full glass-subtle px-4 py-1.5 text-[11px] font-mono uppercase tracking-[0.2em] font-medium text-[#A97B32] dark:text-[#E6C27A]">
             <span className="h-2 w-2 rounded-full bg-[#E6C27A] animate-pulse" />
@@ -384,11 +374,6 @@ export const LandingPage: React.FC = () => {
             >
               <span>{t('landing.nav.exploreHowItWorks', 'Explore How It Works')}</span>
             </button>
-
-            <PWAInstallButton
-              variant="secondary"
-              className="w-full sm:w-auto rounded-2xl px-6 py-3.5 text-sm"
-            />
           </div>
 
           {/* Trust Statement */}
@@ -980,17 +965,14 @@ export const LandingPage: React.FC = () => {
       <footer className="border-t border-black/[0.06] bg-[#EBE7DE]/40 dark:border-white/[0.08] dark:bg-[#0E1118]/60 py-12 px-4 sm:px-6 lg:px-8 transition-colors">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-black/[0.06] dark:border-white/[0.08]">
-            <div className="space-y-2.5 max-w-md">
+            <div className="space-y-2 max-w-md">
               <div className="flex items-center gap-2.5">
-                <AurelisLogo variant="emblem" size={30} />
-                <div className="flex flex-col">
-                  <span className="font-serif text-base font-semibold tracking-[0.16em] uppercase text-[#20232A] dark:text-[#F6F3EC]">
-                    AURELIS
-                  </span>
-                  <span className="text-[10px] tracking-[0.08em] text-[#A97B32] dark:text-[#E6C27A]">
-                    {t('app.brandConcept', 'Where knowledge meets the light of discovery.')}
-                  </span>
+                <div className="flex h-7 w-7 shrink-0 aspect-square items-center justify-center rounded-lg bg-gradient-to-br from-[#1E2430] to-[#0E1118] text-xs font-semibold text-[#E6C27A] border border-white/10 dark:border-[#E6C27A]/30">
+                  <span className="font-serif leading-none">A</span>
                 </div>
+                <span className="font-serif text-base font-semibold tracking-wider text-[#20232A] dark:text-[#F6F3EC]">
+                  AURELIS
+                </span>
               </div>
               <p className="text-xs text-[#858A93] dark:text-[#777F8C] leading-relaxed">
                 {t(

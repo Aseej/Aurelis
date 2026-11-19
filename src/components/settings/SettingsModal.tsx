@@ -14,14 +14,8 @@ import {
   Check,
   Cloud,
   HardDrive,
-  Sparkles,
-  BookOpen,
-  Compass,
-  Orbit,
 } from 'lucide-react';
 import { CloudBackupSection } from './CloudBackupSection';
-import { AurelisLogo } from '../brand/AurelisLogo';
-import { PWAInstallButton } from '../brand/PWAInstallButton';
 
 export const SettingsModal: React.FC = () => {
   const {
@@ -38,7 +32,7 @@ export const SettingsModal: React.FC = () => {
 
   const { t, setLanguage } = useI18n();
 
-  const [activeTab, setActiveTab] = useState<'profile' | 'schedule' | 'backup' | 'privacy' | 'about'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'schedule' | 'backup' | 'privacy'>('profile');
   const [backupSubTab, setBackupSubTab] = useState<'cloud' | 'local'>('cloud');
   const [studentName, setStudentName] = useState(state.settings.studentName || 'Aakash Panjiyar');
   const [targetExam, setTargetExam] = useState(state.settings.targetExam || '');
@@ -135,20 +129,17 @@ export const SettingsModal: React.FC = () => {
         <div className="relative w-full max-w-2xl rounded-3xl glass-premium shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col border border-white/20 dark:border-white/10">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-black/[0.06] px-6 py-4 dark:border-white/[0.08]">
-            <div className="flex items-center gap-3 min-w-0">
-              <AurelisLogo variant="emblem" size={34} priority />
-              <div className="min-w-0">
-                <h2 className="text-base font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC] truncate">
-                  {t('settings.title', 'Settings & Preferences')}
-                </h2>
-                <p className="text-xs text-[#858A93] dark:text-[#777F8C] truncate">
-                  {t('settings.subtitle', 'Customize revision rhythm, personal targets, and local data backups')}
-                </p>
-              </div>
+            <div>
+              <h2 className="text-base font-semibold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
+                {t('settings.title', 'Settings & Preferences')}
+              </h2>
+              <p className="text-xs text-[#858A93] dark:text-[#777F8C]">
+                {t('settings.subtitle', 'Customize revision rhythm, personal targets, and local data backups')}
+              </p>
             </div>
             <button
               onClick={() => setIsSettingsOpen(false)}
-              className="rounded-xl p-1.5 text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC] transition-colors shrink-0"
+              className="rounded-xl p-1.5 text-[#858A93] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC] transition-colors"
               aria-label={t('common.close', 'Close')}
             >
               <X className="h-4 w-4" />
@@ -156,18 +147,17 @@ export const SettingsModal: React.FC = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex overflow-x-auto scrollbar-none border-b border-black/[0.06] px-6 dark:border-white/[0.08] text-xs whitespace-nowrap">
+          <div className="flex border-b border-black/[0.06] px-6 dark:border-white/[0.08] text-xs">
             {[
               { id: 'profile', label: t('settings.tabProfile', 'Profile & Targets') },
               { id: 'schedule', label: t('settings.tabSchedule', 'Revision Rhythm') },
               { id: 'backup', label: t('settings.tabBackup', 'Backup & Recovery') },
               { id: 'privacy', label: t('settings.tabPrivacy', 'Privacy') },
-              { id: 'about', label: t('settings.tabAbout', 'About AURELIS') },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`py-3 px-3.5 font-medium transition-all border-b-2 -mb-px shrink-0 ${
+                className={`py-3 px-3.5 font-medium transition-all border-b-2 -mb-px ${
                   activeTab === tab.id
                     ? 'border-[#A97B32] text-[#20232A] dark:border-[#E6C27A] dark:text-[#FFE6AD] font-semibold'
                     : 'border-transparent text-[#686D77] hover:text-[#20232A] dark:text-[#777F8C] dark:hover:text-[#F6F3EC]'
@@ -469,93 +459,8 @@ export const SettingsModal: React.FC = () => {
                   )}
                 </p>
                 <p>
-                  {t(
-                    'settings.privacyOfflineDesc',
-                    'AURELIS operates offline-first and locally. Language preferences, topics, notes, and progress records remain entirely on your device.'
-                  )}
+                  AURELIS operates fully offline and locally. Language preferences, topics, notes, and progress records remain entirely on your personal machine.
                 </p>
-              </div>
-            )}
-
-            {/* 5. About AURELIS Tab */}
-            {activeTab === 'about' && (
-              <div className="space-y-5 animate-fadeIn">
-                <div className="flex flex-col sm:flex-row items-center gap-5 rounded-2xl glass-subtle border border-black/[0.06] dark:border-[#E6C27A]/20 p-5">
-                  <div className="relative shrink-0">
-                    <div
-                      aria-hidden="true"
-                      className="pointer-events-none absolute -inset-2.5 rounded-3xl bg-gradient-to-tr from-[#254B7C]/25 via-[#E6C27A]/20 to-[#4338CA]/20 blur-lg opacity-80"
-                    />
-                    <AurelisLogo
-                      variant="full"
-                      size={96}
-                      priority
-                      className="relative shadow-xl border-[#E6C27A]/40"
-                    />
-                  </div>
-                  <div className="space-y-2 text-center sm:text-left">
-                    <div>
-                      <h3 className="font-serif text-xl font-semibold tracking-[0.2em] uppercase text-[#20232A] dark:text-[#F6F3EC]">
-                        AURELIS
-                      </h3>
-                      <p className="text-xs font-serif tracking-wide text-[#A97B32] dark:text-[#E6C27A] mt-0.5">
-                        {t('app.brandConcept', 'Where knowledge meets the light of discovery.')}
-                      </p>
-                    </div>
-                    <p className="text-[11px] text-[#686D77] dark:text-[#A7ABB5] leading-relaxed">
-                      {t(
-                        'settings.aboutDesc',
-                        'Crafted for calm, disciplined mastery — combining calibrated spaced repetition, digital handwritten capture, and distraction-free academic precision.'
-                      )}
-                    </p>
-                    <div className="pt-1 flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                      <PWAInstallButton variant="primary" showInstalledBadge />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Brand Identity Symbolism */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="rounded-2xl glass-subtle border border-black/[0.06] dark:border-white/[0.08] p-3.5 space-y-1">
-                    <div className="flex items-center gap-1.5 font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                      <BookOpen className="h-3.5 w-3.5 text-[#A97B32] dark:text-[#E6C27A]" />
-                      <span>{t('settings.symbolBookTitle', 'Illuminated Open Book')}</span>
-                    </div>
-                    <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] leading-relaxed">
-                      {t('settings.symbolBookDesc', 'Translucent crystalline pages radiating golden clarity from structured knowledge.')}
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl glass-subtle border border-black/[0.06] dark:border-white/[0.08] p-3.5 space-y-1">
-                    <div className="flex items-center gap-1.5 font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                      <Sparkles className="h-3.5 w-3.5 text-[#A97B32] dark:text-[#E6C27A]" />
-                      <span>{t('settings.symbolStarTitle', 'Celestial Star & Light')}</span>
-                    </div>
-                    <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] leading-relaxed">
-                      {t('settings.symbolStarDesc', 'Intellectual enlightenment, ambition, and continuous illumination of understanding.')}
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl glass-subtle border border-black/[0.06] dark:border-white/[0.08] p-3.5 space-y-1">
-                    <div className="flex items-center gap-1.5 font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                      <Orbit className="h-3.5 w-3.5 text-[#A97B32] dark:text-[#E6C27A]" />
-                      <span>{t('settings.symbolOrbitTitle', 'Orbital Horizon')}</span>
-                    </div>
-                    <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] leading-relaxed">
-                      {t('settings.symbolOrbitDesc', 'Disciplined 7-stage recall cycles and enduring curiosity orbiting mastery.')}
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl glass-subtle border border-black/[0.06] dark:border-white/[0.08] p-3.5 space-y-1">
-                    <div className="flex items-center gap-1.5 font-semibold text-[#20232A] dark:text-[#F6F3EC]">
-                      <Compass className="h-3.5 w-3.5 text-[#A97B32] dark:text-[#E6C27A]" />
-                      <span>{t('settings.symbolGlassTitle', 'Obsidian Glass Material')}</span>
-                    </div>
-                    <p className="text-[11px] text-[#858A93] dark:text-[#777F8C] leading-relaxed">
-                      {t('settings.symbolGlassDesc', 'Sapphire, indigo, and champagne gold depth engineered for quiet focus.')}
-                    </p>
-                  </div>
-                </div>
               </div>
             )}
           </div>

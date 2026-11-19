@@ -1,7 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../i18n';
-import { AurelisLogo } from '../brand/AurelisLogo';
 import { Search, Plus, Moon, Sun, Flame, Settings } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -39,25 +38,22 @@ export const Navbar: React.FC = () => {
     <header className="sticky top-0 z-20 w-full border-b border-black/[0.06] bg-[#F4F1EA]/85 backdrop-blur-xl dark:border-white/[0.08] dark:bg-[#090B10]/85 transition-colors">
       <div className="flex h-14 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left Section: Mobile Brand wordmark OR Desktop Page Title */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           {/* Mobile Only: Brand Logo & Title */}
           <button
             onClick={() => setActiveView('dashboard')}
-            className="flex md:hidden items-center gap-2.5 text-left focus:outline-none group"
+            className="flex md:hidden items-center gap-2.5 text-left focus:outline-none group min-w-0"
             aria-label="AURELIS Home"
           >
-            <AurelisLogo
-              variant="emblem"
-              size={30}
-              priority
-              className="transition-transform group-hover:scale-105"
-            />
+            <div className="relative flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-lg bg-gradient-to-br from-[#1E2430] to-[#0E1118] text-xs font-semibold tracking-wider text-[#E6C27A] shadow-xs border border-white/10 dark:from-[#1E2430] dark:to-[#090B10] dark:border-[#E6C27A]/30 transition-transform group-hover:scale-105">
+              <span className="font-serif text-sm leading-none">A</span>
+            </div>
 
-            <div className="flex flex-col">
-              <span className="font-serif text-sm font-semibold tracking-[0.16em] text-[#20232A] dark:text-[#F6F3EC] uppercase">
+            <div className="flex flex-col min-w-0">
+              <span className="font-serif text-sm font-semibold tracking-wider text-[#20232A] dark:text-[#F6F3EC] truncate">
                 AURELIS
               </span>
-              <span className="text-[9px] uppercase tracking-widest text-[#858A93] dark:text-[#777F8C] -mt-0.5">
+              <span className="text-[9px] uppercase tracking-widest text-[#858A93] dark:text-[#777F8C] -mt-0.5 truncate">
                 {t('app.brandTagline', 'Remember what matters')}
               </span>
             </div>

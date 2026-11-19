@@ -25,7 +25,6 @@ import { TableGeneratorView } from './TableGeneratorView';
 import { CalculationHistoryDrawer } from './CalculationHistoryDrawer';
 import { History, Sparkles, HelpCircle } from 'lucide-react';
 import { useI18n } from '../../../i18n';
-import { AurelisLogo } from '../../brand/AurelisLogo';
 
 const STORAGE_KEY_HISTORY = 'aurelis_scientific_calc_history';
 const MAX_HISTORY = 50;
@@ -556,9 +555,8 @@ export const ScientificCalculator: React.FC = () => {
         <div className="relative rounded-3xl bg-gradient-to-b from-[#2A2E38] via-[#1E222A] to-[#14161C] p-3 sm:p-5 shadow-2xl border border-white/[0.08] dark:border-white/[0.12] space-y-3">
           {/* Subtle Outer Bezel Rim */}
           <div className="flex items-center justify-between px-1 text-slate-400">
-            <div className="flex items-center gap-2">
-              <AurelisLogo variant="emblem" size={20} roundedClassName="rounded-md" />
-              <span className="font-serif tracking-[0.16em] uppercase font-bold text-xs sm:text-sm text-slate-200">
+            <div className="flex items-center gap-1.5">
+              <span className="font-serif tracking-wider font-bold text-xs sm:text-sm text-slate-200">
                 AURELIS
               </span>
               <span className="text-[10px] sm:text-xs font-mono font-medium px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">

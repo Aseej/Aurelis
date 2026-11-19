@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../i18n';
-import { AurelisLogo } from '../brand/AurelisLogo';
 import {
   LayoutDashboard,
   Repeat,
@@ -162,19 +161,17 @@ export const Sidebar: React.FC = () => {
             className="group flex items-center gap-3 text-left focus:outline-none min-w-0"
             aria-label="AURELIS Home"
           >
-            <AurelisLogo
-              variant="emblem"
-              size={34}
-              priority
-              className="transition-transform duration-200 group-hover:scale-105 shadow-md"
-            />
+            {/* Logo Emblem Tile */}
+            <div className="relative flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-lg bg-gradient-to-br from-[#1E2430] to-[#0E1118] text-sm font-semibold tracking-wider text-[#E6C27A] shadow-sm border border-white/10 dark:from-[#1E2430] dark:to-[#090B10] dark:border-[#E6C27A]/30 transition-transform group-hover:scale-105">
+              <span className="font-serif leading-none">A</span>
+            </div>
 
             {/* Brand Title & Tagline */}
             <div className="flex flex-col min-w-0">
-              <span className="font-serif text-base font-bold tracking-[0.16em] uppercase text-[#20232A] transition-colors group-hover:text-[#A97B32] dark:text-[#F6F3EC] dark:group-hover:text-[#E6C27A] truncate">
+              <span className="font-serif text-base font-bold tracking-wider text-[#20232A] transition-colors group-hover:text-[#A97B32] dark:text-[#F6F3EC] dark:group-hover:text-[#E6C27A] truncate">
                 AURELIS
               </span>
-              <span className="text-[9.5px] uppercase tracking-[0.14em] text-[#858A93] dark:text-[#777F8C] -mt-0.5 truncate">
+              <span className="text-[9.5px] uppercase tracking-widest text-[#858A93] dark:text-[#777F8C] -mt-0.5 truncate">
                 {t('app.brandTagline', 'Remember what matters')}
               </span>
             </div>
@@ -183,11 +180,11 @@ export const Sidebar: React.FC = () => {
           /* Collapsed Brand View */
           <button
             onClick={() => setActiveView('dashboard')}
-            className="group mx-auto flex items-center justify-center rounded-xl focus:outline-none transition-transform hover:scale-105"
+            className="group relative mx-auto flex h-8 w-8 shrink-0 aspect-square items-center justify-center rounded-lg bg-gradient-to-br from-[#1E2430] to-[#0E1118] text-sm font-semibold tracking-wider text-[#E6C27A] shadow-sm border border-white/10 dark:from-[#1E2430] dark:to-[#090B10] dark:border-[#E6C27A]/30 transition-transform hover:scale-105"
             aria-label="AURELIS Home"
             title="AURELIS"
           >
-            <AurelisLogo variant="emblem" size={38} priority className="shadow-md" />
+            <span className="font-serif leading-none">A</span>
           </button>
         )}
 

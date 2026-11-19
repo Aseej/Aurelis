@@ -34,12 +34,12 @@ const AppContent: React.FC = () => {
     <div className="relative min-h-screen flex flex-col bg-[#F4F1EA] dark:bg-[#090B10] text-[#20232A] dark:text-[#F6F3EC] selection:bg-[#E6C27A]/25 selection:text-[#B88A43] dark:selection:text-[#FFE6AD] overflow-x-hidden">
       {/* Cinematic Ambient Atmosphere Layers */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-        {/* Subtle warm champagne-gold ambient glow top-right */}
-        <div className="absolute -top-[120px] right-[5%] h-[550px] w-[550px] rounded-full bg-gradient-to-br from-[#E6C27A]/8 via-[#B88A43]/4 to-transparent blur-[120px] dark:from-[#E6C27A]/12 dark:via-[#B88A43]/6" />
-        {/* Subtle sapphire-indigo celestial ambient glow mid-left */}
-        <div className="absolute top-[35%] -left-[100px] h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-[#254B7C]/5 via-[#4338CA]/3 to-transparent blur-[140px] dark:from-[#254B7C]/12 dark:via-[#4338CA]/7" />
-        {/* Faint gold & violet horizon glow bottom-right */}
-        <div className="absolute -bottom-[80px] right-[15%] h-[420px] w-[420px] rounded-full bg-gradient-to-t from-[#B88A43]/5 via-[#4338CA]/3 to-transparent blur-[110px] dark:from-[#B88A43]/8 dark:via-[#4338CA]/6" />
+        {/* Subtle warm champagne ambient glow top-right */}
+        <div className="absolute -top-[120px] right-[5%] h-[550px] w-[550px] rounded-full bg-gradient-to-br from-[#E6C27A]/8 via-[#B88A43]/4 to-transparent blur-[120px] dark:from-[#E6C27A]/10 dark:via-[#B88A43]/5" />
+        {/* Subtle slate ambient glow mid-left */}
+        <div className="absolute top-[35%] -left-[100px] h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-[#3B82F6]/4 via-transparent to-transparent blur-[140px] dark:from-[#60A5FA]/6" />
+        {/* Faint gold horizon glow bottom-right */}
+        <div className="absolute -bottom-[80px] right-[15%] h-[420px] w-[420px] rounded-full bg-gradient-to-t from-[#B88A43]/5 to-transparent blur-[110px] dark:from-[#B88A43]/7" />
       </div>
 
       {activeView === 'landing' ? (

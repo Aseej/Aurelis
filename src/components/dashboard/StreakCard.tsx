@@ -43,7 +43,6 @@ export const StreakCard: React.FC = () => {
         <div className="flex items-start sm:items-center gap-3.5">
           <div className="relative flex h-12 w-12 sm:h-13 sm:w-13 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#E6C27A]/20 to-[#B88A43]/10 text-[#A97B32] dark:text-[#E6C27A] border border-[#E6C27A]/30 shadow-xs">
             <Flame className="h-6 w-6 fill-[#E6C27A]/30 text-[#B88A43] dark:text-[#E6C27A]" />
-            <div className="absolute inset-x-0 top-0 h-[1px] bg-white/20 rounded-t-2xl" />
           </div>
 
           <div className="space-y-0.5 min-w-0">

@@ -2,7 +2,7 @@
   "id": "/",
   "name": "AURELIS — Spaced Repetition & Revision Platform",
   "short_name": "AURELIS",
-  "description": "Where knowledge meets the light of discovery. A distraction-free spaced-repetition study and revision platform.",
+  "description": "Remember what matters. A distraction-free spaced-repetition study and revision platform.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -10,6 +10,12 @@
   "background_color": "#090B10",
   "theme_color": "#090B10",
   "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
     {
       "src": "/pwa-192x192.png",
       "sizes": "192x192",

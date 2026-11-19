@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../i18n';
-import { AurelisLogo } from '../brand/AurelisLogo';
 import { Check, ArrowRight, ArrowLeft } from 'lucide-react';
 
 export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
@@ -56,29 +55,18 @@ export const OnboardingModal: React.FC<{ isOpen: boolean; onClose: () => void }>
       <div className="relative w-full max-w-lg rounded-3xl glass-premium p-6 sm:p-8 shadow-2xl flex flex-col space-y-6 border border-white/20 dark:border-white/10">
         {/* Step Indicator */}
         <div className="flex items-center justify-between text-xs text-[#858A93] dark:text-[#777F8C]">
-          <div className="flex items-center gap-2.5">
-            <AurelisLogo variant="emblem" size={24} priority />
-            <span className="font-serif tracking-[0.16em] uppercase text-[#20232A] dark:text-[#F6F3EC] font-semibold">
-              AURELIS
-            </span>
-          </div>
+          <span className="font-serif tracking-widest text-[#20232A] dark:text-[#F6F3EC] font-semibold">
+            AURELIS
+          </span>
           <span className="font-mono">{t('dashboard.stepOf', 'Step {current} of {total}', { current: step, total: 5 })}</span>
         </div>
 
         {/* Step 1: Welcome & Vision */}
         {step === 1 && (
           <div className="space-y-4 py-4 text-center">
-            <div className="relative mx-auto inline-flex">
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -inset-3 rounded-3xl bg-gradient-to-tr from-[#254B7C]/25 via-[#E6C27A]/20 to-[#4338CA]/20 blur-xl opacity-80"
-              />
-              <AurelisLogo variant="full" size={112} priority className="relative shadow-2xl border-[#E6C27A]/40" />
+            <div className="mx-auto flex h-14 w-14 shrink-0 aspect-square items-center justify-center rounded-xl bg-gradient-to-br from-[#1E2430] to-[#0E1118] text-[#E6C27A] border border-[#E6C27A]/30 shadow-md">
+              <span className="font-serif text-2xl font-bold leading-none">A</span>
             </div>
-
-            <p className="text-[11px] font-serif uppercase tracking-[0.16em] text-[#A97B32] dark:text-[#E6C27A]">
-              {t('app.brandConcept', 'Where knowledge meets the light of discovery.')}
-            </p>
 
             <div className="space-y-2">
               <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#20232A] dark:text-[#F6F3EC]">
