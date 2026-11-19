@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../i18n';
+import { AurelisLogo } from '../brand/AurelisLogo';
 import { Search, Plus, Moon, Sun, Flame, Settings } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -42,16 +43,18 @@ export const Navbar: React.FC = () => {
           {/* Mobile Only: Brand Logo & Title */}
           <button
             onClick={() => setActiveView('dashboard')}
-            className="flex md:hidden items-center gap-2.5 text-left focus:outline-none"
+            className="flex md:hidden items-center gap-2.5 text-left focus:outline-none group"
             aria-label="AURELIS Home"
           >
-            <div className="relative flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#1E2430] to-[#0E1118] text-xs font-semibold tracking-wider text-[#E6C27A] shadow-xs border border-white/10 dark:from-[#1E2430] dark:to-[#090B10] dark:border-[#E6C27A]/30">
-              <span className="font-serif">A</span>
-              <div className="absolute inset-x-0 top-0 h-[1px] bg-white/20 rounded-t-lg" />
-            </div>
+            <AurelisLogo
+              variant="emblem"
+              size={30}
+              priority
+              className="transition-transform group-hover:scale-105"
+            />
 
             <div className="flex flex-col">
-              <span className="font-serif text-sm font-semibold tracking-wider text-[#20232A] dark:text-[#F6F3EC]">
+              <span className="font-serif text-sm font-semibold tracking-[0.16em] text-[#20232A] dark:text-[#F6F3EC] uppercase">
                 AURELIS
               </span>
               <span className="text-[9px] uppercase tracking-widest text-[#858A93] dark:text-[#777F8C] -mt-0.5">

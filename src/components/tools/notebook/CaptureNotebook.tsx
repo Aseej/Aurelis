@@ -18,6 +18,7 @@ import {
 import { SubjectView } from './SubjectView';
 import { TopicView } from './TopicView';
 import { useI18n } from '../../../i18n';
+import { AurelisLogo } from '../../brand/AurelisLogo';
 import {
   Cloud,
   ShieldCheck,
@@ -295,12 +296,10 @@ export const CaptureNotebook: React.FC = () => {
     return (
       <div className="w-full max-w-xl mx-auto py-8 px-4 animate-fade-in">
         <div className="rounded-3xl glass-premium border border-black/[0.08] dark:border-white/[0.12] p-6 sm:p-8 text-center space-y-6 shadow-2xl">
-          {/* Visual Icon Badge */}
-          <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
-              <Cloud className="w-8 h-8" />
-            </div>
-            <div className="absolute -bottom-1 -right-1 p-1 bg-emerald-500 rounded-full text-black shadow-md">
+          {/* Official Brand Emblem + Cloud Security Lock */}
+          <div className="relative w-18 h-18 mx-auto flex items-center justify-center">
+            <AurelisLogo variant="full" size={72} className="shadow-xl border-[#E6C27A]/40" />
+            <div className="absolute -bottom-1 -right-1 p-1.5 bg-emerald-500 rounded-full text-black shadow-md border-2 border-[#090B10]">
               <Lock className="w-3.5 h-3.5 stroke-[2.5]" />
             </div>
           </div>
